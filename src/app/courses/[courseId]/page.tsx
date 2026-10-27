@@ -22,6 +22,7 @@ import {
   FolderGit2,
   Compass,
 } from 'lucide-react';
+import { getLearnerProgress } from '@/lib/curriculum/progression-engine';
 
 export default function CourseDetailPage() {
   return (
@@ -47,8 +48,8 @@ function CourseDetailContent() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = JSON.parse(localStorage.getItem('dronacharya_completed_lessons_v1') || '[]');
-      setCompletedLessonIds(saved);
+      const p = getLearnerProgress();
+      setCompletedLessonIds(p.completedLessonIds);
     }
   }, []);
 

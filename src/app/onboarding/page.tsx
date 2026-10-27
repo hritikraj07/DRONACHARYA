@@ -126,7 +126,15 @@ export default function OnboardingPage() {
       preferredLanguage: selectedLang,
     });
 
-    router.push('/simulator');
+    if (finalSubject.includes('python')) {
+      if (difficulty === 'intermediate') {
+        router.push('/diagnostic');
+      } else {
+        router.push('/learn/py-topic-1');
+      }
+    } else {
+      router.push('/paths');
+    }
   };
 
   return (

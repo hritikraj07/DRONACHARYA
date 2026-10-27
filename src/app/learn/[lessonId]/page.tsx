@@ -1,16 +1,18 @@
 // Interactive Coding Lesson Laboratory
-// Follows the CodeDex-inspired learning cycle:
-// Story -> Concept -> Example -> Try It Yourself -> Run & Understand -> Practice Exercise -> Tests -> 4-Tier Hints -> Game Mission Link
+// Integrates with 112-topic structured curriculum, prerequisite checks, anti-cheat XP, and targeted revision guidance
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
-  findLessonById,
-  Lesson,
-  Chapter,
-  Course,
+  findTopicById,
+  findTopicBySlug,
+  ALL_PYTHON_TOPICS,
+  CurriculumTopic,
+} from '@/lib/data/python-curriculum-112';
+import {
+  findLessonById as findLegacyLessonById,
 } from '@/lib/data/course-system';
 import {
   runPythonCode,
@@ -18,6 +20,14 @@ import {
   ExerciseValidationResult,
   PythonRunResult,
 } from '@/lib/simulator/python-interpreter';
+import {
+  getLearnerProgress,
+  checkPrerequisites,
+  evaluateActivityAttempt,
+  completeLessonAndUnlockNext,
+  getNextRecommendedActivity,
+  LearnerProgressState,
+} from '@/lib/curriculum/progression-engine';
 import { useDronacharya } from '@/lib/store';
 import {
   BookOpen,
@@ -37,6 +47,9 @@ import {
   Award,
   ChevronRight,
   ShieldCheck,
+  Lock,
+  AlertTriangle,
+  Info,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -58,534 +71,668 @@ export default function LessonPage() {
 function LessonContent() {
   const router = useRouter();
   const params = useParams();
-  const rawLessonId = (params?.lessonId as string) || 'py-less-1-1';
+  const rawId = (params?.lessonId as string) || 'py-topic-1';
 
-  const lessonData = findLessonById(rawLessonId) || findLessonById('py-less-1-1');
-
-  const { state } = useDronacharya();
+  // State management
+  const [progress, setProgress] = useState<LearnerProgressState | null>(null);
   const [preferredDialect, setPreferredDialect] = useState<'english' | 'hinglish'>('english');
+  const [showDiagnosticAnswers, setShowDiagnosticAnswers] = useState<boolean>(false);
 
-  // Interactive Try It Yourself Editor State
+  // Try it yourself state
   const [tryCode, setTryCode] = useState<string>('');
   const [tryRunning, setTryRunning] = useState<boolean>(false);
   const [tryResult, setTryResult] = useState<PythonRunResult | null>(null);
 
-  // Practice Exercise Editor State
+  // Exercise state
   const [exerciseCode, setExerciseCode] = useState<string>('');
   const [exerciseRunning, setExerciseRunning] = useState<boolean>(false);
   const [exerciseResult, setExerciseResult] = useState<ExerciseValidationResult | null>(null);
   const [exercisePassed, setExercisePassed] = useState<boolean>(false);
+  const [awardedXp, setAwardedXp] = useState<number>(0);
+  const [revisionAdvice, setRevisionAdvice] = useState<string | null>(null);
 
   // Progressive Hint System (1 to 4)
   const [hintTier, setHintTier] = useState<number>(0);
   const [showSolution, setShowSolution] = useState<boolean>(false);
 
-  // Set initial code on lesson load or lesson switch
+  // Load progress
   useEffect(() => {
-    if (lessonData?.lesson) {
-      setTryCode(lessonData.lesson.interactiveTryStarter);
-      setExerciseCode(lessonData.lesson.exercise.initialCode);
+    if (typeof window !== 'undefined') {
+      const p = getLearnerProgress();
+      setProgress(p);
+    }
+  }, []);
+
+  // Resolve Topic (Checks 112 curriculum first, then legacy format)
+  const topic: CurriculumTopic | undefined =
+    findTopicById(rawId) ||
+    findTopicBySlug(rawId) ||
+    (() => {
+      // If legacy ID like py-less-1-1 passed, map to py-topic-1
+      if (rawId.startsWith('py-less-')) {
+        const parts = rawId.split('-');
+        const chap = parseInt(parts[2] || '1', 10);
+        const less = parseInt(parts[3] || '1', 10);
+        return findTopicById(`py-topic-${(chap - 1) * 2 + less}`) || findTopicById('py-topic-1');
+      }
+      return findTopicById('py-topic-1');
+    })();
+
+  // Check prerequisites
+  const currentCompleted = progress?.completedLessonIds || [];
+  const prereqCheck = topic ? checkPrerequisites(topic.id, currentCompleted) : { canUnlock: true, missingPrerequisites: [], explanation: '' };
+
+  // Set starter code when topic changes
+  useEffect(() => {
+    if (topic?.lessonContent) {
+      setTryCode(topic.lessonContent.interactiveTryStarter);
+      const firstAct = topic.activities?.[0];
+      setExerciseCode(firstAct?.starterCode || firstAct?.solution || '# Write your solution:\n');
       setTryResult(null);
       setExerciseResult(null);
       setExercisePassed(false);
+      setAwardedXp(0);
+      setRevisionAdvice(null);
       setHintTier(0);
       setShowSolution(false);
     }
-  }, [rawLessonId]);
+  }, [topic?.id]);
 
-  if (!lessonData) {
+  if (!topic) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-        <h1 className="text-2xl font-black text-[#1E1E24]">Lesson Not Found</h1>
+        <h1 className="text-2xl font-black text-[#1E1E24]">Topic Not Found</h1>
         <p className="text-sm text-[#4A4A58] mt-2 font-bold">
-          The requested coding lesson could not be found.
+          The requested curriculum topic does not exist.
         </p>
-        <Link href="/courses" className="btn-game-purple mt-4 inline-flex py-2 px-4 text-xs font-black">
-          ← Return to Courses
+        <Link href="/paths" className="btn-game-purple mt-4 inline-flex py-2 px-4 text-xs font-black">
+          ← Return to Roadmap
         </Link>
       </div>
     );
   }
 
-  const { lesson, chapter, course, prevLesson, nextLesson } = lessonData;
+  // PREREQUISITE LOCK SCREEN
+  if (!prereqCheck.canUnlock) {
+    return (
+      <div className="max-w-3xl mx-auto py-16 px-4">
+        <div className="bg-white rounded-2xl border-2 border-[#1E1E24] p-8 shadow-[8px_8px_0px_#1E1E24] text-center space-y-6">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#FEE2E2] border-2 border-[#EF4444] text-[#EF4444] flex items-center justify-center">
+            <Lock className="w-8 h-8" />
+          </div>
 
-  // Run the Try It Yourself code snippet
+          <div>
+            <span className="text-xs font-black uppercase tracking-wider text-gray-400">
+              Topic #{topic.sequenceNumber} • Stage {topic.stageNumber}
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#1E1E24] mt-1">
+              Lesson Locked: Prerequisites Required
+            </h1>
+            <p className="text-sm font-bold text-[#4A4A58] mt-2 max-w-xl mx-auto">
+              In Dronacharya Gurukul, lessons build directly on prior concepts. You cannot jump ahead without demonstrating mastery of the prerequisites.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] max-w-md mx-auto text-left space-y-2">
+            <div className="text-xs font-black uppercase text-[#EF4444] flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4" />
+              <span>Required Uncompleted Lessons:</span>
+            </div>
+            <ul className="space-y-2">
+              {prereqCheck.missingPrerequisites.map((p) => (
+                <li key={p.id} className="flex items-center justify-between text-xs font-bold text-[#1E1E24]">
+                  <span>Lesson {p.sequenceNumber}: {p.title}</span>
+                  <Link
+                    href={`/learn/${p.id}`}
+                    className="text-[#6C5CE7] hover:underline font-black flex items-center gap-1"
+                  >
+                    <span>Start Lesson</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="pt-4 flex justify-center gap-4">
+            <Link href="/paths" className="btn-game-yellow py-2.5 px-6 text-xs font-black">
+              ← Return to Roadmap
+            </Link>
+            {prereqCheck.missingPrerequisites[0] && (
+              <Link
+                href={`/learn/${prereqCheck.missingPrerequisites[0].id}`}
+                className="btn-game-purple py-2.5 px-6 text-xs font-black"
+              >
+                Go to Lesson {prereqCheck.missingPrerequisites[0].sequenceNumber} →
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // COMING SOON NOTICE IF CONTENT NOT READY
+  if (topic.contentStatus === 'coming_soon' || !topic.lessonContent) {
+    return (
+      <div className="max-w-3xl mx-auto py-16 px-4">
+        <div className="bg-white rounded-2xl border-2 border-[#1E1E24] p-8 shadow-[8px_8px_0px_#1E1E24] text-center space-y-6">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-blue-100 border-2 border-blue-500 text-blue-600 flex items-center justify-center">
+            <Sparkles className="w-8 h-8" />
+          </div>
+
+          <div>
+            <span className="text-xs font-black uppercase tracking-wider text-blue-600">
+              Curriculum Metadata Active • Stage {topic.stageNumber}
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#1E1E24] mt-1">
+              Topic #{topic.sequenceNumber}: {topic.title}
+            </h1>
+            <p className="text-sm font-bold text-[#4A4A58] mt-2 max-w-xl mx-auto">
+              {topic.description}
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] max-w-md mx-auto text-left space-y-2 text-xs font-bold text-[#4A4A58]">
+            <div className="font-black text-[#1E1E24]">Learning Objectives:</div>
+            <ul className="list-disc pl-4 space-y-1">
+              {topic.learningObjectives.map((obj, i) => (
+                <li key={i}>{obj}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="pt-2 text-xs font-bold text-gray-500">
+            Interactive laboratory for this topic is currently in authoring. Play fully completed Stage 1 & 2 lessons first!
+          </div>
+
+          <div className="pt-2 flex justify-center gap-4">
+            <Link href="/paths" className="btn-game-purple py-2.5 px-6 text-xs font-black">
+              ← Return to Roadmap
+            </Link>
+            <Link href="/learn/py-topic-1" className="btn-game-yellow py-2.5 px-6 text-xs font-black">
+              Play Topic #1 →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const act = topic.activities?.[0];
+
+  // Try it yourself execution
   const handleRunTryCode = () => {
     setTryRunning(true);
     setTimeout(() => {
       const res = runPythonCode(tryCode);
       setTryResult(res);
       setTryRunning(false);
-    }, 150);
-  };
-
-  const handleResetTryCode = () => {
-    setTryCode(lesson.interactiveTryStarter);
-    setTryResult(null);
-  };
-
-  // Run and validate the student's practice exercise
-  const handleCheckExercise = () => {
-    setExerciseRunning(true);
-    setTimeout(() => {
-      const validation = validatePythonExercise(exerciseCode, lesson.exercise.testCases);
-      setExerciseResult(validation);
-      setExerciseRunning(false);
-
-      if (validation.allPassed) {
-        setExercisePassed(true);
-        try {
-          confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-        } catch (e) {}
-
-        // Persist completed lesson in local storage
-        if (typeof window !== 'undefined') {
-          const completedKey = 'dronacharya_completed_lessons_v1';
-          const saved: string[] = JSON.parse(localStorage.getItem(completedKey) || '[]');
-          if (!saved.includes(lesson.id)) {
-            saved.push(lesson.id);
-            localStorage.setItem(completedKey, JSON.stringify(saved));
-          }
-        }
-      }
     }, 200);
   };
 
-  const handleResetExercise = () => {
-    setExerciseCode(lesson.exercise.initialCode);
-    setExerciseResult(null);
-    setExercisePassed(false);
+  // Exercise validation
+  const handleCheckExercise = () => {
+    if (!act) return;
+    setExerciseRunning(true);
+
+    setTimeout(() => {
+      const tests = act.testCases || [
+        {
+          inputDescription: 'Produces valid output',
+          expectedOutput: act.expectedOutput || '',
+          codeSnippet: act.expectedOutput ? `stdout:${act.expectedOutput}` : 'stdout:OK',
+        },
+      ];
+
+      const validation = validatePythonExercise(exerciseCode, tests);
+      setExerciseResult(validation);
+      setExerciseRunning(false);
+
+      const isCorrect = validation.allPassed;
+      setExercisePassed(isCorrect);
+
+      // Evaluate attempt with progression engine
+      const evalRes = evaluateActivityAttempt({
+        topicId: topic.id,
+        activityId: act.id,
+        isCorrect,
+        score: isCorrect ? 100 : 0,
+        hintsUsed: hintTier,
+        xpReward: act.xpReward || 35,
+      });
+
+      if (evalRes.awardedXp > 0) {
+        setAwardedXp(evalRes.awardedXp);
+        confetti({ particleCount: 75, spread: 60, origin: { y: 0.7 } });
+      }
+
+      if (evalRes.needsRevision && evalRes.strugglingConcept) {
+        setRevisionAdvice(
+          `You have struggled with ${evalRes.strugglingConcept}. Check Hint ${Math.min(4, hintTier + 1)} or review earlier lessons on the roadmap.`
+        );
+      }
+
+      // Mark lesson complete and unlock next topic
+      if (isCorrect) {
+        completeLessonAndUnlockNext(topic.id, 100);
+      }
+    }, 300);
   };
 
-  const handleRevealNextHint = () => {
-    if (hintTier < 4) {
-      setHintTier((prev) => prev + 1);
-    } else {
-      setShowSolution(true);
-    }
-  };
+  // Find next topic in sequence
+  const nextTopic = ALL_PYTHON_TOPICS.find((t) => t.sequenceNumber === topic.sequenceNumber + 1);
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* 1. TOP BREADCRUMB & DIALECT TOGGLE */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#1E1E24] pb-4 mb-8">
-        <div className="flex items-center gap-2 text-xs font-bold text-[#4A4A58] flex-wrap">
-          <Link href="/courses" className="hover:text-[#6C5CE7] flex items-center gap-1">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Courses</span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
+      {/* Top Breadcrumb & Status Navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24]">
+        <div className="flex items-center gap-2 text-xs font-black text-[#4A4A58]">
+          <Link href="/paths" className="hover:text-[#6C5CE7] flex items-center gap-1">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Roadmap</span>
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-[#A0A0B0]" />
-          <Link href={`/courses/${course.id}`} className="hover:text-[#6C5CE7]">
-            {course.title.split(':')[0]}
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-[#A0A0B0]" />
-          <span className="text-[#1E1E24] font-black">{chapter.title.split(':')[0]}</span>
+          <span>/</span>
+          <span className="text-[#6C5CE7]">{topic.stageTitle}</span>
+          <span>/</span>
+          <span className="text-[#1E1E24]">Topic #{topic.sequenceNumber}</span>
         </div>
 
-        {/* Language Dialect Switcher */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <div className="flex items-center bg-white border-2 border-[#1E1E24] rounded-xl p-0.5 shadow-[2px_2px_0px_#1E1E24]">
-            <button
-              onClick={() => setPreferredDialect('english')}
-              className={`px-3 py-1 text-xs font-black rounded-lg transition-all ${
-                preferredDialect === 'english'
-                  ? 'bg-[#6C5CE7] text-white shadow-[1px_1px_0px_#1E1E24]'
-                  : 'text-[#4A4A58] hover:text-[#1E1E24]'
-              }`}
-            >
-              English
-            </button>
-            <button
-              onClick={() => setPreferredDialect('hinglish')}
-              className={`px-3 py-1 text-xs font-black rounded-lg transition-all flex items-center gap-1 ${
-                preferredDialect === 'hinglish'
-                  ? 'bg-[#FBBF24] text-[#1E1E24] shadow-[1px_1px_0px_#1E1E24]'
-                  : 'text-[#4A4A58] hover:text-[#1E1E24]'
-              }`}
-            >
-              <span>Hinglish</span>
-              <span className="text-[9px] bg-[#10B981] text-white px-1 rounded font-black">AI</span>
-            </button>
-          </div>
+        {/* Dialect Switcher & Mentor Diagnostic Info */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowDiagnosticAnswers(!showDiagnosticAnswers)}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-black bg-[#FAF6EE] text-[#4A4A58] border border-[#1E1E24] hover:bg-white"
+          >
+            <Info className="w-3.5 h-3.5 text-[#6C5CE7]" />
+            <span>Why Am I Learning This?</span>
+          </button>
 
-          <div className="bg-[#FAF6EE] border-2 border-[#1E1E24] rounded-xl px-2.5 py-1 text-xs font-black text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5 text-[#FBBF24]" />
-            <span>+{lesson.xpReward} XP</span>
-          </div>
+          <button
+            onClick={() => setPreferredDialect(preferredDialect === 'english' ? 'hinglish' : 'english')}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-black bg-[#FAF6EE] text-[#4A4A58] border border-[#1E1E24] hover:bg-white"
+          >
+            <Globe className="w-3.5 h-3.5 text-[#10B981]" />
+            <span>{preferredDialect === 'english' ? 'EN (English)' : 'HI (Hinglish)'}</span>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* ========================================================
-            LEFT COLUMN: STORY, CONCEPT, CODE EXAMPLE & UNDERSTAND
-           ======================================================== */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Header */}
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#6C5CE7] mb-2">
-              <span>{chapter.realmName}</span>
-              <span>•</span>
-              <span>Lesson {lesson.sequenceOrder}</span>
+      {/* Expandable Core Diagnostic Answers (The 6 Questions) */}
+      {showDiagnosticAnswers && (
+        <div className="p-4 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] text-xs font-bold text-[#4A4A58] space-y-2 animate-fade-in">
+          <div className="font-black text-[#1E1E24] text-sm flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-[#6C5CE7]" />
+            <span>Curriculum Mentor Explanations (6 Core Objectives)</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div>
+              <span className="font-black text-[#6C5CE7]">1. What am I learning?</span>
+              <p className="mt-0.5">{topic.title} (Concepts: {topic.conceptsIntroduced.join(', ')})</p>
             </div>
-            <h1 className="font-black text-2xl sm:text-3xl text-[#1E1E24]">
-              {lesson.title}
-            </h1>
-            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1">
-              {lesson.subtitle}
-            </p>
-          </div>
-
-          {/* SECTION A: STORY / NARRATIVE INTRODUCTION */}
-          <div className="p-4 rounded-2xl bg-[#F8F3E8] border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] space-y-2">
-            <div className="flex items-center gap-2 text-xs font-black text-[#6C5CE7] uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-[#FBBF24]" />
-              <span>Adventure Context & Lore</span>
+            <div>
+              <span className="font-black text-[#6C5CE7]">2. Why is this taught?</span>
+              <p className="mt-0.5">{topic.description}</p>
             </div>
-            <p className="text-xs text-[#1E1E24] font-medium leading-relaxed">
-              {preferredDialect === 'hinglish' && lesson.storyIntroHinglish
-                ? lesson.storyIntroHinglish
-                : lesson.storyIntro}
-            </p>
+            <div>
+              <span className="font-black text-[#6C5CE7]">3. Prerequisites needed:</span>
+              <p className="mt-0.5">
+                {topic.prerequisiteLessonIds.length === 0
+                  ? 'Foundational entry point (None)'
+                  : topic.prerequisiteLessonIds.map((id) => findTopicById(id)?.title || id).join(', ')}
+              </p>
+            </div>
+            <div>
+              <span className="font-black text-[#6C5CE7]">4. What unlocks next?</span>
+              <p className="mt-0.5">
+                Pass code tests with 100% assertions to unlock Topic #{topic.sequenceNumber + 1}.
+              </p>
+            </div>
           </div>
+        </div>
+      )}
 
-          {/* SECTION B: CONCEPT EXPLANATION */}
-          <div className="card-game space-y-3">
-            <h2 className="font-black text-base text-[#1E1E24] flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#6C5CE7]" />
-              <span>How It Works</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold leading-relaxed">
-              {preferredDialect === 'hinglish' && lesson.conceptExplanationHinglish
-                ? lesson.conceptExplanationHinglish
-                : lesson.conceptExplanation}
-            </p>
-          </div>
+      {/* Main Two-Column Lesson Lab */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column (Theory, Story, Explanation, Code Example) */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Section A & B: Story & Concept */}
+          <div className="bg-white rounded-2xl border-2 border-[#1E1E24] p-5 shadow-[4px_4px_0px_#1E1E24] space-y-4">
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded">
+                Topic #{topic.sequenceNumber} • {topic.difficulty}
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black text-[#1E1E24] mt-2">
+                {topic.title}
+              </h1>
+            </div>
 
-          {/* SECTION C: CODE EXAMPLE */}
-          <div className="card-game p-0 overflow-hidden bg-white">
-            <div className="bg-[#1E1E24] px-4 py-2.5 flex items-center justify-between text-xs text-white">
-              <div className="flex items-center gap-2 font-mono font-bold">
-                <Terminal className="w-3.5 h-3.5 text-[#10B981]" />
-                <span>syntax_example.py</span>
+            {/* Story / Lore */}
+            <div className="p-3.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24]/20 space-y-1">
+              <div className="text-[11px] font-black uppercase text-[#F59E0B] flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Mission Lore</span>
               </div>
-              <span className="text-[10px] text-[#A0A0B0] uppercase font-bold">Python 3</span>
+              <p className="text-xs sm:text-sm font-bold text-[#4A4A58] leading-relaxed">
+                {preferredDialect === 'hinglish' && topic.lessonContent.storyIntroHinglish
+                  ? topic.lessonContent.storyIntroHinglish
+                  : topic.lessonContent.storyIntro}
+              </p>
             </div>
 
-            <pre className="p-4 bg-[#141419] text-[#10B981] font-mono text-xs leading-relaxed overflow-x-auto">
-              <code>{lesson.codeExample}</code>
+            {/* Concept Explanation */}
+            <div className="space-y-2">
+              <h3 className="text-sm font-black text-[#1E1E24]">Concept Explanation:</h3>
+              <p className="text-xs sm:text-sm font-bold text-[#4A4A58] whitespace-pre-line leading-relaxed">
+                {preferredDialect === 'hinglish' && topic.lessonContent.conceptExplanationHinglish
+                  ? topic.lessonContent.conceptExplanationHinglish
+                  : topic.lessonContent.conceptExplanation}
+              </p>
+            </div>
+
+            {/* Real World Analogy */}
+            {topic.lessonContent.analogy && (
+              <div className="p-3 rounded-lg bg-[#E0F2FE] border border-[#0284C7] text-xs font-bold text-[#0369A1]">
+                <span className="font-black">Analogy: </span>
+                {topic.lessonContent.analogy}
+              </div>
+            )}
+
+            {/* Common Mistakes */}
+            {topic.lessonContent.commonMistakes && topic.lessonContent.commonMistakes.length > 0 && (
+              <div className="p-3 rounded-lg bg-[#FEF2F2] border border-[#EF4444] text-xs font-bold text-[#991B1B] space-y-1">
+                <div className="font-black uppercase flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>Common Pitfalls to Avoid:</span>
+                </div>
+                <ul className="list-disc pl-4 space-y-0.5">
+                  {topic.lessonContent.commonMistakes.map((m, i) => (
+                    <li key={i}>{m}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Section C: Code Example */}
+          <div className="bg-white rounded-2xl border-2 border-[#1E1E24] p-5 shadow-[4px_4px_0px_#1E1E24] space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black text-[#1E1E24] flex items-center gap-1.5">
+                <Terminal className="w-4 h-4 text-[#10B981]" />
+                <span>Reference Code Example</span>
+              </h3>
+              <span className="text-[10px] font-black uppercase text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                Python 3
+              </span>
+            </div>
+
+            <pre className="p-3.5 rounded-xl bg-[#1E1E24] text-[#FAF6EE] font-mono text-xs overflow-x-auto border-2 border-[#1E1E24] leading-relaxed">
+              <code>{topic.lessonContent.codeExample}</code>
             </pre>
 
-            <div className="p-3 bg-[#FAF6EE] border-t-2 border-[#1E1E24] text-[11px] text-[#4A4A58] font-bold">
-              <strong>Line Breakdown:</strong> {lesson.codeExampleExplanation}
-            </div>
+            <p className="text-xs font-bold text-[#4A4A58]">
+              {topic.lessonContent.codeExampleExplanation}
+            </p>
           </div>
+        </div>
 
-          {/* SECTION D & E: TRY IT YOURSELF & RUN CODE */}
-          <div className="rounded-2xl border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] overflow-hidden bg-white">
-            <div className="bg-[#FAF6EE] px-4 py-2 border-b-2 border-[#1E1E24] flex items-center justify-between">
-              <span className="font-black text-xs text-[#1E1E24] flex items-center gap-1.5">
-                <Play className="w-3.5 h-3.5 text-[#6C5CE7] fill-current" />
-                <span>Try It Yourself (Modify & Run)</span>
-              </span>
+        {/* Right Column (Try It Yourself, Practice Exercise, Tests, Console) */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Section D & E: Try It Yourself Sandbox */}
+          <div className="bg-white rounded-2xl border-2 border-[#1E1E24] p-5 shadow-[4px_4px_0px_#1E1E24] space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black text-[#1E1E24] flex items-center gap-1.5">
+                <Play className="w-4 h-4 text-[#6C5CE7]" />
+                <span>Try It Yourself (Live Sandbox)</span>
+              </h3>
               <button
-                onClick={handleResetTryCode}
-                className="text-[11px] text-[#7E7E8F] hover:text-[#1E1E24] flex items-center gap-1 font-bold cursor-pointer"
-                title="Reset to starter"
+                onClick={() => setTryCode(topic.lessonContent?.interactiveTryStarter || '')}
+                className="text-[11px] font-black text-gray-500 hover:text-[#1E1E24] flex items-center gap-1"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Reset</span>
               </button>
             </div>
 
-            <textarea
-              value={tryCode}
-              onChange={(e) => setTryCode(e.target.value)}
-              rows={4}
-              className="w-full p-3.5 bg-[#141419] text-[#FAF6EE] font-mono text-xs leading-relaxed focus:outline-none resize-none"
-              spellCheck={false}
-            />
+            <p className="text-xs font-bold text-[#4A4A58]">
+              {topic.lessonContent.tryExplanation}
+            </p>
 
-            <div className="bg-[#FAF6EE] p-3 border-t-2 border-[#1E1E24] flex items-center justify-between gap-3">
-              <span className="text-[11px] text-[#4A4A58] font-bold truncate">
-                {lesson.tryExplanation}
-              </span>
-              <button
-                onClick={handleRunTryCode}
-                disabled={tryRunning}
-                className="btn-game-purple py-1.5 px-4 text-xs font-black shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 shrink-0"
-              >
-                <Play className="w-3 h-3 fill-current" />
-                <span>{tryRunning ? 'Executing...' : 'Run Example'}</span>
-              </button>
-            </div>
-
-            {/* Live Stdout Terminal Output */}
-            {tryResult && (
-              <div className="bg-[#141419] p-3 border-t-2 border-[#1E1E24] text-xs font-mono">
-                <div className="text-[10px] text-[#A0A0B0] mb-1 font-bold flex items-center justify-between">
-                  <span>Terminal Output:</span>
-                  <span>{tryResult.executionTimeMs}ms</span>
-                </div>
-                {tryResult.stdout && (
-                  <pre className="text-[#FAF6EE] whitespace-pre-wrap">{tryResult.stdout}</pre>
-                )}
-                {tryResult.stderr && (
-                  <pre className="text-[#EF4444] whitespace-pre-wrap mt-1">{tryResult.stderr}</pre>
-                )}
+            {/* Interactive Code Editor */}
+            <div className="relative rounded-xl border-2 border-[#1E1E24] overflow-hidden bg-[#1E1E24]">
+              <div className="flex items-center justify-between px-3 py-1.5 bg-[#121316] border-b border-gray-700 text-[11px] font-mono text-gray-400">
+                <span>sandbox_experiment.py</span>
+                <span>Python Interpreter</span>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* ========================================================
-            RIGHT COLUMN: PRACTICE EXERCISE, TESTS, HINTS & NEXT STEP
-           ======================================================== */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* SECTION G: PRACTICE EXERCISE */}
-          <div className="card-game space-y-4">
-            <div className="flex items-center justify-between border-b-2 border-[#1E1E24] pb-3">
-              <div>
-                <span className="text-[10px] font-black text-[#6C5CE7] uppercase tracking-wider">
-                  Hands-On Mission Exercise
-                </span>
-                <h3 className="font-black text-base text-[#1E1E24] mt-0.5">
-                  {lesson.exercise.title}
-                </h3>
-              </div>
-              <span className="bg-[#FBBF24] text-[#1E1E24] px-2.5 py-0.5 rounded-lg border-2 border-[#1E1E24] font-black text-xs shadow-[2px_2px_0px_#1E1E24]">
-                +{lesson.exercise.xpReward} XP
-              </span>
-            </div>
-
-            <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs font-bold text-[#1E1E24] space-y-1">
-              <div className="font-black text-[#6C5CE7]">Instructions:</div>
-              <p className="text-[#4A4A58]">{lesson.exercise.instructions}</p>
-            </div>
-
-            {/* Student Code Editor */}
-            <div className="rounded-xl border-2 border-[#1E1E24] overflow-hidden">
-              <div className="bg-[#1E1E24] px-3.5 py-1.5 flex items-center justify-between text-xs text-white">
-                <span className="font-mono text-[11px] text-[#A0A0B0]">main.py</span>
-                <button
-                  onClick={handleResetExercise}
-                  className="text-[10px] text-[#A0A0B0] hover:text-white flex items-center gap-1 font-bold"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Reset Exercise</span>
-                </button>
-              </div>
-
               <textarea
-                value={exerciseCode}
-                onChange={(e) => setExerciseCode(e.target.value)}
-                rows={7}
-                className="w-full p-3.5 bg-[#141419] text-[#FAF6EE] font-mono text-xs leading-relaxed focus:outline-none resize-none"
+                value={tryCode}
+                onChange={(e) => setTryCode(e.target.value)}
+                rows={4}
+                className="w-full p-3 font-mono text-xs text-[#10B981] bg-[#1E1E24] focus:outline-none resize-y leading-relaxed"
                 spellCheck={false}
               />
             </div>
 
-            {/* Check Solution Action Bar */}
-            <div className="flex items-center justify-between pt-1">
+            {/* Run Button */}
+            <div className="flex items-center justify-between">
               <button
-                type="button"
-                onClick={handleRevealNextHint}
-                className="text-xs font-black text-[#6C5CE7] hover:underline flex items-center gap-1 cursor-pointer"
+                onClick={handleRunTryCode}
+                disabled={tryRunning}
+                className="btn-game-purple py-2 px-5 text-xs font-black flex items-center gap-2"
               >
-                <Lightbulb className="w-4 h-4 text-[#FBBF24]" />
-                <span>
-                  {hintTier === 0
-                    ? 'Need a Hint?'
-                    : hintTier < 4
-                    ? `Next Hint (${hintTier}/4)`
-                    : 'Show Solution'}
-                </span>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>{tryRunning ? 'Executing...' : 'Run Example'}</span>
               </button>
-
-              <button
-                onClick={handleCheckExercise}
-                disabled={exerciseRunning}
-                className="btn-game-yellow py-2 px-5 text-xs font-black shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5"
-              >
-                <CheckCircle2 className="w-4 h-4 text-[#1E1E24]" />
-                <span>{exerciseRunning ? 'Evaluating Tests...' : 'Check Solution & Run Tests'}</span>
-              </button>
+              <span className="text-[11px] font-bold text-gray-400">
+                Safe Sandboxed Execution
+              </span>
             </div>
 
-            {/* Socratic Progressive Hints Card */}
-            {hintTier > 0 && (
-              <div className="p-3.5 rounded-xl bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-black text-[#D97706] flex items-center gap-1">
-                    <Lightbulb className="w-4 h-4" />
-                    <span>
-                      {hintTier === 1
-                        ? 'Hint 1: Concept Direction'
-                        : hintTier === 2
-                        ? 'Hint 2: Logic Guidance'
-                        : hintTier === 3
-                        ? 'Hint 3: Error Diagnostic'
-                        : 'Hint 4: Code Template'}
-                    </span>
-                  </span>
-                  <span className="text-[10px] text-[#7E7E8F] font-bold">Tier {hintTier} of 4</span>
+            {/* Stdout Console */}
+            {tryResult && (
+              <div className="p-3 rounded-xl bg-[#090A0F] border-2 border-[#1E1E24] font-mono text-xs space-y-1">
+                <div className="text-[10px] uppercase font-black tracking-wider text-gray-500">
+                  Terminal Output (stdout):
                 </div>
-
-                <p className="text-[#1E1E24] font-bold leading-relaxed">
-                  {lesson.exercise.hints[hintTier - 1]}
-                </p>
-
-                {showSolution && (
-                  <div className="mt-2 pt-2 border-t-2 border-[#1E1E24]">
-                    <span className="font-black text-[#1E1E24] text-[11px]">Exact Solution Reference:</span>
-                    <pre className="p-2.5 bg-[#141419] text-[#10B981] font-mono text-[11px] rounded-lg mt-1 overflow-x-auto">
-                      <code>{lesson.exercise.solutionCode}</code>
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Validation & Test Results Breakdown */}
-            {exerciseResult && (
-              <div className="space-y-3 pt-2">
-                <div
-                  className={`p-3.5 rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex items-center justify-between ${
-                    exerciseResult.allPassed ? 'bg-[#D1FAE5]' : 'bg-[#FEE2E2]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {exerciseResult.allPassed ? (
-                      <CheckCircle2 className="w-5 h-5 text-[#059669]" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-[#DC2626]" />
-                    )}
-                    <div>
-                      <div className="font-black text-xs text-[#1E1E24]">
-                        {exerciseResult.allPassed
-                          ? 'All Test Cases Passed! Quest Objective Cleared.'
-                          : 'Test Verification Failed. Review output diff below.'}
-                      </div>
-                      <div className="text-[11px] text-[#4A4A58] font-bold">
-                        {exerciseResult.testResults.filter((t) => t.passed).length} of{' '}
-                        {exerciseResult.testResults.length} test cases verified.
-                      </div>
-                    </div>
-                  </div>
-
-                  {exerciseResult.allPassed && (
-                    <span className="text-xs font-black text-[#059669] bg-white px-2 py-0.5 rounded border border-[#1E1E24]">
-                      +{lesson.exercise.xpReward} XP Awarded
-                    </span>
-                  )}
-                </div>
-
-                {/* Individual Test Suite Results */}
-                <div className="space-y-2">
-                  {exerciseResult.testResults.map((t, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs font-bold space-y-1"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#1E1E24] font-black">{t.description}</span>
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded font-black border ${
-                            t.passed
-                              ? 'bg-[#10B981] text-white border-[#1E1E24]'
-                              : 'bg-[#EF4444] text-white border-[#1E1E24]'
-                          }`}
-                        >
-                          {t.passed ? 'PASSED' : 'FAILED'}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 font-mono">
-                        <div>
-                          <span className="text-[#7E7E8F]">Expected: </span>
-                          <span className="text-[#1E1E24]">{t.expected}</span>
-                        </div>
-                        <div>
-                          <span className="text-[#7E7E8F]">Actual: </span>
-                          <span className={t.passed ? 'text-[#059669]' : 'text-[#DC2626]'}>
-                            {t.actual}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bug-to-Battle Guidance */}
-                {exerciseResult.diagnosticHint && (
-                  <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs font-bold text-[#1E1E24]">
-                    <strong className="text-[#6C5CE7]">Diagnostic Advice: </strong>
-                    <span className="text-[#4A4A58]">{exerciseResult.diagnosticHint}</span>
-                  </div>
+                {tryResult.stderr ? (
+                  <div className="text-[#EF4444] font-bold">{tryResult.stderr}</div>
+                ) : (
+                  <pre className="text-[#10B981] whitespace-pre-wrap">{tryResult.stdout || '(No text output)'}</pre>
                 )}
               </div>
             )}
           </div>
 
-          {/* SECTION H: NEXT STEP / GAME MISSION CONNECTION */}
-          {exercisePassed && (
-            <div className="card-game bg-[#FEF3C7] border-2 border-[#1E1E24] p-5 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <div className="flex items-center gap-2 font-black text-sm text-[#1E1E24]">
-                <Award className="w-5 h-5 text-[#F59E0B]" />
-                <span>Lesson Mastered! Choose Your Next Move:</span>
+          {/* Section G: Practice Exercise & Evaluation */}
+          {act && (
+            <div className="bg-white rounded-2xl border-2 border-[#1E1E24] p-5 shadow-[4px_4px_0px_#1E1E24] space-y-4">
+              <div className="flex items-center justify-between border-b border-[#1E1E24]/10 pb-3">
+                <div>
+                  <span className="text-[10px] font-black uppercase text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded">
+                    Practice Exercise #{act.sequenceNumber}
+                  </span>
+                  <h3 className="text-base font-black text-[#1E1E24] mt-1">
+                    {act.learningObjective}
+                  </h3>
+                </div>
+                <span className="text-xs font-black text-[#F59E0B] bg-[#FEF3C7] px-2.5 py-1 rounded-lg border border-[#F59E0B]">
+                  +{act.xpReward} XP
+                </span>
               </div>
 
-              {/* If connected to game mission (like Rescue the Robot) */}
-              {chapter.connectedGameMissionId && (
-                <div className="p-3.5 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex items-center justify-between gap-3">
-                  <div>
-                    <div className="font-black text-xs text-[#1E1E24] flex items-center gap-1.5">
-                      <Gamepad2 className="w-4 h-4 text-[#6C5CE7]" />
-                      <span>Playable 2D Mission Ready</span>
-                    </div>
-                    <p className="text-[11px] text-[#4A4A58] font-bold mt-0.5">
-                      Apply what you learned to drive the real rover across the grid maze!
-                    </p>
-                  </div>
-                  <Link
-                    href={`/simulator?mission=${chapter.connectedGameMissionId}`}
-                    className="btn-game-purple py-2 px-4 text-xs font-black shadow-[2px_2px_0px_#1E1E24] shrink-0"
-                  >
-                    Launch Game Mission →
-                  </Link>
+              <div className="space-y-1 text-xs font-bold text-[#4A4A58]">
+                <p className="text-[#1E1E24] font-black">{act.prompt}</p>
+                <p>{act.instructions}</p>
+              </div>
+
+              {/* Targeted Revision Advice if user is struggling */}
+              {revisionAdvice && (
+                <div className="p-3 rounded-xl bg-[#FEF3C7] border border-[#F59E0B] text-xs font-bold text-[#B45309] flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span>{revisionAdvice}</span>
                 </div>
               )}
 
-              {/* Navigation Actions */}
-              <div className="flex items-center justify-between gap-3 pt-1">
-                {prevLesson ? (
-                  <Link
-                    href={`/learn/${prevLesson.id}`}
-                    className="btn-game-white py-2 px-4 text-xs font-black shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Previous</span>
-                  </Link>
-                ) : (
-                  <div />
-                )}
-
-                {nextLesson ? (
-                  <Link
-                    href={`/learn/${nextLesson.id}`}
-                    className="btn-game-yellow py-2.5 px-6 text-xs font-black shadow-[4px_4px_0px_#1E1E24] flex items-center gap-1.5"
-                  >
-                    <span>Next Lesson: {nextLesson.title}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/courses/${course.id}`}
-                    className="btn-game-yellow py-2.5 px-6 text-xs font-black shadow-[4px_4px_0px_#1E1E24] flex items-center gap-1.5"
-                  >
-                    <span>⚔️ Chapter Boss Challenge</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                )}
+              {/* Exercise Code Editor */}
+              <div className="relative rounded-xl border-2 border-[#1E1E24] overflow-hidden bg-[#1E1E24]">
+                <div className="flex items-center justify-between px-3 py-1.5 bg-[#121316] border-b border-gray-700 text-[11px] font-mono text-gray-400">
+                  <span>exercise_solution.py</span>
+                  <span>Type Code Here</span>
+                </div>
+                <textarea
+                  value={exerciseCode}
+                  onChange={(e) => setExerciseCode(e.target.value)}
+                  rows={5}
+                  className="w-full p-3 font-mono text-xs text-[#FAF6EE] bg-[#1E1E24] focus:outline-none resize-y leading-relaxed"
+                  spellCheck={false}
+                />
               </div>
+
+              {/* Test Action Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <button
+                  onClick={handleCheckExercise}
+                  disabled={exerciseRunning}
+                  className="btn-game-purple py-2 px-6 text-xs font-black flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{exerciseRunning ? 'Evaluating...' : 'Check Solution'}</span>
+                </button>
+
+                {/* Progressive Hints Button */}
+                <button
+                  onClick={() => setHintTier((prev) => Math.min(4, prev + 1))}
+                  className="flex items-center gap-1.5 text-xs font-black text-[#6C5CE7] hover:underline"
+                >
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  <span>
+                    {hintTier === 0
+                      ? 'Need a Hint?'
+                      : hintTier < 4
+                      ? `Hint (${hintTier}/4) • Next Hint`
+                      : 'All Hints Revealed'}
+                  </span>
+                </button>
+              </div>
+
+              {/* Progressive Hints Display */}
+              {hintTier > 0 && (
+                <div className="p-3.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] space-y-2 text-xs font-bold text-[#4A4A58]">
+                  <div className="font-black text-[#1E1E24] flex items-center gap-1 text-[11px] uppercase tracking-wider">
+                    <HelpCircle className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                    <span>Progressive Guidance ({hintTier}/4):</span>
+                  </div>
+                  {act.hints.slice(0, hintTier).map((hint, idx) => (
+                    <div key={idx} className="p-2 rounded bg-white border border-gray-200">
+                      <span className="font-black text-[#6C5CE7]">Hint {idx + 1}: </span>
+                      {hint}
+                    </div>
+                  ))}
+                  {hintTier >= 3 && !showSolution && (
+                    <button
+                      onClick={() => setShowSolution(true)}
+                      className="text-[11px] font-black text-gray-500 hover:text-red-600 underline"
+                    >
+                      Show Full Solution
+                    </button>
+                  )}
+                  {showSolution && (
+                    <div className="p-2.5 rounded bg-red-50 border border-red-200 text-xs font-mono text-red-900">
+                      <div className="font-sans font-black text-[10px] uppercase text-red-600 mb-1">
+                        Worked Reference Solution:
+                      </div>
+                      <code>{act.solution}</code>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Test Results Output */}
+              {exerciseResult && (
+                <div
+                  className={`p-4 rounded-xl border-2 space-y-2 ${
+                    exerciseResult.allPassed
+                      ? 'bg-[#F0FDF4] border-[#10B981] text-[#065F46]'
+                      : 'bg-[#FEF2F2] border-[#EF4444] text-[#991B1B]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs font-black">
+                    <span className="flex items-center gap-1.5">
+                      {exerciseResult.allPassed ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+                          <span>All Automated Tests Passed! (+{awardedXp || act.xpReward} XP)</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-4 h-4 text-[#EF4444]" />
+                          <span>Validation Failed • Tests Not Satisfied</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  {exerciseResult.stdout && (
+                    <div className="font-mono text-xs bg-black/80 text-white p-2 rounded">
+                      Output: {exerciseResult.stdout}
+                    </div>
+                  )}
+
+                  {/* Individual test assertions */}
+                  <div className="space-y-1 text-xs font-bold pt-1">
+                    {exerciseResult.testResults.map((t, i) => (
+                      <div key={i} className="flex items-center gap-1.5">
+                        {t.passed ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                        ) : (
+                          <XCircle className="w-3.5 h-3.5 text-[#EF4444]" />
+                        )}
+                        <span>{t.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Next Step Navigation when passed */}
+              {exercisePassed && (
+                <div className="pt-4 border-t border-[#1E1E24]/10 flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-xs font-bold text-[#10B981] flex items-center gap-1">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Topic #{topic.sequenceNumber} Completed & Verified</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {topic.missionId && (
+                      <Link
+                        href={`/simulator?mission=${topic.missionId}`}
+                        className="btn-game-yellow py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                      >
+                        <Gamepad2 className="w-3.5 h-3.5" />
+                        <span>Play Mission</span>
+                      </Link>
+                    )}
+
+                    {nextTopic ? (
+                      <Link
+                        href={`/learn/${nextTopic.id}`}
+                        className="btn-game-purple py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                      >
+                        <span>Next: Lesson #{nextTopic.sequenceNumber}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/paths"
+                        className="btn-game-purple py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                      >
+                        <span>Return to Roadmap</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

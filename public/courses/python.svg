@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="100%" height="100%">
+  <defs>
+    <!-- Grid Pattern -->
+    <pattern id="python-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1" />
+    </pattern>
+    <!-- Linear Gradients for Python snakes -->
+    <linearGradient id="python-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+    <linearGradient id="python-yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#EAB308" />
+    </linearGradient>
+    <!-- Radial Glows -->
+    <radialGradient id="python-glow-blue" cx="45%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="python-glow-yellow" cx="55%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#FACC15" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#FACC15" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="100%" height="100%" fill="#0A0E1A" />
+  <rect width="100%" height="100%" fill="url(#python-grid)" />
+
+  <!-- Backlight Glows -->
+  <circle cx="180" cy="90" r="80" fill="url(#python-glow-blue)" />
+  <circle cx="220" cy="115" r="80" fill="url(#python-glow-yellow)" />
+
+  <!-- Left Bracket Pill -->
+  <rect x="42" y="65" width="18" height="72" rx="9" fill="none" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+  <circle cx="51" cy="52" r="3.5" fill="#38BDF8" />
+
+  <!-- Right Bracket Pill -->
+  <rect x="340" y="65" width="18" height="72" rx="9" fill="none" stroke="#FACC15" stroke-width="3" stroke-linecap="round" />
+  <circle cx="349" cy="150" r="3.5" fill="#FACC15" />
+
+  <!-- Version Badge: v3.12 (Top Right) -->
+  <g transform="translate(290, 26)">
+    <rect x="0" y="0" width="68" height="24" rx="12" fill="#0F172A" stroke="#38BDF8" stroke-width="1.8" />
+    <text x="34" y="16" text-anchor="middle" fill="#38BDF8" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="900" letter-spacing="0.5">
+      v3.12
+    </text>
+  </g>
+
+  <!-- Top Yellow Sparkle -->
+  <polygon points="135,35 137,42 144,44 137,46 135,53 133,46 126,44 133,42" fill="#FACC15" />
+
+  <!-- ========================================================
+       OFFICIAL PYTHON LOGO GEOMETRY (Interlocking Snakes)
+       ======================================================== -->
+  <g transform="translate(200, 102) scale(0.68)">
+    <!-- Blue Snake (Top Half) -->
+    <path
+      d="M -3,-68 C -40,-68 -37,-52 -37,-52 L -37,-36 L 2,-36 L 2,-30 L -51,-30 C -51,-30 -74,-32 -74,5 C -74,42 -53,40 -53,40 L -40,40 L -40,21 C -40,0 -23,0 -23,0 L 16,0 C 34,0 34,-18 34,-18 L 34,-52 C 34,-68 -3,-68 -3,-68 Z"
+      fill="url(#python-blue)"
+    />
+    <!-- Blue Snake Eye -->
+    <circle cx="-19" cy="-51" r="5.5" fill="#FFFFFF" />
+
+    <!-- Yellow Snake (Bottom Half) -->
+    <path
+      d="M 3,68 C 40,68 37,52 37,52 L 37,36 L -2,36 L -2,30 L 51,30 C 51,30 74,32 74,-5 C 74,-42 53,-40 53,-40 L 40,-40 L 40,-21 C 40,0 23,0 23,0 L -16,0 C -34,0 -34,18 -34,18 L -34,52 C -34,68 3,68 3,68 Z"
+      fill="url(#python-yellow)"
+    />
+    <!-- Yellow Snake Eye -->
+    <circle cx="19" cy="51" r="5.5" fill="#0A0E1A" />
+  </g>
+</svg>

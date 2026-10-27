@@ -59,6 +59,27 @@ html, body {
 }
 
 /* =========================================================================
+   UNIVERSAL THEME TEXT SELECTION HIGHLIGHT
+   Replaces default browser blue with Dronacharya Arcade Gold & Deep Charcoal
+   ========================================================================= */
+::selection {
+  background-color: #FFD214 !important;
+  color: #1E1E24 !important;
+  -webkit-text-fill-color: #1E1E24 !important;
+}
+
+::-moz-selection {
+  background-color: #FFD214 !important;
+  color: #1E1E24 !important;
+}
+
+*::selection {
+  background-color: #FFD214 !important;
+  color: #1E1E24 !important;
+  -webkit-text-fill-color: #1E1E24 !important;
+}
+
+/* =========================================================================
    DRONACHARYA CUSTOM RETRO PIXEL CURSOR SYSTEM
    ========================================================================= */
 

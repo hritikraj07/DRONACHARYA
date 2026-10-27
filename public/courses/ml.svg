@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="100%" height="100%">
+  <defs>
+    <pattern id="ml-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1" />
+    </pattern>
+    <radialGradient id="ml-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF6F00" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#FF6F00" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#0A0E1A" />
+  <rect width="100%" height="100%" fill="url(#ml-grid)" />
+
+  <circle cx="200" cy="110" r="90" fill="url(#ml-glow)" />
+
+  <!-- Top Pill: model.fit() -->
+  <g transform="translate(144, 22)">
+    <rect x="0" y="0" width="112" height="26" rx="13" fill="#0F172A" stroke="#FF6F00" stroke-width="2" />
+    <text x="56" y="17.5" text-anchor="middle" fill="#FB923C" font-size="11.5" font-family="'JetBrains Mono', monospace" font-weight="900">
+      model.fit()
+    </text>
+  </g>
+
+  <!-- Synaptic Connections -->
+  <g stroke="#F97316" stroke-width="2" opacity="0.6">
+    <line x1="120" y1="75" x2="200" y2="60" />
+    <line x1="120" y1="75" x2="200" y2="115" />
+    <line x1="120" y1="75" x2="200" y2="165" />
+    <line x1="120" y1="155" x2="200" y2="60" />
+    <line x1="120" y1="155" x2="200" y2="115" />
+    <line x1="120" y1="155" x2="200" y2="165" />
+
+    <line x1="200" y1="60" x2="280" y2="88" />
+    <line x1="200" y1="60" x2="280" y2="142" />
+    <line x1="200" y1="115" x2="280" y2="88" />
+    <line x1="200" y1="115" x2="280" y2="142" />
+    <line x1="200" y1="165" x2="280" y2="88" />
+    <line x1="200" y1="165" x2="280" y2="142" />
+  </g>
+
+  <!-- Layer 1 Nodes (Input) -->
+  <circle cx="120" cy="75" r="9" fill="#EA580C" stroke="#FED7AA" stroke-width="2.5" />
+  <circle cx="120" cy="155" r="9" fill="#EA580C" stroke="#FED7AA" stroke-width="2.5" />
+
+  <!-- Layer 2 Nodes (Hidden) -->
+  <circle cx="200" cy="60" r="9" fill="#F97316" stroke="#FFEDD5" stroke-width="2.5" />
+  <circle cx="200" cy="115" r="11" fill="#F97316" stroke="#FFFFFF" stroke-width="3" />
+  <circle cx="200" cy="165" r="9" fill="#F97316" stroke="#FFEDD5" stroke-width="2.5" />
+
+  <!-- Layer 3 Nodes (Output) -->
+  <circle cx="280" cy="88" r="9" fill="#FDBA74" stroke="#FFFFFF" stroke-width="2.5" />
+  <circle cx="280" cy="142" r="9" fill="#FDBA74" stroke="#FFFFFF" stroke-width="2.5" />
+</svg>

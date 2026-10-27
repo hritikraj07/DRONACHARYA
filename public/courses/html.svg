@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="100%" height="100%">
+  <defs>
+    <pattern id="html-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1" />
+    </pattern>
+    <radialGradient id="html-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E44D26" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#E44D26" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#0A0E1A" />
+  <rect width="100%" height="100%" fill="url(#html-grid)" />
+
+  <circle cx="200" cy="100" r="85" fill="url(#html-glow)" />
+
+  <!-- Left Pill: <code> -->
+  <g transform="translate(40, 85)">
+    <rect x="0" y="0" width="76" height="30" rx="15" fill="#0F172A" stroke="#38BDF8" stroke-width="2" />
+    <text x="38" y="20" text-anchor="middle" fill="#38BDF8" font-size="12" font-family="'JetBrains Mono', monospace" font-weight="900">
+      &lt;code&gt;
+    </text>
+  </g>
+
+  <!-- Right Pill: </div> -->
+  <g transform="translate(284, 85)">
+    <rect x="0" y="0" width="76" height="30" rx="15" fill="#0F172A" stroke="#34D399" stroke-width="2" />
+    <text x="38" y="20" text-anchor="middle" fill="#34D399" font-size="12" font-family="'JetBrains Mono', monospace" font-weight="900">
+      &lt;/div&gt;
+    </text>
+  </g>
+
+  <!-- Browser Window Frame -->
+  <g transform="translate(136, 28)">
+    <rect x="0" y="0" width="128" height="136" rx="12" fill="#151C2C" stroke="#2D3748" stroke-width="2.5" />
+    <path d="M 0,26 L 128,26" stroke="#2D3748" stroke-width="2" />
+    <!-- Traffic lights -->
+    <circle cx="15" cy="13" r="4" fill="#EF4444" />
+    <circle cx="27" cy="13" r="4" fill="#FBBF24" />
+    <circle cx="39" cy="13" r="4" fill="#10B981" />
+
+    <!-- Official 3D HTML5 Shield -->
+    <g transform="translate(32, 42)">
+      <!-- Outer Shield (Dark Orange / Left) -->
+      <polygon points="32,0 64,10 56,66 32,78 8,66 0,10" fill="#E44D26" />
+      <!-- Right Facet (Bright Orange) -->
+      <polygon points="32,0 64,10 56,66 32,78" fill="#F16529" />
+      <!-- Inner White/Light Gray '5' -->
+      <!-- Left side of 5 (Pure White) -->
+      <polygon points="32,15 17,15 18,28 32,28 32,41 21,41 22,54 32,58 32,54 42,50 43,33 32,33" fill="#FFFFFF" opacity="0.95" />
+      <!-- Right side of 5 (Light Silver) -->
+      <polygon points="32,15 47,15 46,28 32,28 32,33 43,33 42,50 32,54" fill="#EBEBEB" />
+    </g>
+  </g>
+</svg>

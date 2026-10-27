@@ -178,26 +178,19 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
           {/* LEFT: Brand Logo & Title */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-nowrap">
             <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="relative">
-                <img
-                  src="/logo.png"
-                  alt="Dronacharya Logo"
-                  className="w-9 h-9 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 group-hover:scale-105 transition-all shrink-0 bg-white"
-                />
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#10B981] border border-[#1E1E24]" />
-              </div>
-              <div className="flex flex-col shrink-0">
-                <div className="flex items-center gap-1 leading-none">
-                  <span className="font-serif font-black text-sm sm:text-base tracking-tight text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors">
-                    DRONACHARYA
-                  </span>
+              <img
+                src="/logo.png"
+                alt="Dronacharya Logo"
+                className="w-9 h-9 object-contain group-hover:rotate-6 group-hover:scale-105 transition-all shrink-0 select-none drop-shadow-xs"
+              />
+              <div className="flex flex-col justify-center shrink-0">
+                <span className="font-serif font-black text-sm sm:text-base tracking-tight leading-none text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors flex items-center gap-1 select-none">
+                  DRONACHARYA
                   <span className="text-amber-500 font-bold text-xs sm:text-sm">⋆˙⟡</span>
-                </div>
-                <div className="mt-0.5">
-                  <span className="text-[9px] font-black tracking-wider uppercase text-[#B45309] bg-[#FEF3C7] px-1.5 py-0.2 rounded-md border border-[#F59E0B]/30 inline-block shadow-2xs">
-                    Coding Adventure
-                  </span>
-                </div>
+                </span>
+                <span className="text-[9px] font-black tracking-[0.22em] uppercase text-[#D97706] leading-none mt-1 select-none">
+                  Coding Adventure
+                </span>
               </div>
             </Link>
 

@@ -70,22 +70,17 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
             {/* Logo & Brand Wordmark */}
             <Link href="/" className="flex items-center gap-2.5 group w-fit">
-              <div className="relative">
-                <img
-                  src="/logo.png"
-                  alt="Dronacharya Logo"
-                  className="w-9 h-9 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 group-hover:scale-105 transition-all shrink-0 bg-white"
-                />
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#10B981] border border-[#1E1E24]" />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5 leading-none">
-                  <span className="font-serif font-black text-lg sm:text-xl tracking-tight text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors">
-                    DRONACHARYA
-                  </span>
+              <img
+                src="/logo.png"
+                alt="Dronacharya Logo"
+                className="w-10 h-10 object-contain group-hover:rotate-6 group-hover:scale-105 transition-all shrink-0 select-none drop-shadow-xs"
+              />
+              <div className="flex flex-col justify-center">
+                <span className="font-serif font-black text-lg sm:text-xl tracking-tight leading-none text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors flex items-center gap-1.5 select-none">
+                  DRONACHARYA
                   <span className="text-amber-500 font-bold text-sm sm:text-base">⋆˙⟡</span>
-                </div>
-                <span className="text-[9px] font-black tracking-wider uppercase text-[#B45309] bg-[#FEF3C7] px-1.5 py-0.2 rounded-md border border-[#F59E0B]/30 inline-block shadow-2xs mt-1 w-fit">
+                </span>
+                <span className="text-[10px] font-black tracking-[0.22em] uppercase text-[#D97706] leading-none mt-1 select-none">
                   Coding Adventure
                 </span>
               </div>

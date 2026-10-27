@@ -1,5 +1,5 @@
-// Dronacharya Authentication & Registration Gateway with Interactive Cosmic Background
-// Includes Guest Demo mode (no credentials required) with immediate Course Selection & Launch
+// Dronacharya Premium Gaming Authentication Gateway
+// Glassmorphism login card, interactive coding universe background, guest demo quick-start, and Supabase integration
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -15,10 +15,7 @@ import {
 } from '@/lib/db/auth-db';
 import { CosmicInteractiveBg } from '@/components/game/CosmicInteractiveBg';
 import {
-  ShieldCheck,
   ArrowRight,
-  BookOpen,
-  GraduationCap,
   Sparkles,
   AlertCircle,
   CheckCircle2,
@@ -29,10 +26,8 @@ import {
   Gamepad2,
   Play,
   Zap,
-  Terminal,
-  Code2,
-  Globe,
-  RotateCcw,
+  GraduationCap,
+  ArrowLeft,
 } from 'lucide-react';
 
 export default function AuthPage() {
@@ -149,13 +144,13 @@ export default function AuthPage() {
     setIsSubmitting(false);
 
     if (result.success && result.user) {
-      setSuccessMsg(`Welcome, ${result.user.name}! Your game arena is ready.`);
+      setSuccessMsg(`Account established! Welcome, ${result.user.name}! Entering your world...`);
       setActiveSession(result.user, result.session);
       window.dispatchEvent(new Event('dronacharya_session_change'));
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
         window.location.href = '/';
-      }, 300);
+      }, 400);
     } else {
       setErrorMsg(result.error || 'Registration failed.');
     }
@@ -180,11 +175,11 @@ export default function AuthPage() {
     AVAILABLE_SUBJECTS.find((s) => s.id === guestSubject) || AVAILABLE_SUBJECTS[0];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#090A0F] text-white flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#080B14] text-white flex flex-col overflow-y-auto antialiased">
       {/* 1. Sleek Top Header Navigation on Auth */}
-      <div className="relative z-20 w-full px-4 sm:px-6 h-16 flex items-center justify-between border-b-2 border-white/10 bg-[#090A0F]/80 backdrop-blur-md shrink-0">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-lg font-bold border-2 border-white/20 shadow-[2px_2px_0px_#1E1E24]">
+      <header className="relative z-20 w-full px-4 sm:px-8 h-16 flex items-center justify-between border-b border-white/10 bg-[#080B14]/75 backdrop-blur-md shrink-0">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7257FF] to-[#5843D8] text-white flex items-center justify-center font-serif text-lg font-bold border border-white/30 shadow-[0_4px_12px_rgba(114,87,255,0.4)] group-hover:scale-105 transition-all">
             द्रो
           </div>
           <div className="flex flex-col">
@@ -192,7 +187,7 @@ export default function AuthPage() {
               DRONACHARYA
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
             </span>
-            <span className="text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
+            <span className="text-[9px] tracking-widest uppercase text-[#FFC83D] font-black mt-0.5">
               Coding Adventure
             </span>
           </div>
@@ -200,387 +195,301 @@ export default function AuthPage() {
 
         <Link
           href="/"
-          className="btn-game-white text-xs py-1.5 px-3.5 font-black flex items-center gap-1 shadow-[2px_2px_0px_#1E1E24]"
+          className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-black backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] group cursor-pointer"
         >
-          ← Return to Portal
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Return to Portal</span>
         </Link>
-      </div>
+      </header>
 
-      {/* 2. Interactive Cosmic Space Background (Active strictly on auth page) */}
+      {/* 2. Upgraded Interactive Cosmic Coding Universe Background */}
       <CosmicInteractiveBg />
 
       {/* 3. Center Authentication & Guest Demo Card */}
-      <div className="relative z-10 flex-1 flex items-center justify-center py-10 px-4 sm:px-6">
-        <div className="w-full max-w-xl card-game bg-white p-6 sm:p-8 shadow-[8px_8px_0px_#1E1E24] border-2 border-[#1E1E24] rounded-2xl animate-in fade-in zoom-in-95 duration-200 text-[#1E1E24]">
-        {/* Brand Header */}
-        <div className="text-center mb-5">
-          <div className="w-12 h-12 mx-auto rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-2xl font-bold border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] mb-2.5">
-            द्रो
-          </div>
-          <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#1E1E24]">
-            {authMode === 'guest'
-              ? 'Guest Demo: Select Your Course'
-              : authMode === 'signup'
-              ? 'Begin Your Coding Adventure'
-              : 'Sign In to Your Quest'}
-          </h1>
-          <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1 max-w-md mx-auto">
-            {authMode === 'guest'
-              ? 'No registration needed. Choose your programming track to start playing immediately.'
-              : authMode === 'signup'
-              ? 'Complete 3 quick steps to tailor your interactive programming world.'
-              : 'Enter your credentials to load your saved progress & character state.'}
-          </p>
-        </div>
+      <main className="relative z-10 flex-1 flex items-center justify-center py-10 px-4 sm:px-6 my-auto">
+        <div className="relative w-full max-w-xl">
+          {/* Ambient Purple-Cyan Glow Behind Glass Card */}
+          <div
+            className="absolute -inset-1.5 bg-gradient-to-r from-[#7257FF]/30 via-[#21D4FD]/20 to-[#FFC83D]/25 rounded-[32px] blur-2xl opacity-75 -z-10 pointer-events-none"
+            aria-hidden="true"
+          />
 
-        {/* Guest Demo Quick Callout Banner (shown on signin/signup) */}
-        {authMode !== 'guest' && (
-          <div className="mb-5 p-3.5 rounded-xl bg-[#FBBF24]/20 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#FBBF24] border border-[#1E1E24] flex items-center justify-center text-[#1E1E24] shrink-0 font-black">
-                <Gamepad2 className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="font-black text-xs text-[#1E1E24] flex items-center gap-1.5">
-                  <span>Want to play immediately without signing in?</span>
-                  <span className="text-[10px] bg-[#10B981] text-white px-1.5 py-0.2 rounded font-black">Free</span>
+          {/* Premium Glassmorphism Card (Ivory Translucent Canvas) */}
+          <div
+            className="w-full p-6 sm:p-9 rounded-[26px] text-[#1E1E24] transition-all duration-300 relative"
+            style={{
+              backgroundColor: 'rgba(255, 252, 245, 0.88)',
+              backdropFilter: 'blur(28px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(28px) saturate(160%)',
+              border: '1.5px solid rgba(255, 255, 255, 0.85)',
+              boxShadow:
+                '0 24px 80px -12px rgba(0, 0, 0, 0.45), 0 0 35px -8px rgba(114, 87, 255, 0.25), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95)',
+            }}
+          >
+            {/* Brand Header */}
+            <div className="text-center mb-6">
+              <div className="relative inline-block mb-2.5">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#7257FF] to-[#5843D8] text-white flex items-center justify-center font-serif text-2xl font-black shadow-[0_8px_20px_rgba(114,87,255,0.45)] border border-white/40 ring-4 ring-[#7257FF]/15">
+                  द्रो
                 </div>
-                <div className="text-[11px] text-[#4A4A58] font-medium">
-                  Jump directly to course selection & interactive 2D gameplay.
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode('guest');
-                setErrorMsg(null);
-              }}
-              className="btn-game-yellow py-1.5 px-3.5 text-xs font-black shadow-[2px_2px_0px_#1E1E24] shrink-0 flex items-center justify-center gap-1"
-            >
-              <Play className="w-3.5 h-3.5 fill-[#1E1E24]" />
-              <span>Guest Demo</span>
-            </button>
-          </div>
-        )}
-
-        {/* Tab Switcher (Sign In vs New Apprentice vs Guest Demo) */}
-        <div className="flex border-b-2 border-[#1E1E24] mb-5">
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('signin');
-              setErrorMsg(null);
-            }}
-            className={`flex-1 py-2 text-xs font-black border-b-2 transition-all cursor-pointer ${
-              authMode === 'signin'
-                ? 'border-[#6C5CE7] text-[#6C5CE7]'
-                : 'border-transparent text-[#7E7E8F] hover:text-[#1E1E24]'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('signup');
-              setSignupStep(1);
-              setErrorMsg(null);
-            }}
-            className={`flex-1 py-2 text-xs font-black border-b-2 transition-all cursor-pointer ${
-              authMode === 'signup'
-                ? 'border-[#6C5CE7] text-[#6C5CE7]'
-                : 'border-transparent text-[#7E7E8F] hover:text-[#1E1E24]'
-            }`}
-          >
-            Create Account
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('guest');
-              setErrorMsg(null);
-            }}
-            className={`flex-1 py-2 text-xs font-black border-b-2 transition-all cursor-pointer flex items-center justify-center gap-1 ${
-              authMode === 'guest'
-                ? 'border-[#FBBF24] text-[#D97706] bg-[#FEF3C7]/40'
-                : 'border-transparent text-[#7E7E8F] hover:text-[#1E1E24]'
-            }`}
-          >
-            <Gamepad2 className="w-3.5 h-3.5 text-[#F59E0B]" />
-            <span>Guest Demo</span>
-          </button>
-        </div>
-
-        {/* Feedback Alerts */}
-        {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-[#FEE2E2] border-2 border-[#EF4444] text-xs text-[#DC2626] font-black flex items-start gap-2 shadow-[2px_2px_0px_#EF4444]">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {successMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-[#D1FAE5] border-2 border-[#10B981] text-xs text-[#059669] font-black flex items-center gap-2 shadow-[2px_2px_0px_#10B981]">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{successMsg}</span>
-          </div>
-        )}
-
-        {/* ========================================================
-            VIEW 1: GUEST DEMO — SELECT COURSE & LAUNCH DIRECTLY
-           ======================================================== */}
-        {authMode === 'guest' && (
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="font-black text-xs text-[#1E1E24] uppercase tracking-wider">
-                  1. Choose Your Programming Course:
-                </label>
-                <span className="text-[10px] bg-[#10B981] text-white font-black px-2 py-0.5 rounded border border-[#1E1E24]">
-                  Playable 2D Game
+                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#10B981] border-2 border-white flex items-center justify-center shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 </span>
               </div>
 
-              {/* Course Selection Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {AVAILABLE_SUBJECTS.map((sub) => {
-                  const isSelected = guestSubject === sub.id;
-                  return (
-                    <div
-                      key={sub.id}
-                      onClick={() => setGuestSubject(sub.id)}
-                      className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex flex-col justify-between ${
-                        isSelected
-                          ? 'bg-[#FBBF24] shadow-[3px_3px_0px_#1E1E24] font-black'
-                          : 'bg-white hover:bg-[#FAF6EE] shadow-[2px_2px_0px_#1E1E24]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-xs text-[#1E1E24]">{sub.name}</span>
-                        {sub.isAvailable ? (
-                          <span className="text-[9px] bg-[#10B981] text-white px-1.5 py-0.2 rounded font-black">
-                            Live Game
-                          </span>
-                        ) : (
-                          <span className="text-[9px] bg-[#FAF6EE] border border-[#1E1E24] text-[#7E7E8F] px-1.5 py-0.2 rounded font-bold">
-                            Coming Soon
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-[#4A4A58] mt-1 line-clamp-2 font-medium">
-                        {sub.tagline}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+              <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#1E1E24] tracking-tight">
+                {authMode === 'guest'
+                  ? 'Guest Demo: Select Your Course'
+                  : authMode === 'signup'
+                  ? 'Begin Your Coding Adventure'
+                  : 'Sign In to Your Quest'}
+              </h1>
 
-            {/* Class Selection for Guest Demo */}
-            <div>
-              <label className="block font-black text-xs text-[#1E1E24] mb-1.5 uppercase tracking-wider">
-                2. Select Class / Standard:
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {AVAILABLE_CLASSES.map((cls) => {
-                  const isSelected = guestClass === cls;
-                  return (
-                    <button
-                      key={cls}
-                      type="button"
-                      onClick={() => setGuestClass(cls)}
-                      className={`py-2 px-2 rounded-xl border-2 border-[#1E1E24] text-xs font-black transition-all ${
-                        isSelected
-                          ? 'bg-[#6C5CE7] text-white shadow-[2px_2px_0px_#1E1E24]'
-                          : 'bg-white text-[#4A4A58] hover:bg-[#FAF6EE] shadow-[1px_1px_0px_#1E1E24]'
-                      }`}
-                    >
-                      {cls}
-                    </button>
-                  );
-                })}
+              <div className="flex items-center justify-center gap-2 mt-2.5">
+                <div className="h-px w-10 bg-gradient-to-r from-transparent via-[#7257FF]/40 to-transparent" />
+                <span className="text-[10px] text-[#7257FF] font-black uppercase tracking-widest flex items-center gap-1 bg-[#EDE9FE]/80 px-2.5 py-0.5 rounded-full border border-[#7257FF]/25 shadow-xs">
+                  <Sparkles className="w-3 h-3 text-[#D97706]" />
+                  <span>Gurukul Gateway</span>
+                </span>
+                <div className="h-px w-10 bg-gradient-to-r from-transparent via-[#7257FF]/40 to-transparent" />
               </div>
-            </div>
 
-            {/* Course Preview Callout */}
-            <div className="p-3.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-black text-[#6C5CE7]">
-                <Zap className="w-3.5 h-3.5 text-[#FBBF24]" />
-                <span>Launching: {selectedGuestSubjectObj.name} ({guestClass})</span>
-              </div>
-              <p className="text-[11px] text-[#4A4A58] font-medium leading-relaxed">
-                Direct access with full 5/5 player hearts, interactive 2D simulation grid, and Acharya AI mentor.
+              <p className="text-xs sm:text-sm text-[#4A4A58] font-semibold mt-2 max-w-md mx-auto leading-relaxed">
+                {authMode === 'guest'
+                  ? 'No registration needed. Choose your programming track to start playing immediately.'
+                  : authMode === 'signup'
+                  ? 'Complete 3 quick steps to tailor your interactive programming world.'
+                  : 'Enter your credentials to load your saved progress & character state.'}
               </p>
             </div>
 
-            {/* Launch Action */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+            {/* Redesigned Quick Start / Play Instantly Guest Banner */}
+            {authMode !== 'guest' && (
+              <div
+                className="mb-5 p-3.5 sm:p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative overflow-hidden"
+                style={{
+                  background:
+                    'linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(254, 215, 170, 0.9) 100%)',
+                  borderColor: 'rgba(245, 158, 11, 0.45)',
+                  boxShadow:
+                    '0 8px 24px -6px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FBBF24] to-[#F59E0B] text-[#1E1E24] flex items-center justify-center shrink-0 font-black shadow-[0_4px_12px_rgba(245,158,11,0.35)] border border-amber-200">
+                    <Gamepad2 className="w-5 h-5 text-[#1E1E24]" />
+                  </div>
+                  <div>
+                    <div className="font-black text-xs sm:text-sm text-[#1E1E24] flex items-center gap-2">
+                      <span>Ready to start your adventure?</span>
+                      <span className="text-[10px] bg-[#10B981] text-white px-2 py-0.5 rounded-full font-black shadow-xs">
+                        Instant
+                      </span>
+                    </div>
+                    <div className="text-[11px] sm:text-xs text-[#5D4037] font-semibold mt-0.5">
+                      Explore the coding world without creating an account.
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('guest');
+                    setErrorMsg(null);
+                  }}
+                  className="bg-[#1E1E24] hover:bg-[#2D2D3A] text-[#FBBF24] font-black py-2.5 px-4 rounded-xl text-xs shadow-md hover:shadow-lg active:scale-95 transition-all shrink-0 flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto border border-[#1E1E24]"
+                >
+                  <Play className="w-3.5 h-3.5 fill-[#FBBF24]" />
+                  <span>Play as Guest</span>
+                </button>
+              </div>
+            )}
+
+            {/* Redesigned Glass Tab Switcher (Sign In vs Create Account vs Guest Demo) */}
+            <div className="flex bg-[#1E1E24]/6 p-1 rounded-xl border border-[#1E1E24]/10 mb-5 relative">
               <button
                 type="button"
-                onClick={handleLaunchGuestDemo}
-                disabled={isSubmitting}
-                className="btn-game-yellow w-full py-3 text-xs font-black shadow-[4px_4px_0px_#1E1E24] flex items-center justify-center gap-2"
+                onClick={() => {
+                  setAuthMode('signin');
+                  setErrorMsg(null);
+                }}
+                className={`flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer relative ${
+                  authMode === 'signin'
+                    ? 'bg-white text-[#6C5CE7] shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white/60'
+                    : 'text-[#64748B] hover:text-[#1E1E24]'
+                }`}
               >
-                <span>{isSubmitting ? 'Entering Arena...' : `🚀 Start ${selectedGuestSubjectObj.name} as Guest`}</span>
-                <ArrowRight className="w-4 h-4" />
+                Sign In
               </button>
-
-              <button
-                type="button"
-                onClick={() => setAuthMode('signin')}
-                className="btn-game-white w-full sm:w-auto py-2.5 px-4 text-xs font-black shrink-0"
-              >
-                ← Back to Login
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================
-            VIEW 2: SIGN IN FORM
-           ======================================================== */}
-        {authMode === 'signin' && (
-          <form onSubmit={handleSignIn} className="space-y-4 text-xs">
-            <div>
-              <label className="block font-bold text-[#1E1E24] mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => setEmail((prev) => prev.trim())}
-                  placeholder="student@learning.edu"
-                  className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none font-bold"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-bold text-[#1E1E24] mb-1">Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your database password"
-                  className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none font-bold"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn-game-purple w-full py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24] mt-2 font-black flex items-center justify-center gap-1.5"
-            >
-              <span>{isSubmitting ? 'Verifying...' : 'Verify Credentials & Start Quest'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-
-            <div className="text-center pt-2 text-[#7E7E8F] font-bold">
-              Don&apos;t have an account yet?{' '}
               <button
                 type="button"
                 onClick={() => {
                   setAuthMode('signup');
                   setSignupStep(1);
+                  setErrorMsg(null);
                 }}
-                className="text-[#6C5CE7] font-black underline cursor-pointer"
+                className={`flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer relative ${
+                  authMode === 'signup'
+                    ? 'bg-white text-[#6C5CE7] shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white/60'
+                    : 'text-[#64748B] hover:text-[#1E1E24]'
+                }`}
               >
-                Start Step-by-Step Setup
+                Create Account
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('guest');
+                  setErrorMsg(null);
+                }}
+                className={`flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 relative ${
+                  authMode === 'guest'
+                    ? 'bg-white text-[#D97706] shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white/60'
+                    : 'text-[#64748B] hover:text-[#1E1E24]'
+                }`}
+              >
+                <Gamepad2 className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Guest Demo</span>
               </button>
             </div>
-          </form>
-        )}
 
-        {/* ========================================================
-            VIEW 3: STEP-BY-STEP SIGN UP WIZARD
-           ======================================================== */}
-        {authMode === 'signup' && (
-          <div>
-            {/* Step Stepper Header */}
-            <div className="flex items-center justify-between mb-6 px-2">
-              <div className="flex items-center gap-1.5">
-                <div
-                  className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] ${
-                    signupStep >= 1 ? 'bg-[#6C5CE7] text-white' : 'bg-[#E8E1D2] text-[#7E7E8F]'
-                  }`}
-                >
-                  1
-                </div>
-                <span className={`text-xs font-black ${signupStep === 1 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
-                  Account
-                </span>
+            {/* Feedback Alerts */}
+            {errorMsg && (
+              <div className="mb-4 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-700 font-bold flex items-start gap-2.5 backdrop-blur-xs animate-in fade-in duration-150">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+                <span>{errorMsg}</span>
               </div>
+            )}
 
-              <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 2 ? 'bg-[#6C5CE7]' : 'bg-[#1E1E24]/20'}`} />
-
-              <div className="flex items-center gap-1.5">
-                <div
-                  className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] ${
-                    signupStep >= 2 ? 'bg-[#6C5CE7] text-white' : 'bg-[#E8E1D2] text-[#7E7E8F]'
-                  }`}
-                >
-                  2
-                </div>
-                <span className={`text-xs font-black ${signupStep === 2 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
-                  Class
-                </span>
+            {successMsg && (
+              <div className="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-800 font-bold flex items-center gap-2.5 backdrop-blur-xs animate-in fade-in duration-150">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{successMsg}</span>
               </div>
+            )}
 
-              <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 3 ? 'bg-[#6C5CE7]' : 'bg-[#1E1E24]/20'}`} />
-
-              <div className="flex items-center gap-1.5">
-                <div
-                  className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] ${
-                    signupStep >= 3 ? 'bg-[#6C5CE7] text-white' : 'bg-[#E8E1D2] text-[#7E7E8F]'
-                  }`}
-                >
-                  3
-                </div>
-                <span className={`text-xs font-black ${signupStep === 3 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
-                  Language
-                </span>
-              </div>
-            </div>
-
-            {/* STEP 1: Full Name, Email, Password */}
-            {signupStep === 1 && (
-              <form onSubmit={handleProceedToStep2} className="space-y-4 text-xs">
+            {/* ========================================================
+                VIEW 1: GUEST DEMO — SELECT COURSE & LAUNCH DIRECTLY
+               ======================================================== */}
+            {authMode === 'guest' && (
+              <div className="space-y-4">
                 <div>
-                  <div className="font-black text-sm text-[#1E1E24] mb-1">
-                    Step 1: Scholar Identification
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="font-black text-xs text-[#1E1E24] uppercase tracking-wider">
+                      1. Choose Your Programming Course:
+                    </label>
+                    <span className="text-[10px] bg-[#10B981] text-white font-black px-2 py-0.5 rounded-md shadow-xs">
+                      Playable 2D Game
+                    </span>
                   </div>
-                  <p className="text-[#4A4A58] text-[11px] mb-3">
-                    Enter your name and login credentials to establish your saved account:
+
+                  {/* Course Selection Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {AVAILABLE_SUBJECTS.map((sub) => {
+                      const isSelected = guestSubject === sub.id;
+                      return (
+                        <div
+                          key={sub.id}
+                          onClick={() => setGuestSubject(sub.id)}
+                          className={`p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                            isSelected
+                              ? 'bg-gradient-to-br from-[#FEF3C7] to-[#FDE68A] border-[#D97706] shadow-[0_4px_14px_rgba(217,119,6,0.25)] ring-2 ring-[#D97706]/30'
+                              : 'bg-white/80 hover:bg-white border-[#1E1E24]/15 shadow-xs'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-black text-xs text-[#1E1E24]">{sub.name}</span>
+                            {sub.isAvailable ? (
+                              <span className="text-[9px] bg-[#10B981] text-white px-2 py-0.5 rounded-full font-black">
+                                Live Game
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-gray-100 text-[#7E7E8F] px-2 py-0.5 rounded-full font-bold">
+                                Coming Soon
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-[#4A4A58] mt-1 line-clamp-2 font-medium">
+                            {sub.tagline}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Class Selection for Guest Demo */}
+                <div>
+                  <label className="block font-black text-xs text-[#1E1E24] mb-1.5 uppercase tracking-wider">
+                    2. Select Class / Standard:
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {AVAILABLE_CLASSES.map((cls) => {
+                      const isSelected = guestClass === cls;
+                      return (
+                        <button
+                          key={cls}
+                          type="button"
+                          onClick={() => setGuestClass(cls)}
+                          className={`py-2 px-2 rounded-xl border text-xs font-black transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-[#7257FF] to-[#5843D8] text-white border-transparent shadow-[0_4px_12px_rgba(114,87,255,0.35)]'
+                              : 'bg-white/80 text-[#4A4A58] hover:bg-white border-[#1E1E24]/15'
+                          }`}
+                        >
+                          {cls}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Course Preview Callout */}
+                <div className="p-3.5 rounded-xl bg-[#FAF6EE] border border-[#1E1E24]/15 shadow-xs space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs font-black text-[#6C5CE7]">
+                    <Zap className="w-3.5 h-3.5 text-[#F59E0B]" />
+                    <span>Launching: {selectedGuestSubjectObj.name} ({guestClass})</span>
+                  </div>
+                  <p className="text-[11px] text-[#4A4A58] font-medium leading-relaxed">
+                    Direct access with 5 full player hearts, interactive 2D simulation grid, and Acharya AI mentor.
                   </p>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-[#1E1E24] mb-1">Full Name</label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Aryabhata Sharma"
-                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none font-bold"
-                    />
-                  </div>
-                </div>
+                {/* Launch Action */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleLaunchGuestDemo}
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 text-xs sm:text-sm font-black rounded-xl bg-gradient-to-r from-[#FBBF24] via-[#F59E0B] to-[#D97706] text-[#1E1E24] shadow-[0_8px_24px_-4px_rgba(245,158,11,0.4)] hover:shadow-[0_12px_28px_-4px_rgba(245,158,11,0.55)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 border border-amber-200/50"
+                  >
+                    <span>{isSubmitting ? 'Entering Arena...' : `🚀 Start ${selectedGuestSubjectObj.name} as Guest`}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
 
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode('signin')}
+                    className="w-full sm:w-auto py-3 px-4 rounded-xl bg-white/80 hover:bg-white text-xs font-black text-[#4A4A58] hover:text-[#1E1E24] border border-[#1E1E24]/15 shrink-0 transition-all cursor-pointer"
+                  >
+                    ← Back to Login
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ========================================================
+                VIEW 2: SIGN IN FORM (Premium Glass Input Fields & CTA)
+               ======================================================== */}
+            {authMode === 'signin' && (
+              <form onSubmit={handleSignIn} className="space-y-4 text-xs sm:text-sm">
                 <div>
-                  <label className="block font-bold text-[#1E1E24] mb-1">Email Address</label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
+                  <label className="block font-black text-xs text-[#1E1E24] mb-1.5">
+                    Email Address
+                  </label>
+                  <div className="relative group">
+                    <Mail className="w-4 h-4 text-[#94A3B8] group-focus-within:text-[#7257FF] absolute left-3.5 top-3.5 transition-colors pointer-events-none" />
                     <input
                       type="email"
                       required
@@ -588,172 +497,317 @@ export default function AuthPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       onBlur={() => setEmail((prev) => prev.trim())}
                       placeholder="student@learning.edu"
-                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none font-bold"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/80 border border-[#1E1E24]/20 text-xs sm:text-sm font-bold text-[#1E1E24] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#7257FF] focus:ring-4 focus:ring-[#7257FF]/15 focus:outline-none transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-[#1E1E24] mb-1">Password</label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
+                  <label className="block font-black text-xs text-[#1E1E24] mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <Lock className="w-4 h-4 text-[#94A3B8] group-focus-within:text-[#7257FF] absolute left-3.5 top-3.5 transition-colors pointer-events-none" />
                     <input
                       type="password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="At least 6 characters"
-                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none font-bold"
+                      placeholder="Enter your database password"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/80 border border-[#1E1E24]/20 text-xs sm:text-sm font-bold text-[#1E1E24] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#7257FF] focus:ring-4 focus:ring-[#7257FF]/15 focus:outline-none transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2">
+                {/* Primary Call to Action Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#7257FF] via-[#6348F0] to-[#5843D8] hover:from-[#7E65FF] hover:to-[#6348F0] text-white font-black text-xs sm:text-sm shadow-[0_8px_24px_-4px_rgba(114,87,255,0.45)] hover:shadow-[0_12px_28px_-4px_rgba(114,87,255,0.6)] active:scale-[0.98] border border-white/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed group mt-2"
+                >
+                  <span>{isSubmitting ? 'Verifying Credentials...' : 'Verify Credentials & Start Quest'}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                <div className="text-center pt-2 text-[#7E7E8F] text-xs font-semibold">
+                  Don&apos;t have an account yet?{' '}
                   <button
                     type="button"
-                    onClick={() => setAuthMode('signin')}
-                    className="text-[#7E7E8F] hover:text-[#1E1E24] font-bold text-xs"
+                    onClick={() => {
+                      setAuthMode('signup');
+                      setSignupStep(1);
+                    }}
+                    className="text-[#6C5CE7] hover:text-[#5843D8] font-black underline cursor-pointer transition-colors"
                   >
-                    Already registered? Sign In
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn-game-purple py-2 px-5 text-xs shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5"
-                  >
-                    <span>Continue to Step 2: Select Class</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    Start Step-by-Step Setup
                   </button>
                 </div>
               </form>
             )}
 
-            {/* STEP 2: CLASS STANDARD SELECTION (Strictly up to 12th Pass) */}
-            {signupStep === 2 && (
-              <div className="space-y-4 text-xs">
-                <div>
-                  <div className="font-black text-sm text-[#1E1E24] mb-1">
-                    Step 2: Select Your Class Standard
+            {/* ========================================================
+                VIEW 3: STEP-BY-STEP SIGN UP WIZARD
+               ======================================================== */}
+            {authMode === 'signup' && (
+              <div>
+                {/* Step Stepper Header */}
+                <div className="flex items-center justify-between mb-6 px-1">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border transition-all ${
+                        signupStep >= 1
+                          ? 'bg-[#7257FF] text-white border-[#7257FF] shadow-[0_2px_8px_rgba(114,87,255,0.35)]'
+                          : 'bg-gray-100 text-[#7E7E8F] border-gray-200'
+                      }`}
+                    >
+                      1
+                    </div>
+                    <span className={`text-xs font-black ${signupStep === 1 ? 'text-[#7257FF]' : 'text-[#7E7E8F]'}`}>
+                      Account
+                    </span>
                   </div>
-                  <p className="text-[#4A4A58] text-[11px] mb-3">
-                    Curriculum is strictly tailored up to 12th Pass (no irrelevant university topics):
-                  </p>
+
+                  <div className={`flex-1 h-0.5 mx-3 ${signupStep >= 2 ? 'bg-[#7257FF]' : 'bg-[#1E1E24]/15'}`} />
+
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border transition-all ${
+                        signupStep >= 2
+                          ? 'bg-[#7257FF] text-white border-[#7257FF] shadow-[0_2px_8px_rgba(114,87,255,0.35)]'
+                          : 'bg-gray-100 text-[#7E7E8F] border-gray-200'
+                      }`}
+                    >
+                      2
+                    </div>
+                    <span className={`text-xs font-black ${signupStep === 2 ? 'text-[#7257FF]' : 'text-[#7E7E8F]'}`}>
+                      Class
+                    </span>
+                  </div>
+
+                  <div className={`flex-1 h-0.5 mx-3 ${signupStep >= 3 ? 'bg-[#7257FF]' : 'bg-[#1E1E24]/15'}`} />
+
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border transition-all ${
+                        signupStep >= 3
+                          ? 'bg-[#7257FF] text-white border-[#7257FF] shadow-[0_2px_8px_rgba(114,87,255,0.35)]'
+                          : 'bg-gray-100 text-[#7E7E8F] border-gray-200'
+                      }`}
+                    >
+                      3
+                    </div>
+                    <span className={`text-xs font-black ${signupStep === 3 ? 'text-[#7257FF]' : 'text-[#7E7E8F]'}`}>
+                      Language
+                    </span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-2.5">
-                  {AVAILABLE_CLASSES.map((cls) => {
-                    const isSelected = studentClass === cls;
-                    return (
-                      <div
-                        key={cls}
-                        onClick={() => setStudentClass(cls)}
-                        className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-[#FBBF24] shadow-[3px_3px_0px_#1E1E24] font-black'
-                            : 'bg-white hover:bg-[#F2ECE0] shadow-[2px_2px_0px_#1E1E24]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span className="font-black text-xs text-[#1E1E24]">{cls}</span>
-                        </div>
-
-                        <span className="text-[10px] text-[#4A4A58] font-bold">
-                          {cls === 'Class 9'
-                            ? 'Foundations & Algorithmic Logic'
-                            : cls === 'Class 10'
-                            ? 'Core Problem Solving & Python'
-                            : cls === 'Class 11'
-                            ? 'CS Principles & Loops'
-                            : 'Advanced Systems & Capstones'}
-                        </span>
+                {/* STEP 1: Full Name, Email, Password */}
+                {signupStep === 1 && (
+                  <form onSubmit={handleProceedToStep2} className="space-y-4 text-xs sm:text-sm">
+                    <div>
+                      <div className="font-black text-sm text-[#1E1E24] mb-0.5">
+                        Step 1: Scholar Identification
                       </div>
-                    );
-                  })}
-                </div>
+                      <p className="text-[#4A4A58] text-xs mb-3 font-medium">
+                        Enter your name and login credentials to establish your saved account:
+                      </p>
+                    </div>
 
-                <div className="flex items-center justify-between pt-3">
-                  <button
-                    type="button"
-                    onClick={() => setSignupStep(1)}
-                    className="btn-game-white py-2 px-4 text-xs font-black"
-                  >
-                    ← Back
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleProceedToStep3}
-                    className="btn-game-purple py-2 px-5 text-xs shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5"
-                  >
-                    <span>Continue to Step 3: Select Language</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                    <div>
+                      <label className="block font-black text-xs text-[#1E1E24] mb-1.5">Full Name</label>
+                      <div className="relative group">
+                        <User className="w-4 h-4 text-[#94A3B8] group-focus-within:text-[#7257FF] absolute left-3.5 top-3.5 transition-colors pointer-events-none" />
+                        <input
+                          type="text"
+                          required
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Aryabhata Sharma"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/80 border border-[#1E1E24]/20 text-xs sm:text-sm font-bold text-[#1E1E24] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#7257FF] focus:ring-4 focus:ring-[#7257FF]/15 focus:outline-none transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-xs text-[#1E1E24] mb-1.5">Email Address</label>
+                      <div className="relative group">
+                        <Mail className="w-4 h-4 text-[#94A3B8] group-focus-within:text-[#7257FF] absolute left-3.5 top-3.5 transition-colors pointer-events-none" />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          onBlur={() => setEmail((prev) => prev.trim())}
+                          placeholder="student@learning.edu"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/80 border border-[#1E1E24]/20 text-xs sm:text-sm font-bold text-[#1E1E24] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#7257FF] focus:ring-4 focus:ring-[#7257FF]/15 focus:outline-none transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-xs text-[#1E1E24] mb-1.5">Password</label>
+                      <div className="relative group">
+                        <Lock className="w-4 h-4 text-[#94A3B8] group-focus-within:text-[#7257FF] absolute left-3.5 top-3.5 transition-colors pointer-events-none" />
+                        <input
+                          type="password"
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="At least 6 characters"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/80 border border-[#1E1E24]/20 text-xs sm:text-sm font-bold text-[#1E1E24] placeholder:text-[#94A3B8] focus:bg-white focus:border-[#7257FF] focus:ring-4 focus:ring-[#7257FF]/15 focus:outline-none transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setAuthMode('signin')}
+                        className="text-[#7E7E8F] hover:text-[#1E1E24] font-bold text-xs order-2 sm:order-1 cursor-pointer"
+                      >
+                        Already registered? Sign In
+                      </button>
+                      <button
+                        type="submit"
+                        className="w-full sm:w-auto py-3 px-6 rounded-xl bg-gradient-to-r from-[#7257FF] via-[#6348F0] to-[#5843D8] hover:from-[#7E65FF] hover:to-[#6348F0] text-white font-black text-xs sm:text-sm shadow-[0_8px_20px_-4px_rgba(114,87,255,0.4)] flex items-center justify-center gap-1.5 order-1 sm:order-2 cursor-pointer transition-all"
+                      >
+                        <span>Continue to Step 2</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* STEP 2: CLASS STANDARD SELECTION */}
+                {signupStep === 2 && (
+                  <div className="space-y-4 text-xs sm:text-sm">
+                    <div>
+                      <div className="font-black text-sm text-[#1E1E24] mb-0.5">
+                        Step 2: Select Your Class Standard
+                      </div>
+                      <p className="text-[#4A4A58] text-xs mb-3 font-medium">
+                        Curriculum is strictly tailored up to 12th Pass:
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {AVAILABLE_CLASSES.map((cls) => {
+                        const isSelected = studentClass === cls;
+                        return (
+                          <div
+                            key={cls}
+                            onClick={() => setStudentClass(cls)}
+                            className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-[#FEF3C7] to-[#FDE68A] border-[#D97706] shadow-[0_4px_12px_rgba(217,119,6,0.2)] font-black'
+                                : 'bg-white/80 hover:bg-white border-[#1E1E24]/15'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <GraduationCap className={`w-4 h-4 ${isSelected ? 'text-[#D97706]' : 'text-[#7E7E8F]'}`} />
+                              <span className="font-black text-xs text-[#1E1E24]">{cls}</span>
+                            </div>
+
+                            <span className="text-[10px] text-[#4A4A58] font-semibold">
+                              {cls === 'Class 9'
+                                ? 'Foundations & Algorithmic Logic'
+                                : cls === 'Class 10'
+                                ? 'Core Problem Solving & Python'
+                                : cls === 'Class 11'
+                                ? 'CS Principles & Loops'
+                                : 'Advanced Systems & Capstones'}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3">
+                      <button
+                        type="button"
+                        onClick={() => setSignupStep(1)}
+                        className="py-2.5 px-4 rounded-xl bg-white/80 hover:bg-white text-xs font-black text-[#4A4A58] border border-[#1E1E24]/15 cursor-pointer transition-all"
+                      >
+                        ← Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleProceedToStep3}
+                        className="py-3 px-6 rounded-xl bg-gradient-to-r from-[#7257FF] via-[#6348F0] to-[#5843D8] hover:from-[#7E65FF] hover:to-[#6348F0] text-white font-black text-xs sm:text-sm shadow-[0_8px_20px_-4px_rgba(114,87,255,0.4)] flex items-center gap-1.5 cursor-pointer transition-all"
+                      >
+                        <span>Continue to Step 3</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 3: PROGRAMMING LANGUAGE SELECTION */}
+                {signupStep === 3 && (
+                  <form onSubmit={handleFinalSignUp} className="space-y-4 text-xs sm:text-sm">
+                    <div>
+                      <div className="font-black text-sm text-[#1E1E24] mb-0.5">
+                        Step 3: Select Programming Realm
+                      </div>
+                      <p className="text-[#4A4A58] text-xs mb-3 font-medium">
+                        Choose the language you want to learn through playable 2D games and quests:
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-xs text-[#1E1E24] mb-1.5">
+                        Programming Language:
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={targetSubject}
+                          onChange={(e) => setTargetSubject(e.target.value)}
+                          className="w-full appearance-none px-4 py-3 border border-[#1E1E24]/20 rounded-xl bg-white text-xs sm:text-sm font-black text-[#1E1E24] focus:outline-none focus:border-[#7257FF] focus:ring-4 focus:ring-[#7257FF]/15 cursor-pointer pr-10 shadow-xs"
+                        >
+                          {AVAILABLE_SUBJECTS.map((sub) => (
+                            <option key={sub.id} value={sub.id}>
+                              {sub.name} — {sub.tagline}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-[#1E1E24] absolute right-3.5 top-3.5 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#FAF6EE] border border-[#1E1E24]/15 space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs font-black text-[#6C5CE7]">
+                        <Gamepad2 className="w-4 h-4 text-[#EF4444]" />
+                        <span>Included Mission: Rescue the Robot with Python Loops</span>
+                      </div>
+                      <p className="text-[11px] text-[#4A4A58] font-medium leading-relaxed">
+                        You will play an animated 2D grid game to steer the robot, collect energy cells, avoid space obstacles, and reach the base beacon.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3">
+                      <button
+                        type="button"
+                        onClick={() => setSignupStep(2)}
+                        className="py-2.5 px-4 rounded-xl bg-white/80 hover:bg-white text-xs font-black text-[#4A4A58] border border-[#1E1E24]/15 cursor-pointer transition-all"
+                      >
+                        ← Back
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#FBBF24] via-[#F59E0B] to-[#D97706] text-[#1E1E24] font-black text-xs sm:text-sm shadow-[0_8px_24px_-4px_rgba(245,158,11,0.4)] hover:shadow-[0_12px_28px_-4px_rgba(245,158,11,0.55)] active:scale-[0.98] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-60 border border-amber-200/50"
+                      >
+                        <span>{isSubmitting ? 'Setting up...' : '🚀 Finish Setup & Enter Game Arena'}</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             )}
-
-            {/* STEP 3: PROGRAMMING LANGUAGE IN DROPDOWN BUTTON */}
-            {signupStep === 3 && (
-              <form onSubmit={handleFinalSignUp} className="space-y-4 text-xs">
-                <div>
-                  <div className="font-black text-sm text-[#1E1E24] mb-1">
-                    Step 3: Select Programming Realm
-                  </div>
-                  <p className="text-[#4A4A58] text-[11px] mb-3">
-                    Choose the language you want to learn through playable 2D games and quests:
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block font-black text-[#1E1E24] mb-1.5">
-                    Programming Language (Select from dropdown):
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={targetSubject}
-                      onChange={(e) => setTargetSubject(e.target.value)}
-                      className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#1E1E24] rounded-xl bg-white text-xs font-black text-[#1E1E24] focus:outline-none shadow-[3px_3px_0px_#1E1E24] cursor-pointer pr-10"
-                    >
-                      {AVAILABLE_SUBJECTS.map((sub) => (
-                        <option key={sub.id} value={sub.id}>
-                          {sub.name} — {sub.tagline}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-[#1E1E24] absolute right-3.5 top-3 pointer-events-none" />
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-black text-[#6C5CE7]">
-                    <Gamepad2 className="w-4 h-4 text-[#EF4444]" />
-                    <span>Included Mission: Rescue the Robot with Python Loops</span>
-                  </div>
-                  <p className="text-[11px] text-[#4A4A58] font-medium leading-relaxed">
-                    You will play an animated 2D grid game to steer the robot, collect energy cells, avoid space obstacles, and reach the base beacon.
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between pt-3">
-                  <button
-                    type="button"
-                    onClick={() => setSignupStep(2)}
-                    className="btn-game-white py-2 px-4 text-xs font-black"
-                  >
-                    ← Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-game-yellow py-2.5 px-6 text-xs font-black shadow-[4px_4px_0px_#1E1E24] flex items-center gap-1.5"
-                  >
-                    <span>{isSubmitting ? 'Setting up...' : '🚀 Finish Setup & Enter Game Arena'}</span>
-                  </button>
-                </div>
-              </form>
-            )}
           </div>
-        )}
-      </div>
+        </div>
+      </main>
     </div>
-  </div>
   );
 }

@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Lock,
+  Eye,
+  EyeOff,
   Mail,
   User,
   GraduationCap,
@@ -54,6 +56,18 @@ export function SaveProgressModal({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleGenerateSafePassword = () => {
+    const prefixes = ['Quest', 'Hero', 'Code', 'Drona', 'Arcade', 'Gurukul'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const num = Math.floor(100 + Math.random() * 900);
+    const symbols = ['!', '#', '$', '@', '*'];
+    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const generated = `${prefix}#${num}${symbol}`;
+    setPassword(generated);
+    setShowPassword(true);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -292,19 +306,40 @@ export function SaveProgressModal({
           </div>
 
           <div>
-            <label className="block text-xs font-black text-[#1E1E24] mb-1">
-              Password:
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-black text-[#1E1E24]">
+                Password:
+              </label>
+              {mode === 'signup' && (
+                <button
+                  type="button"
+                  onClick={handleGenerateSafePassword}
+                  className="text-[10px] text-[#6C5CE7] hover:underline font-black flex items-center gap-1 cursor-pointer bg-[#EDE9FE] px-2 py-0.5 rounded-md border border-[#6C5CE7]/30"
+                >
+                  <span>🎲 Safe Password</span>
+                </button>
+              )}
+            </div>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
+                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                data-lpignore="true"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 pl-9 rounded-xl border-2 border-[#1E1E24] bg-white text-xs font-bold text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] focus:outline-none focus:border-[#6C5CE7]"
+                className="w-full px-3.5 py-2.5 pl-9 pr-10 rounded-xl border-2 border-[#1E1E24] bg-white text-xs font-bold text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] focus:outline-none focus:border-[#6C5CE7]"
               />
               <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-3 pointer-events-none" />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1E1E24] cursor-pointer"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 

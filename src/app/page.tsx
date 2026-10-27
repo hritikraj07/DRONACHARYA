@@ -23,6 +23,8 @@ import {
   Flame,
   Play,
   Lock,
+  Eye,
+  EyeOff,
   CheckCircle2,
   AlertCircle,
   HelpCircle,
@@ -69,6 +71,18 @@ export default function HomePage() {
   const [authSubject, setAuthSubject] = useState('html');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleGenerateSafePassword = () => {
+    const prefixes = ['Quest', 'Hero', 'Code', 'Drona', 'Arcade', 'Gurukul'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const num = Math.floor(100 + Math.random() * 900);
+    const symbols = ['!', '#', '$', '@', '*'];
+    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const generated = `${prefix}#${num}${symbol}`;
+    setAuthPassword(generated);
+    setShowPassword(true);
+  };
 
   // Hero In-Browser Code Studio State
   const [activeCodeTab, setActiveCodeTab] = useState<'python' | 'html' | 'javascript'>('python');
@@ -256,6 +270,13 @@ export default function HomePage() {
     window.dispatchEvent(new Event('storage'));
   };
 
+  // Active course & first lesson for logged-in adventurers
+  const activeSubjectId = currentUser?.targetSubject || 'python';
+  const activeSubjectCourse =
+    COURSES_CATALOG.find((c) => c.id === activeSubjectId) || COURSES_CATALOG[0];
+  const activeFirstLessonId =
+    activeSubjectCourse.chapters[0]?.lessons[0]?.id || `${activeSubjectCourse.id}-less-1-1`;
+
   // Filtered courses for Journey section
   const displayedCourses = COURSES_CATALOG.filter((c) => {
     if (journeyFilter === 'active') return !c.isComingSoon;
@@ -311,16 +332,26 @@ export default function HomePage() {
 
               {/* Dual CTAs (Tactile Arcade Buttons) */}
               <div className="flex flex-wrap items-center gap-4 pt-1">
-                <button
-                  onClick={() => {
-                    setAuthMode('signup');
-                    setIsAuthModalOpen(true);
-                  }}
-                  className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4 text-[#071426]" />
-                  <span>Start Your Adventure 🚀</span>
-                </button>
+                {currentUser ? (
+                  <Link
+                    href={`/learn/${activeFirstLessonId}`}
+                    className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#071426]" />
+                    <span>Continue Adventure 🚀</span>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setAuthMode('signup');
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#071426]" />
+                    <span>Start Your Adventure 🚀</span>
+                  </button>
+                )}
 
                 <Link
                   href="/courses"
@@ -767,21 +798,32 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-2">
-            <button
-              onClick={() => {
-                setAuthMode('signup');
-                setIsAuthModalOpen(true);
-              }}
-              className="btn-arcade btn-arcade-purple px-8 py-3.5"
-            >
-              Start Free Adventure Now →
-            </button>
-            <button
-              onClick={handleInstantGuestLaunch}
-              className="btn-arcade btn-arcade-gold px-6 py-3.5"
-            >
-              ⚡ Instant 1-Click Guest Demo
-            </button>
+            {currentUser ? (
+              <Link
+                href={`/learn/${activeFirstLessonId}`}
+                className="btn-arcade btn-arcade-purple px-8 py-3.5"
+              >
+                Continue Your Adventure Now →
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setAuthMode('signup');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="btn-arcade btn-arcade-purple px-8 py-3.5"
+                >
+                  Start Free Adventure Now →
+                </button>
+                <button
+                  onClick={handleInstantGuestLaunch}
+                  className="btn-arcade btn-arcade-gold px-6 py-3.5"
+                >
+                  ⚡ Instant 1-Click Guest Demo
+                </button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -907,17 +949,29 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[#1E1E24] mb-1">Password</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[#1E1E24]">Password</label>
+                  </div>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
+                      autoComplete="current-password"
+                      data-lpignore="true"
                       value={authPassword}
                       onChange={(e) => setAuthPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
+                      className="w-full pl-9 pr-10 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1E1E24] cursor-pointer"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
@@ -976,15 +1030,36 @@ export default function HomePage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[#1E1E24] mb-1">Password (min 6 chars)</label>
-                      <input
-                        type="password"
-                        required
-                        value={authPassword}
-                        onChange={(e) => setAuthPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full px-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
-                      />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-[#1E1E24]">Password (min 6 chars)</label>
+                        <button
+                          type="button"
+                          onClick={handleGenerateSafePassword}
+                          className="text-[10px] text-[#6C5CE7] hover:underline font-black flex items-center gap-1 cursor-pointer bg-[#EDE9FE] px-2 py-0.5 rounded-md border border-[#6C5CE7]/30"
+                        >
+                          <span>🎲 Safe Password</span>
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          autoComplete="new-password"
+                          data-lpignore="true"
+                          value={authPassword}
+                          onChange={(e) => setAuthPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full pl-3 pr-10 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1E1E24] cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                     <button
                       type="submit"

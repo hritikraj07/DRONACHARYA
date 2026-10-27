@@ -182,7 +182,6 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   }`}
                 >
                   DRONACHARYA ⋆˙⟡
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
                 </span>
                 <span className="text-[8px] sm:text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
                   Coding Adventure
@@ -263,13 +262,18 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap">
             {currentUser ? (
               <>
-                {/* 1. Player Avatar */}
+                {/* 1. Player Profile (Whole Name + Avatar Initial) */}
                 <Link
                   href="/dashboard"
-                  className="w-8 h-8 rounded-xl bg-[#6C5CE7] border border-[#6C5CE7] text-white flex items-center justify-center font-serif font-black text-xs shrink-0 hover:scale-105 transition-transform"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#6C5CE7] hover:bg-[#5b4bc4] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-white transition-all shrink-0 cursor-pointer"
                   title={`Adventurer: ${currentUser.name} (Quest Hub)`}
                 >
-                  {currentUser.name.charAt(0).toUpperCase()}
+                  <div className="w-5 h-5 rounded-md bg-white/20 flex items-center justify-center font-serif font-black text-[11px] shrink-0">
+                    {currentUser.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="font-bold text-xs truncate max-w-[130px]">
+                    {currentUser.name}
+                  </span>
                 </Link>
 
                 {/* 2. Hearts Remaining */}
@@ -332,13 +336,12 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               </>
             ) : (
               <>
-                {/* GUEST EXPLORER HUD: Pill badge + Log In + Sign Up (Routes to separate /auth page) */}
+                {/* GUEST EXPLORER HUD: Pill badge (No green blinking light) + Log In + Sign Up */}
                 <Link
                   href="/auth?mode=signup"
                   className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100/80 border border-amber-200 text-xs font-bold text-amber-900 transition-colors cursor-pointer shrink-0"
                   title="Guest Mode • Sign up to save progress"
                 >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
                   <span className="hidden 2xl:inline">Guest Mode • Sign up to save progress</span>
                   <span className="hidden md:inline 2xl:hidden">Guest Mode</span>
                   <span className="md:hidden">Guest</span>

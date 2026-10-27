@@ -1,5 +1,5 @@
-// Dronacharya — Gamified AI-Powered Learning Platform
-// Transforms theoretical programming knowledge into verifiable skill through 2D games and live code
+// Dronacharya — Gamified AI-Powered Coding Adventure
+// CodeDex-inspired playful portal: Playable hero mini-game, 8-realm world map, gameplay loop & Supabase auth
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -10,15 +10,11 @@ import {
   authenticateUser,
   registerUser,
   updateUserLearningSelection,
-  awardGameProgress,
-  deductHeart,
-  restoreHearts,
   RegisteredUser,
   AVAILABLE_CLASSES,
   AVAILABLE_SUBJECTS,
 } from '@/lib/db/auth-db';
-import { SUBJECT_CURRICULA } from '@/lib/data/game-curriculum';
-import { RobotRescueGame } from '@/components/game/RobotRescueGame';
+import { WorldMap } from '@/components/game/WorldMap';
 import {
   Sparkles,
   Heart,
@@ -42,13 +38,22 @@ import {
   ChevronDown,
   Gamepad2,
   Terminal,
+  Zap,
+  Star,
+  Target,
+  Compass,
+  Layers,
+  ShieldCheck,
+  Cpu,
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Authentication State
+  // Authentication Modal State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
   const [signupStep, setSignupStep] = useState<1 | 2 | 3>(1);
 
@@ -61,20 +66,18 @@ export default function HomePage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
 
-  // Switch Modal State
-  const [isSwitchOpen, setIsSwitchOpen] = useState(false);
-  const [modalClass, setModalClass] = useState('');
-  const [modalSubject, setModalSubject] = useState('');
+  // Hero Playable Interactive Mini-Game State
+  const [heroRoverPos, setHeroRoverPos] = useState({ x: 0, y: 0 });
+  const [heroBattery, setHeroBattery] = useState(80);
+  const [heroBatteryCollected, setHeroBatteryCollected] = useState(false);
+  const [heroWon, setHeroWon] = useState(false);
+  const [heroConsoleMsg, setHeroConsoleMsg] = useState('Type or click commands below to test real rover propulsion.');
 
   // Synchronize active session on mount & on custom event
   useEffect(() => {
     const syncUser = () => {
       const session = getActiveSession();
       setCurrentUser(session);
-      if (session) {
-        setModalClass(session.studentClass);
-        setModalSubject(session.targetSubject);
-      }
     };
     syncUser();
     window.addEventListener('dronacharya_session_change', syncUser);
@@ -87,7 +90,49 @@ export default function HomePage() {
     };
   }, []);
 
-  // Handle Sign In (Strict database credential matching with Supabase)
+  // Handle Hero Mini-Game Movement Commands
+  const handleHeroCommand = (cmd: 'RIGHT' | 'DOWN' | 'COLLECT' | 'RESET') => {
+    if (cmd === 'RESET') {
+      setHeroRoverPos({ x: 0, y: 0 });
+      setHeroBattery(80);
+      setHeroBatteryCollected(false);
+      setHeroWon(false);
+      setHeroConsoleMsg('Rover reset to launch pad (0, 0).');
+      return;
+    }
+
+    if (cmd === 'COLLECT') {
+      if (heroRoverPos.x === 2 && heroRoverPos.y === 0 && !heroBatteryCollected) {
+        setHeroBatteryCollected(true);
+        setHeroBattery((b) => Math.min(100, b + 25));
+        setHeroConsoleMsg('⚡ robot.collect() -> Energized! +25% battery added.');
+      } else {
+        setHeroConsoleMsg('robot.collect() -> No battery cell at this tile.');
+      }
+      return;
+    }
+
+    let nextX = heroRoverPos.x;
+    let nextY = heroRoverPos.y;
+
+    if (cmd === 'RIGHT') nextX = Math.min(3, nextX + 1);
+    if (cmd === 'DOWN') nextY = Math.min(3, nextY + 1);
+
+    const newBat = Math.max(0, heroBattery - 10);
+    setHeroBattery(newBat);
+    setHeroRoverPos({ x: nextX, y: nextY });
+    setHeroConsoleMsg(`robot.move("${cmd}") -> New tile (${nextX}, ${nextY}) | Battery: ${newBat}%`);
+
+    if (nextX === 3 && nextY === 3) {
+      setHeroWon(true);
+      setHeroConsoleMsg('🎉 Extraction Beacon reached! Mission Complete!');
+      try {
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.5 } });
+      } catch (e) {}
+    }
+  };
+
+  // Handle Sign In (Supabase with trimmed email & cookies)
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
@@ -108,9 +153,8 @@ export default function HomePage() {
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
         setCurrentUser(res.user!);
-        setModalClass(res.user!.studentClass);
-        setModalSubject(res.user!.targetSubject);
-      }, 250);
+        setIsAuthModalOpen(false);
+      }, 300);
     } else {
       setAuthError(res.error || 'Authentication failed. Please verify credentials.');
     }
@@ -171,732 +215,608 @@ export default function HomePage() {
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
         setCurrentUser(res.user!);
-        setModalClass(res.user!.studentClass);
-        setModalSubject(res.user!.targetSubject);
-      }, 250);
+        setIsAuthModalOpen(false);
+      }, 300);
     } else {
       setAuthError(res.error || 'Registration failed.');
     }
   };
 
-  // Handle Switch Subject / Class
-  const handleSaveClassSubjectSwitch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const updated = updateUserLearningSelection({
-      studentClass: modalClass,
-      targetSubject: modalSubject,
-    });
-    if (updated) {
-      setCurrentUser({ ...updated });
-      setIsSwitchOpen(false);
-    }
-  };
-
-  // Restore Hearts
-  const handleRestoreHearts = () => {
-    const updated = restoreHearts();
-    if (updated && currentUser) {
-      setCurrentUser({ ...currentUser, hearts: 3 });
-    }
-  };
-
-  // Callback from Game Component when level is completed
-  const handleGameLevelComplete = (xpEarned: number) => {
-    if (currentUser) {
-      const updated = awardGameProgress({
-        missionId: 'level-1-robot-rescue',
-        earnedXp: xpEarned,
-      });
-      if (updated) {
-        setCurrentUser({ ...updated });
-      }
-    }
-  };
-
-  // Callback when heart is lost during game collision
-  const handleHeartLost = () => {
-    const remaining = deductHeart();
-    if (currentUser) {
-      setCurrentUser({ ...currentUser, hearts: remaining });
-    }
-  };
-
-  if (!isLoaded) {
-    return (
-      <div className="w-full flex-1 flex items-center justify-center py-24 text-sm text-[#575A51]">
-        <RefreshCw className="w-5 h-5 animate-spin mr-2 text-[#354B3A]" />
-        <span>Loading Dronacharya...</span>
-      </div>
-    );
-  }
-
-  // =========================================================================
-  // VIEW 1: NOT LOGGED IN -> STEP-BY-STEP ONBOARDING WIZARD
-  // =========================================================================
-  if (!currentUser) {
-    return (
-      <div className="w-full flex-1 flex flex-col items-center justify-center py-8 px-4 sm:px-6">
-        <div className="w-full max-w-xl bg-white border border-[#D8CFC0] rounded-2xl shadow-xl p-6 sm:p-8">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 mx-auto rounded-xl bg-[#354B3A] text-[#F6F1E7] flex items-center justify-center font-serif text-2xl font-bold shadow-xs mb-3">
-              द्रो
+  return (
+    <div className="w-full flex flex-col items-center">
+      {/* =========================================================================
+          1. CODEDEX-INSPIRED HERO: "Don't Just Learn to Code. Play Your Way Through It."
+         ========================================================================= */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          {/* Left Column: Bold Copy & Actions */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EDE9FE] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
+              <Sparkles className="w-4 h-4 text-[#6C5CE7]" />
+              <span className="text-xs font-black uppercase tracking-wider text-[#6C5CE7]">
+                Gamified Programming Adventure
+              </span>
             </div>
-            <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#252820]">
-              {authMode === 'signin' ? 'Sign In to Continue' : 'What do you want to learn?'}
+
+            <h1 className="font-serif font-black text-4xl sm:text-5xl lg:text-6xl text-[#1E1E24] leading-[1.08] tracking-tight">
+              Don't Just Learn to Code.{' '}
+              <span className="inline-block bg-[#FBBF24] px-2 py-0.5 rounded-xl border-3 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] transform -rotate-1">
+                Play Your Way
+              </span>{' '}
+              Through It.
             </h1>
-            <p className="text-xs sm:text-sm text-[#575A51] mt-1.5 max-w-md mx-auto">
-              {authMode === 'signin'
-                ? 'Enter your registered credentials to jump straight into your game arena.'
-                : 'Complete the 3 quick steps to tailor your interactive gaming curriculum.'}
+
+            <p className="text-sm sm:text-base text-[#4A4A58] max-w-xl font-medium leading-relaxed">
+              Explore 8 vibrant programming worlds, write real Python code to command robots and defeat challenges, and learn from every mistake with your Socratic AI mentor.
             </p>
-          </div>
 
-          {/* Mode Switcher Tabs */}
-          <div className="flex border-b border-[#D8CFC0] mb-6">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode('signin');
-                setAuthError(null);
-                setAuthSuccess(null);
-              }}
-              className={`flex-1 py-2.5 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
-                authMode === 'signin'
-                  ? 'border-[#354B3A] text-[#354B3A]'
-                  : 'border-transparent text-[#7E8276] hover:text-[#252820]'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode('signup');
-                setAuthError(null);
-                setAuthSuccess(null);
-                setSignupStep(1);
-              }}
-              className={`flex-1 py-2.5 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
-                authMode === 'signup'
-                  ? 'border-[#354B3A] text-[#354B3A]'
-                  : 'border-transparent text-[#7E8276] hover:text-[#252820]'
-              }`}
-            >
-              New Student (Step-by-Step)
-            </button>
-          </div>
-
-          {/* Feedback alerts */}
-          {authError && (
-            <div className="mb-4 p-3 rounded-lg bg-[#FAF4F0] border border-[#A65F43] text-xs text-[#A65F43] flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{authError}</span>
-            </div>
-          )}
-
-          {authSuccess && (
-            <div className="mb-4 p-3 rounded-lg bg-[#E2E8E3] border border-[#354B3A] text-xs text-[#354B3A] font-semibold flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>{authSuccess}</span>
-            </div>
-          )}
-
-          {/* =========================================================================
-              SIGN IN FORM (Single fast screen for existing accounts)
-             ========================================================================= */}
-          {authMode === 'signin' ? (
-            <form onSubmit={handleSignIn} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-semibold text-[#252820] mb-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
-                  <input
-                    type="email"
-                    required
-                    value={authEmail}
-                    onChange={(e) => setAuthEmail(e.target.value)}
-                    onBlur={() => setAuthEmail((prev) => prev.trim())}
-                    placeholder="student@learning.edu"
-                    className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-[#252820] mb-1">Password</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
-                  <input
-                    type="password"
-                    required
-                    value={authPassword}
-                    onChange={(e) => setAuthPassword(e.target.value)}
-                    placeholder="Enter your database password"
-                    className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full btn-primary py-2.5 text-xs font-semibold shadow-xs mt-2"
-              >
-                <span>Verify Credentials & Start Learning</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-
-              <div className="text-center pt-2 text-[#7E8276]">
-                Don't have an account yet?{' '}
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              {currentUser ? (
+                <Link
+                  href="/simulator?mission=mission-rescue-robot"
+                  className="btn-game-purple text-sm py-3.5 px-8 shadow-[4px_4px_0px_#1E1E24]"
+                >
+                  <Gamepad2 className="w-5 h-5 fill-white" />
+                  <span>Resume Quest ({currentUser.name})</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
                 <button
-                  type="button"
                   onClick={() => {
                     setAuthMode('signup');
                     setSignupStep(1);
+                    setIsAuthModalOpen(true);
                   }}
-                  className="text-[#354B3A] font-semibold underline cursor-pointer"
+                  className="btn-game-purple text-sm py-3.5 px-8 shadow-[4px_4px_0px_#1E1E24]"
                 >
-                  Start Step-by-Step Setup
+                  <Sparkles className="w-5 h-5 text-[#FBBF24]" />
+                  <span>Start Your Adventure</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+
+              <Link
+                href="/paths"
+                className="btn-game-white text-sm py-3.5 px-6 shadow-[4px_4px_0px_#1E1E24]"
+              >
+                <Compass className="w-4 h-4 text-[#6C5CE7]" />
+                <span>Explore Worlds</span>
+              </Link>
+            </div>
+
+            {/* Quick Badges */}
+            <div className="flex flex-wrap items-center gap-4 pt-2 text-xs font-bold text-[#4A4A58]">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+                <span>Real Python Code Execution</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#6C5CE7]" />
+                <span>Bug-to-Battle Diagnostics</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                <span>Verifiable Mastery Seals</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Interactive Playable Mini-Game Hero Widget */}
+          <div className="lg:col-span-5">
+            <div className="card-game p-5 bg-white shadow-[6px_6px_0px_#1E1E24]">
+              {/* Widget Header */}
+              <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-[#1E1E24]/15">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#10B981] animate-ping" />
+                  <span className="font-serif font-black text-xs text-[#1E1E24]">
+                    Interactive Mission Preview: Rover Arya
+                  </span>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-[#FEF3C7] border border-[#1E1E24] text-[#D97706]">
+                  Live Sandbox
+                </span>
+              </div>
+
+              {/* 4x4 Mini Grid Arena */}
+              <div className="relative aspect-square max-w-[280px] mx-auto border-3 border-[#1E1E24] rounded-2xl bg-[#FAF6EE] shadow-[3px_3px_0px_#1E1E24] p-2 mb-4">
+                <div className="grid grid-cols-4 grid-rows-4 w-full h-full gap-1">
+                  {Array.from({ length: 4 }).map((_, r) =>
+                    Array.from({ length: 4 }).map((_, c) => {
+                      const isRover = heroRoverPos.x === c && heroRoverPos.y === r;
+                      const isBattery = c === 2 && r === 0 && !heroBatteryCollected;
+                      const isTarget = c === 3 && r === 3;
+                      const isObstacle = (c === 1 && r === 1) || (c === 2 && r === 2);
+
+                      return (
+                        <div
+                          key={`${r}-${c}`}
+                          className={`relative rounded-lg border border-[#1E1E24]/20 flex items-center justify-center ${
+                            isTarget
+                              ? 'bg-[#CCFBF1] border-2 border-[#14B8A6]'
+                              : isObstacle
+                              ? 'bg-[#FEE2E2] border-2 border-[#EF4444]'
+                              : (r + c) % 2 === 0
+                              ? 'bg-white'
+                              : 'bg-[#F2ECE0]'
+                          }`}
+                        >
+                          <span className="absolute top-0.5 left-1 text-[7px] text-[#7E7E8F]/40 font-bold">
+                            {c},{r}
+                          </span>
+
+                          {isObstacle && !isRover && (
+                            <span className="text-xs">🪨</span>
+                          )}
+
+                          {isBattery && !isRover && (
+                            <Zap className="w-3.5 h-3.5 text-[#F59E0B] fill-[#F59E0B] animate-bounce" />
+                          )}
+
+                          {isTarget && !isRover && (
+                            <span className="text-xs font-black">🏁</span>
+                          )}
+
+                          {isRover && (
+                            <div className="w-6 h-6 rounded-md bg-[#6C5CE7] border border-[#1E1E24] flex items-center justify-center text-white text-[10px] font-black shadow-[1.5px_1.5px_0px_#1E1E24]">
+                              🤖
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Console Output Strip */}
+              <div className="bg-[#1E1E24] border-2 border-[#1E1E24] rounded-xl p-2.5 mb-3 text-[11px] font-mono text-[#A29BFE] truncate">
+                {heroConsoleMsg}
+              </div>
+
+              {/* Code Command Buttons */}
+              <div className="grid grid-cols-4 gap-1.5 mb-3">
+                <button
+                  onClick={() => handleHeroCommand('RIGHT')}
+                  className="btn-game-white text-[11px] py-1.5 font-mono"
+                  title="robot.move_right()"
+                >
+                  .move_right()
+                </button>
+                <button
+                  onClick={() => handleHeroCommand('DOWN')}
+                  className="btn-game-white text-[11px] py-1.5 font-mono"
+                  title="robot.move_down()"
+                >
+                  .move_down()
+                </button>
+                <button
+                  onClick={() => handleHeroCommand('COLLECT')}
+                  className="btn-game-yellow text-[11px] py-1.5 font-mono"
+                  title="robot.collect()"
+                >
+                  .collect()
+                </button>
+                <button
+                  onClick={() => handleHeroCommand('RESET')}
+                  className="btn-game-coral text-[11px] py-1.5 font-mono"
+                  title="Reset Simulation"
+                >
+                  .reset()
                 </button>
               </div>
-            </form>
-          ) : (
-            /* =========================================================================
-                STEP-BY-STEP SIGN UP WIZARD (Step 1 -> Step 2 -> Step 3)
-               ========================================================================= */
+
+              {/* Enter Full Simulator CTA */}
+              <Link
+                href="/simulator?mission=mission-rescue-robot"
+                className="btn-game-purple w-full py-2.5 text-xs text-center shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <span>Launch Full 6x6 Coding Simulator</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          2. THE 6-STEP GAMEPLAY LOOP (Section 1)
+         ========================================================================= */}
+      <section className="w-full bg-white border-y-2 border-[#1E1E24] py-14 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-black uppercase tracking-wider text-[#6C5CE7] bg-[#EDE9FE] px-3 py-1 rounded-full border border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24]">
+              The Core Gameplay Loop
+            </span>
+            <h2 className="font-serif font-black text-3xl sm:text-4xl text-[#1E1E24] mt-3">
+              How You Master Programming
+            </h2>
+            <p className="text-xs sm:text-sm text-[#4A4A58] mt-2 font-medium">
+              Every quest is an active coding experiment. No boring multiple-choice questions. Real code directly controls game outcomes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+            {[
+              { step: '01', title: 'Explore', desc: 'Journey across 8 connected programming realms on the World Map.', color: '#10B981', bg: '#D1FAE5' },
+              { step: '02', title: 'Accept Quest', desc: 'Receive real mission briefs, story directives, and constraints.', color: '#3B82F6', bg: '#DBEAFE' },
+              { step: '03', title: 'Write Code', desc: 'Author real Python programs in the integrated studio.', color: '#6C5CE7', bg: '#EDE9FE' },
+              { step: '04', title: 'Run Arena', desc: 'Watch your code navigate rovers and inspect bio-cells.', color: '#F59E0B', bg: '#FEF3C7' },
+              { step: '05', title: 'Battle Bugs', desc: 'Analyze observable failures with progressive Socratic hints.', color: '#EF4444', bg: '#FEE2E2' },
+              { step: '06', title: 'Master & Mint', desc: 'Solve follow-up battle challenges to earn verifiable Mastery Seals.', color: '#8B5CF6', bg: '#F3E8FF' },
+            ].map((s, i) => (
+              <div
+                key={i}
+                className="card-game p-4 flex flex-col justify-between hover:translate-y-[-2px] transition-all"
+                style={{ backgroundColor: '#FAF6EE' }}
+              >
+                <div>
+                  <span
+                    className="text-xs font-black px-2 py-0.5 rounded-md border border-[#1E1E24] inline-block mb-3"
+                    style={{ backgroundColor: s.bg, color: s.color }}
+                  >
+                    STEP {s.step}
+                  </span>
+                  <h3 className="font-serif font-black text-lg text-[#1E1E24] mb-1">
+                    {s.title}
+                  </h3>
+                  <p className="text-xs text-[#4A4A58] leading-relaxed">
+                    {s.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          3. INTERACTIVE WORLD MAP SHOWCASE (Section 3)
+         ========================================================================= */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <WorldMap />
+      </section>
+
+      {/* =========================================================================
+          4. FEATURED CODING MISSIONS (Section 4)
+         ========================================================================= */}
+      <section className="w-full bg-[#F2ECE0] border-t-2 border-[#1E1E24] py-14 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
-              {/* Visual Step Progress Indicator */}
-              <div className="flex items-center justify-between mb-6 px-2">
-                {/* Step 1 Pill */}
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                      signupStep >= 1
-                        ? 'bg-[#354B3A] text-white'
-                        : 'bg-[#D8CFC0] text-[#575A51]'
-                    }`}
-                  >
-                    1
-                  </div>
-                  <span className={`text-[11px] font-semibold ${signupStep === 1 ? 'text-[#354B3A]' : 'text-[#7E8276]'}`}>
-                    Account
+              <span className="text-xs font-black uppercase tracking-wider text-[#D97706] bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24]">
+                Featured Quests
+              </span>
+              <h2 className="font-serif font-black text-3xl sm:text-4xl text-[#1E1E24] mt-2">
+                Playable Missions
+              </h2>
+              <p className="text-xs sm:text-sm text-[#4A4A58] mt-1 font-medium">
+                Jump directly into our playable 2D coding simulators.
+              </p>
+            </div>
+
+            <Link
+              href="/simulator"
+              className="btn-game-purple text-xs py-2.5 px-5 shadow-[3px_3px_0px_#1E1E24]"
+            >
+              <span>View All Missions</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mission Card 1: Robot Rescue */}
+            <div className="card-game p-6 bg-white flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-black text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full border border-[#1E1E24]">
+                    Stage 3 • Loop Lab
+                  </span>
+                  <span className="text-xs font-black text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded border border-[#1E1E24]">
+                    +150 XP
                   </span>
                 </div>
 
-                <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 2 ? 'bg-[#354B3A]' : 'bg-[#D8CFC0]'}`} />
+                <h3 className="font-serif font-black text-xl text-[#1E1E24] mb-2">
+                  Rescue the Robot: Facility Navigation
+                </h3>
+                <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
+                  A research facility has locked down! Program exploration rover Arya through a 6x6 grid using loops, battery pickups, and obstacle evasion to reach the emergency extraction beacon.
+                </p>
 
-                {/* Step 2 Pill */}
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                      signupStep >= 2
-                        ? 'bg-[#354B3A] text-white'
-                        : 'bg-[#D8CFC0] text-[#575A51]'
-                    }`}
-                  >
-                    2
-                  </div>
-                  <span className={`text-[11px] font-semibold ${signupStep === 2 ? 'text-[#354B3A]' : 'text-[#7E8276]'}`}>
-                    Class
-                  </span>
-                </div>
-
-                <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 3 ? 'bg-[#354B3A]' : 'bg-[#D8CFC0]'}`} />
-
-                {/* Step 3 Pill */}
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                      signupStep === 3
-                        ? 'bg-[#354B3A] text-white'
-                        : 'bg-[#D8CFC0] text-[#575A51]'
-                    }`}
-                  >
-                    3
-                  </div>
-                  <span className={`text-[11px] font-semibold ${signupStep === 3 ? 'text-[#354B3A]' : 'text-[#7E8276]'}`}>
-                    Language
-                  </span>
+                <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] mb-4 text-xs font-mono text-[#6C5CE7]">
+                  for step in range(3):<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;robot.move_right()<br />
+                  robot.collect()
                 </div>
               </div>
 
-              {/* STEP 1: ACCOUNT CREDENTIALS */}
-              {signupStep === 1 && (
-                <form onSubmit={handleProceedToStep2} className="space-y-4 text-xs">
-                  <div>
-                    <label className="block font-semibold text-[#252820] mb-1">Full Name</label>
-                    <div className="relative">
-                      <User className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+              <Link
+                href="/simulator?mission=mission-rescue-robot"
+                className="btn-game-purple text-xs py-2.5 px-5 w-full text-center shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <span>Launch Mission 1 Simulator</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Mission Card 2: Hazard Filter */}
+            <div className="card-game p-6 bg-white flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-black text-[#F59E0B] bg-[#FEF3C7] px-2.5 py-0.5 rounded-full border border-[#1E1E24]">
+                    Stage 4 • Decision Forest
+                  </span>
+                  <span className="text-xs font-black text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded border border-[#1E1E24]">
+                    +150 XP
+                  </span>
+                </div>
+
+                <h3 className="font-serif font-black text-xl text-[#1E1E24] mb-2">
+                  Filter Damaged Cells: Hazard Decontamination
+                </h3>
+                <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
+                  Radiation has infected biological data cells! Write loops and conditionals to scan incoming cells, routing healthy specimens into the matrix vault while purging negative hazards.
+                </p>
+
+                <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] mb-4 text-xs font-mono text-[#F59E0B]">
+                  for cell in data_cells:<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;if cell &gt; 0:<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clean_vault.append(cell)
+                </div>
+              </div>
+
+              <Link
+                href="/simulator?mission=mission-hazard-filter"
+                className="btn-game-yellow text-xs py-2.5 px-5 w-full text-center shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <span>Launch Mission 2 Simulator</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. AUTHENTICATION MODAL (Supabase with trim & session cookies)
+         ========================================================================= */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E24]/60 backdrop-blur-xs">
+          <div className="relative w-full max-w-lg bg-white border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-6 sm:p-8 animate-in zoom-in-95">
+            <button
+              onClick={() => setIsAuthModalOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#1E1E24] bg-[#F2ECE0] text-[#1E1E24] hover:bg-[#FEE2E2]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-2xl font-bold border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] mx-auto mb-3">
+                द्रो
+              </div>
+              <h2 className="font-serif font-black text-2xl text-[#1E1E24]">
+                {authMode === 'signin' ? 'Sign In to Your Adventure' : 'Join Dronacharya AI'}
+              </h2>
+              <p className="text-xs text-[#4A4A58] mt-1">
+                {authMode === 'signin'
+                  ? 'Enter credentials to load your saved progress & character state.'
+                  : 'Complete 3 quick steps to tailor your interactive gaming curriculum.'}
+              </p>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex border-b-2 border-[#1E1E24] mb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('signin');
+                  setAuthError(null);
+                }}
+                className={`flex-1 py-2 text-xs font-black border-b-2 transition-all cursor-pointer ${
+                  authMode === 'signin'
+                    ? 'border-[#6C5CE7] text-[#6C5CE7]'
+                    : 'border-transparent text-[#7E7E8F]'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('signup');
+                  setSignupStep(1);
+                  setAuthError(null);
+                }}
+                className={`flex-1 py-2 text-xs font-black border-b-2 transition-all cursor-pointer ${
+                  authMode === 'signup'
+                    ? 'border-[#6C5CE7] text-[#6C5CE7]'
+                    : 'border-transparent text-[#7E7E8F]'
+                }`}
+              >
+                New Apprentice (Step-by-Step)
+              </button>
+            </div>
+
+            {/* Feedback Alerts */}
+            {authError && (
+              <div className="mb-4 p-3 rounded-xl bg-[#FEE2E2] border-2 border-[#EF4444] text-xs text-[#DC2626] font-bold flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{authError}</span>
+              </div>
+            )}
+
+            {authSuccess && (
+              <div className="mb-4 p-3 rounded-xl bg-[#D1FAE5] border-2 border-[#10B981] text-xs text-[#059669] font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{authSuccess}</span>
+              </div>
+            )}
+
+            {/* SIGN IN FORM */}
+            {authMode === 'signin' ? (
+              <form onSubmit={handleSignIn} className="space-y-4 text-xs">
+                <div>
+                  <label className="block font-bold text-[#1E1E24] mb-1">Email Address</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
+                    <input
+                      type="email"
+                      required
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      onBlur={() => setAuthEmail((e) => e.trim())}
+                      placeholder="student@learning.edu"
+                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-[#1E1E24] mb-1">Password</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
+                    <input
+                      type="password"
+                      required
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      placeholder="Enter your database password"
+                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn-game-purple w-full py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24] mt-2"
+                >
+                  <span>Verify Credentials &amp; Enter Arena</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            ) : (
+              /* STEP-BY-STEP SIGN UP WIZARD */
+              <div>
+                {/* Step Indicators */}
+                <div className="flex items-center justify-between mb-5 px-4 text-xs font-black">
+                  <div className={`flex items-center gap-1.5 ${signupStep >= 1 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
+                    <span className="w-5 h-5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] flex items-center justify-center text-[10px]">1</span>
+                    <span>Account</span>
+                  </div>
+                  <div className="w-8 h-0.5 bg-[#1E1E24]/20" />
+                  <div className={`flex items-center gap-1.5 ${signupStep >= 2 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
+                    <span className="w-5 h-5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] flex items-center justify-center text-[10px]">2</span>
+                    <span>Class</span>
+                  </div>
+                  <div className="w-8 h-0.5 bg-[#1E1E24]/20" />
+                  <div className={`flex items-center gap-1.5 ${signupStep >= 3 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
+                    <span className="w-5 h-5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] flex items-center justify-center text-[10px]">3</span>
+                    <span>Language</span>
+                  </div>
+                </div>
+
+                {/* Step 1: Account Info */}
+                {signupStep === 1 && (
+                  <form onSubmit={handleProceedToStep2} className="space-y-4 text-xs">
+                    <div>
+                      <label className="block font-bold text-[#1E1E24] mb-1">Full Name</label>
                       <input
                         type="text"
                         required
                         value={authName}
                         onChange={(e) => setAuthName(e.target.value)}
                         placeholder="e.g. Arjun Sharma"
-                        className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                        className="w-full px-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-[#252820] mb-1">Email Address</label>
-                    <div className="relative">
-                      <Mail className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                    <div>
+                      <label className="block font-bold text-[#1E1E24] mb-1">Email Address</label>
                       <input
                         type="email"
                         required
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
-                        onBlur={() => setAuthEmail((prev) => prev.trim())}
-                        placeholder="your.email@example.com"
-                        className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                        onBlur={() => setAuthEmail((e) => e.trim())}
+                        placeholder="arjun@gurukul.edu"
+                        className="w-full px-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-[#252820] mb-1">
-                      Create Password (min 6 characters)
-                    </label>
-                    <div className="relative">
-                      <Lock className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                    <div>
+                      <label className="block font-bold text-[#1E1E24] mb-1">Create Password (min 6 chars)</label>
                       <input
                         type="password"
                         required
                         value={authPassword}
                         onChange={(e) => setAuthPassword(e.target.value)}
-                        placeholder="Create a secure password"
-                        className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                        placeholder="Password"
+                        className="w-full px-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                       />
                     </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      className="w-full btn-primary py-2.5 text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5"
-                    >
-                      <span>Continue to Step 2: Choose Class</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                    <button type="submit" className="btn-game-purple w-full py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24]">
+                      <span>Next: Select Class Standard</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
-                  </div>
+                  </form>
+                )}
 
-                  <div className="text-center pt-2 text-[#7E8276]">
-                    Already registered?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode('signin')}
-                      className="text-[#354B3A] font-semibold underline cursor-pointer"
-                    >
-                      Sign In instead
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* STEP 2: CLASS SELECTION (Kept separately & only 12th pass, no custom topic) */}
-              {signupStep === 2 && (
-                <div className="space-y-4 text-xs">
-                  <div>
-                    <div className="font-serif font-bold text-sm text-[#252820] mb-1">
-                      Step 2: Choose Your Class Standard
-                    </div>
-                    <p className="text-[#575A51] text-[11px] mb-3">
-                      Each class level is calibrated separately (up to 12th Pass):
-                    </p>
-                  </div>
-
-                  {/* 4 Separate Class Option Cards */}
-                  <div className="space-y-2">
-                    {AVAILABLE_CLASSES.map((cls) => {
-                      const isSelected = authClass === cls;
-                      return (
+                {/* Step 2: Class Standard Selection */}
+                {signupStep === 2 && (
+                  <div className="space-y-4 text-xs">
+                    <label className="block font-bold text-[#1E1E24]">Select Your Current Level / Standard:</label>
+                    <div className="space-y-2">
+                      {AVAILABLE_CLASSES.map((c) => (
                         <div
-                          key={cls}
-                          onClick={() => setAuthClass(cls)}
-                          className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
-                            isSelected
-                              ? 'bg-[#E9DFC9] border-[#354B3A] shadow-xs ring-1 ring-[#354B3A]'
-                              : 'bg-[#FAF8F5] border-[#D8CFC0] hover:bg-white hover:border-[#354B3A]/60'
+                          key={c}
+                          onClick={() => setAuthClass(c)}
+                          className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex items-center justify-between ${
+                            authClass === c ? 'bg-[#FBBF24] shadow-[2px_2px_0px_#1E1E24] font-black' : 'bg-white hover:bg-[#F2ECE0]'
                           }`}
                         >
-                          <div className="flex items-center gap-2.5">
-                            <div
-                              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                isSelected ? 'border-[#354B3A] bg-[#354B3A]' : 'border-[#7E8276] bg-white'
-                              }`}
-                            >
-                              {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                            </div>
-                            <span className="font-bold text-xs text-[#252820]">{cls}</span>
-                          </div>
-
-                          <span className="text-[10px] text-[#575A51] font-medium">
-                            {cls === 'Class 9'
-                              ? 'Foundations & Algorithmic Logic'
-                              : cls === 'Class 10'
-                              ? 'Core Problem Solving & Board Prep'
-                              : cls === 'Class 11'
-                              ? 'CS Principles & Loop Engineering'
-                              : 'Advanced Systems & Competitive Prep'}
-                          </span>
+                          <span>{c}</span>
+                          {authClass === c && <CheckCircle2 className="w-4 h-4 text-[#1E1E24]" />}
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Step 2 Navigation Buttons */}
-                  <div className="flex items-center justify-between pt-3">
-                    <button
-                      type="button"
-                      onClick={() => setSignupStep(1)}
-                      className="px-4 py-2 border border-[#D8CFC0] rounded hover:bg-[#E9DFC9] text-[#575A51] font-semibold text-xs transition-colors"
-                    >
-                      ← Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleProceedToStep3}
-                      className="btn-primary py-2 px-5 text-xs font-semibold shadow-xs flex items-center gap-1.5"
-                    >
-                      <span>Continue to Step 3: Select Language</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 3: PROGRAMMING LANGUAGE IN DROPDOWN BUTTON */}
-              {signupStep === 3 && (
-                <form onSubmit={handleFinalSignUp} className="space-y-4 text-xs">
-                  <div>
-                    <div className="font-serif font-bold text-sm text-[#252820] mb-1">
-                      Step 3: Select Programming Language
+                      ))}
                     </div>
-                    <p className="text-[#575A51] text-[11px] mb-3">
-                      Choose the language you want to learn through playable 2D games:
-                    </p>
-                  </div>
-
-                  {/* Dropdown Button for Programming Languages */}
-                  <div>
-                    <label className="block font-semibold text-[#252820] mb-1.5">
-                      Programming Language (Select from dropdown):
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={authSubject}
-                        onChange={(e) => setAuthSubject(e.target.value)}
-                        className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#354B3A] rounded-xl bg-white text-xs font-bold text-[#252820] focus:outline-none shadow-xs cursor-pointer pr-10"
-                      >
-                        {AVAILABLE_SUBJECTS.map((sub) => (
-                          <option key={sub.id} value={sub.id}>
-                            {sub.name} — {sub.tagline}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="w-4 h-4 text-[#354B3A] absolute right-3.5 top-3 pointer-events-none" />
+                    <div className="flex gap-2 pt-2">
+                      <button onClick={() => setSignupStep(1)} className="btn-game-white py-2 px-4 text-xs">Back</button>
+                      <button onClick={handleProceedToStep3} className="btn-game-purple flex-1 py-2 text-xs">Next: Choose Language</button>
                     </div>
                   </div>
+                )}
 
-                  {/* Live Game Preview Box */}
-                  <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#B49A65] space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#354B3A]">
-                      <Gamepad2 className="w-4 h-4 text-[#A65F43]" />
-                      <span>Included Game: Rescue the Robot with Python Loops</span>
+                {/* Step 3: Programming Language */}
+                {signupStep === 3 && (
+                  <div className="space-y-4 text-xs">
+                    <label className="block font-bold text-[#1E1E24]">Select Starting Language / Realm:</label>
+                    <div className="space-y-2">
+                      {AVAILABLE_SUBJECTS.map((s) => (
+                        <div
+                          key={s.id}
+                          onClick={() => setAuthSubject(s.id)}
+                          className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex items-center justify-between ${
+                            authSubject === s.id ? 'bg-[#EDE9FE] border-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24] font-black' : 'bg-white hover:bg-[#F2ECE0]'
+                          }`}
+                        >
+                          <div>
+                            <span className="block font-bold text-[#1E1E24]">{s.name}</span>
+                            <span className="text-[11px] text-[#7E7E8F]">{s.tagline}</span>
+                          </div>
+                          {authSubject === s.id && <CheckCircle2 className="w-4 h-4 text-[#6C5CE7]" />}
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-[11px] text-[#575A51] leading-relaxed">
-                      You will play an animated 2D grid game to steer the robot, collect energy cells, avoid space rocks, and reach the base beacon.
-                    </p>
-                    <div className="flex items-center gap-3 pt-1 text-[10px] text-[#7E8276] font-semibold">
-                      <span>• 3 Starting Lives ❤️</span>
-                      <span>• Real 2D Grid Movement</span>
-                      <span>• No Static MCQs</span>
+                    <div className="flex gap-2 pt-2">
+                      <button onClick={() => setSignupStep(2)} className="btn-game-white py-2 px-4 text-xs">Back</button>
+                      <button onClick={handleFinalSignUp} className="btn-game-yellow flex-1 py-2.5 text-xs font-black shadow-[3px_3px_0px_#1E1E24]">
+                        Create Character &amp; Start Quest
+                      </button>
                     </div>
                   </div>
-
-                  {/* Step 3 Navigation Buttons */}
-                  <div className="flex items-center justify-between pt-3">
-                    <button
-                      type="button"
-                      onClick={() => setSignupStep(2)}
-                      className="px-4 py-2 border border-[#D8CFC0] rounded hover:bg-[#E9DFC9] text-[#575A51] font-semibold text-xs transition-colors"
-                    >
-                      ← Back
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn-primary py-2.5 px-6 text-xs font-bold shadow-md flex items-center gap-1.5"
-                    >
-                      <span>🚀 Finish Setup & Enter Game Arena</span>
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // =========================================================================
-  // VIEW 2: LOGGED IN -> GAMIFIED LEARNING HUB & 2D PLAYABLE GAME
-  // =========================================================================
-  const activeSubjectInfo =
-    AVAILABLE_SUBJECTS.find((s) => s.id === currentUser.targetSubject) || AVAILABLE_SUBJECTS[0];
-
-  const curriculum =
-    SUBJECT_CURRICULA[currentUser.targetSubject] || SUBJECT_CURRICULA['python-basics'] || SUBJECT_CURRICULA['python-algorithms'];
-
-  return (
-    <div className="w-full flex-1 flex flex-col py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      {/* HUD: Student Progress & Learning Target */}
-      <div className="w-full bg-[#E9DFC9] border border-[#D8CFC0] rounded-xl p-4 sm:p-6 mb-6 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#F6F1E7] border border-[#D8CFC0] text-xs font-semibold text-[#354B3A] mb-1.5">
-              <span>Namaste, {currentUser.name}</span>
-              <span>•</span>
-              <span className="font-serif italic">{currentUser.rank} Tier</span>
-            </div>
-            <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#252820]">
-              The Gamified Learning Arena
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-              <span className="text-[#575A51]">
-                Language: <strong className="text-[#252820]">{activeSubjectInfo.name}</strong>
-              </span>
-              <span className="text-[#7E8276]">•</span>
-              <span className="text-[#575A51]">
-                Class: <strong className="text-[#252820]">{currentUser.studentClass}</strong>
-              </span>
-              {/* Quick Switch Button */}
-              <button
-                onClick={() => setIsSwitchOpen(true)}
-                className="ml-1 text-[11px] font-bold text-[#A65F43] underline hover:text-[#354B3A] cursor-pointer"
-              >
-                Change Language / Class
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Stats Grid */}
-          <div className="flex items-center gap-3">
-            {/* Lives / Hearts */}
-            <div className="bg-white border border-[#A65F43] rounded-lg px-3 py-2 text-center shadow-xs">
-              <div className="text-[10px] text-[#7E8276] uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
-                <Heart className="w-3.5 h-3.5 fill-[#A65F43] text-[#A65F43]" />
-                <span>Lives</span>
+                )}
               </div>
-              <div className="font-serif font-bold text-base text-[#A65F43] mt-0.5">
-                {currentUser.hearts} / 3
-              </div>
-              {currentUser.hearts < 3 && (
-                <button
-                  onClick={handleRestoreHearts}
-                  className="text-[9px] text-[#354B3A] font-bold underline mt-0.5 cursor-pointer"
-                >
-                  Revive (+3 ❤️)
-                </button>
-              )}
-            </div>
-
-            {/* Streak */}
-            <div className="bg-white border border-[#D8CFC0] rounded-lg px-3 py-2 text-center shadow-xs">
-              <div className="text-[10px] text-[#7E8276] uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
-                <Flame className="w-3.5 h-3.5 text-[#A65F43]" />
-                <span>Streak</span>
-              </div>
-              <div className="font-serif font-bold text-base text-[#A65F43] mt-0.5">
-                {currentUser.currentStreak}d
-              </div>
-              <div className="text-[9px] text-[#354B3A]">Active</div>
-            </div>
-
-            {/* XP Points */}
-            <div className="bg-white border border-[#B49A65] rounded-lg px-3.5 py-2 text-center shadow-xs">
-              <div className="text-[10px] text-[#7E8276] uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
-                <Award className="w-3.5 h-3.5 text-[#B49A65]" />
-                <span>Mastery XP</span>
-              </div>
-              <div className="font-serif font-bold text-base text-[#354B3A] mt-0.5">
-                {currentUser.totalXp}
-              </div>
-              <div className="text-[9px] text-[#7E8276]">Lvl {currentUser.level || 1}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          PRIMARY PLAYABLE 2D GAME ARENA (NO MCQs! Play the actual game!)
-         ========================================================================= */}
-      <div className="mb-8">
-        <RobotRescueGame
-          onLevelComplete={handleGameLevelComplete}
-          onHeartLost={handleHeartLost}
-          heartsRemaining={currentUser.hearts}
-        />
-      </div>
-
-      {/* Learning Quests & Practical Simulator Missions */}
-      <div className="w-full">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#252820]">
-              Missions & Code Challenges: {activeSubjectInfo.name}
-            </h2>
-            <p className="text-xs text-[#575A51] mt-0.5">
-              Reinforce the loop concepts learned in the game with live Python test suites and practical projects.
-            </p>
-          </div>
-
-          <Link href="/simulator" className="btn-brass text-xs py-1.5 px-3 flex items-center gap-1.5">
-            <Terminal className="w-3.5 h-3.5" />
-            <span>Open Python Sandbox</span>
-          </Link>
-        </div>
-
-        {/* Level Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {curriculum?.levels?.map((lvl, index) => {
-            const isCompleted = currentUser.completedMissions.includes(lvl.id);
-            const isUnlocked = index === 0 || currentUser.completedMissions.includes(curriculum.levels[index - 1].id);
-
-            return (
-              <div
-                key={lvl.id}
-                className={`rounded-xl border p-5 flex flex-col justify-between transition-all ${
-                  isCompleted
-                    ? 'bg-[#E2E8E3] border-[#354B3A]'
-                    : isUnlocked
-                    ? 'bg-white border-[#354B3A] shadow-md ring-1 ring-[#354B3A]/20'
-                    : 'bg-[#F0EAE1]/70 border-[#D8CFC0] opacity-75'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold text-[#A65F43] uppercase tracking-wider">
-                      Stage {lvl.levelNumber}
-                    </span>
-                    <span className="text-xs font-semibold text-[#7A6230] bg-[#FBF8F2] px-2 py-0.5 rounded border border-[#B49A65]">
-                      +{lvl.xpReward} XP
-                    </span>
-                  </div>
-
-                  <h3 className="font-serif font-bold text-lg text-[#252820] leading-snug">
-                    {lvl.title}
-                  </h3>
-
-                  <p className="text-xs text-[#575A51] mt-2 line-clamp-2">
-                    {lvl.storyNarrative}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-[#D8CFC0] mt-4 flex items-center justify-between">
-                  {isCompleted ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#354B3A]">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Completed</span>
-                    </span>
-                  ) : isUnlocked ? (
-                    <Link
-                      href={`/simulator?mission=${lvl.id}`}
-                      className="btn-primary text-xs py-1.5 px-3.5 w-full flex items-center justify-center gap-1"
-                    >
-                      <Play className="w-3.5 h-3.5" />
-                      <span>Launch Mission Simulator</span>
-                    </Link>
-                  ) : (
-                    <span className="text-xs text-[#7E8276] flex items-center gap-1">
-                      <span>Locked (Complete Stage {lvl.levelNumber - 1})</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* CLASS & LANGUAGE SWITCH MODAL */}
-      {isSwitchOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-[#252820]/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setIsSwitchOpen(false)}
-          />
-
-          <div className="relative w-full max-w-md bg-white border border-[#D8CFC0] rounded-2xl shadow-2xl p-6 z-10 animate-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-[#D8CFC0] pb-3 mb-4">
-              <h3 className="font-serif font-bold text-lg text-[#252820]">
-                Switch Learning Settings
-              </h3>
-              <button
-                onClick={() => setIsSwitchOpen(false)}
-                className="p-1 rounded hover:bg-[#FAF8F5] text-[#575A51]"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveClassSubjectSwitch} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-semibold text-[#252820] mb-1.5">
-                  Select Your Class (Up to 12th Pass):
-                </label>
-                <div className="space-y-1.5">
-                  {AVAILABLE_CLASSES.map((c) => (
-                    <div
-                      key={c}
-                      onClick={() => setModalClass(c)}
-                      className={`p-2.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between ${
-                        modalClass === c
-                          ? 'bg-[#E9DFC9] border-[#354B3A] font-bold text-[#252820]'
-                          : 'bg-[#FAF8F5] border-[#D8CFC0] hover:bg-white text-[#575A51]'
-                      }`}
-                    >
-                      <span>{c}</span>
-                      {modalClass === c && <CheckCircle2 className="w-4 h-4 text-[#354B3A]" />}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-[#252820] mb-1.5">
-                  Programming Language (Dropdown Menu):
-                </label>
-                <div className="relative">
-                  <select
-                    value={modalSubject}
-                    onChange={(e) => setModalSubject(e.target.value)}
-                    className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#354B3A] rounded-xl bg-white text-xs font-bold text-[#252820] focus:outline-none cursor-pointer pr-10"
-                  >
-                    {AVAILABLE_SUBJECTS.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name} — {s.tagline}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-[#354B3A] absolute right-3.5 top-3 pointer-events-none" />
-                </div>
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsSwitchOpen(false)}
-                  className="px-4 py-2 border border-[#D8CFC0] rounded hover:bg-[#FAF8F5] text-[#575A51]"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary py-2 px-5">
-                  Save Changes
-                </button>
-              </div>
-            </form>
+            )}
           </div>
         </div>
       )}

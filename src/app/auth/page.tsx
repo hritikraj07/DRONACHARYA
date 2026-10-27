@@ -138,35 +138,35 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="w-full flex-1 flex items-center justify-center py-8 px-4 sm:px-6">
-      <div className="w-full max-w-xl card-ivory border-2 border-[#D8CFC0] rounded-2xl p-6 sm:p-8 shadow-xl">
+    <div className="w-full flex-1 flex items-center justify-center py-10 px-4 sm:px-6">
+      <div className="w-full max-w-xl card-game bg-white p-6 sm:p-8 shadow-[6px_6px_0px_#1E1E24]">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 mx-auto rounded-xl bg-[#354B3A] text-[#F6F1E7] flex items-center justify-center font-serif text-2xl font-bold shadow-xs mb-3">
+          <div className="w-12 h-12 mx-auto rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-2xl font-bold border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] mb-3">
             द्रो
           </div>
-          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#252820]">
-            {isSignUp ? 'What do you want to learn?' : 'Sign In to Continue'}
+          <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#1E1E24]">
+            {isSignUp ? 'Begin Your Coding Adventure' : 'Sign In to Your Quest'}
           </h1>
-          <p className="text-xs sm:text-sm text-[#575A51] mt-1 max-w-md mx-auto">
+          <p className="text-xs sm:text-sm text-[#4A4A58] mt-1 max-w-md mx-auto">
             {isSignUp
-              ? 'Complete the 3 quick steps to tailor your interactive gaming curriculum.'
-              : 'Enter your email and password to access your learning dashboard.'}
+              ? 'Complete 3 quick steps to tailor your interactive programming world.'
+              : 'Enter your credentials to load your saved progress & character state.'}
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-[#D8CFC0] mb-6">
+        <div className="flex border-b-2 border-[#1E1E24] mb-6">
           <button
             type="button"
             onClick={() => {
               setIsSignUp(false);
               setErrorMsg(null);
             }}
-            className={`flex-1 py-2.5 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+            className={`flex-1 py-2.5 text-xs font-black border-b-2 transition-all cursor-pointer ${
               !isSignUp
-                ? 'border-[#354B3A] text-[#354B3A]'
-                : 'border-transparent text-[#7E8276] hover:text-[#252820]'
+                ? 'border-[#6C5CE7] text-[#6C5CE7]'
+                : 'border-transparent text-[#7E7E8F] hover:text-[#1E1E24]'
             }`}
           >
             Sign In
@@ -178,26 +178,26 @@ export default function AuthPage() {
               setErrorMsg(null);
               setSignupStep(1);
             }}
-            className={`flex-1 py-2.5 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+            className={`flex-1 py-2.5 text-xs font-black border-b-2 transition-all cursor-pointer ${
               isSignUp
-                ? 'border-[#354B3A] text-[#354B3A]'
-                : 'border-transparent text-[#7E8276] hover:text-[#252820]'
+                ? 'border-[#6C5CE7] text-[#6C5CE7]'
+                : 'border-transparent text-[#7E7E8F] hover:text-[#1E1E24]'
             }`}
           >
-            New Student (Step-by-Step)
+            New Apprentice (Step-by-Step)
           </button>
         </div>
 
         {/* Feedback alerts */}
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-lg bg-[#FAF4F0] border border-[#A65F43] text-xs text-[#A65F43] flex items-start gap-2">
+          <div className="mb-4 p-3 rounded-xl bg-[#FEE2E2] border-2 border-[#EF4444] text-xs text-[#DC2626] font-bold flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="mb-4 p-3 rounded-lg bg-[#E2E8E3] border border-[#354B3A] text-xs text-[#354B3A] font-semibold flex items-center gap-2">
+          <div className="mb-4 p-3 rounded-xl bg-[#D1FAE5] border-2 border-[#10B981] text-xs text-[#059669] font-bold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{successMsg}</span>
           </div>
@@ -207,9 +207,9 @@ export default function AuthPage() {
         {!isSignUp ? (
           <form onSubmit={handleSignIn} className="space-y-4 text-xs">
             <div>
-              <label className="block font-semibold text-[#252820] mb-1">Email Address</label>
+              <label className="block font-bold text-[#1E1E24] mb-1">Email Address</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
                 <input
                   type="email"
                   required
@@ -217,22 +217,22 @@ export default function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setEmail((prev) => prev.trim())}
                   placeholder="student@learning.edu"
-                  className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                  className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-semibold text-[#252820] mb-1">Password</label>
+              <label className="block font-bold text-[#1E1E24] mb-1">Password</label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your database password"
-                  className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                  className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                 />
               </div>
             </div>
@@ -240,13 +240,13 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full btn-primary py-2.5 text-xs font-semibold shadow-xs mt-2"
+              className="btn-game-purple w-full py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24] mt-2"
             >
-              <span>{isSubmitting ? 'Verifying...' : 'Verify Credentials & Start Learning'}</span>
+              <span>{isSubmitting ? 'Verifying...' : 'Verify Credentials & Start Quest'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
-            <div className="text-center pt-2 text-[#7E8276]">
+            <div className="text-center pt-2 text-[#7E7E8F]">
               Don't have an account yet?{' '}
               <button
                 type="button"
@@ -254,7 +254,7 @@ export default function AuthPage() {
                   setIsSignUp(true);
                   setSignupStep(1);
                 }}
-                className="text-[#354B3A] font-semibold underline cursor-pointer"
+                className="text-[#6C5CE7] font-black underline cursor-pointer"
               >
                 Start Step-by-Step Setup
               </button>
@@ -267,43 +267,43 @@ export default function AuthPage() {
             <div className="flex items-center justify-between mb-6 px-2">
               <div className="flex items-center gap-1.5">
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                    signupStep >= 1 ? 'bg-[#354B3A] text-white' : 'bg-[#D8CFC0] text-[#575A51]'
+                  className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] ${
+                    signupStep >= 1 ? 'bg-[#6C5CE7] text-white' : 'bg-[#E8E1D2] text-[#7E7E8F]'
                   }`}
                 >
                   1
                 </div>
-                <span className={`text-[11px] font-semibold ${signupStep === 1 ? 'text-[#354B3A]' : 'text-[#7E8276]'}`}>
+                <span className={`text-xs font-black ${signupStep === 1 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
                   Account
                 </span>
               </div>
 
-              <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 2 ? 'bg-[#354B3A]' : 'bg-[#D8CFC0]'}`} />
+              <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 2 ? 'bg-[#6C5CE7]' : 'bg-[#1E1E24]/20'}`} />
 
               <div className="flex items-center gap-1.5">
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                    signupStep >= 2 ? 'bg-[#354B3A] text-white' : 'bg-[#D8CFC0] text-[#575A51]'
+                  className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] ${
+                    signupStep >= 2 ? 'bg-[#6C5CE7] text-white' : 'bg-[#E8E1D2] text-[#7E7E8F]'
                   }`}
                 >
                   2
                 </div>
-                <span className={`text-[11px] font-semibold ${signupStep === 2 ? 'text-[#354B3A]' : 'text-[#7E8276]'}`}>
+                <span className={`text-xs font-black ${signupStep === 2 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
                   Class
                 </span>
               </div>
 
-              <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 3 ? 'bg-[#354B3A]' : 'bg-[#D8CFC0]'}`} />
+              <div className={`flex-1 h-0.5 mx-2 ${signupStep >= 3 ? 'bg-[#6C5CE7]' : 'bg-[#1E1E24]/20'}`} />
 
               <div className="flex items-center gap-1.5">
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                    signupStep === 3 ? 'bg-[#354B3A] text-white' : 'bg-[#D8CFC0] text-[#575A51]'
+                  className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] ${
+                    signupStep === 3 ? 'bg-[#6C5CE7] text-white' : 'bg-[#E8E1D2] text-[#7E7E8F]'
                   }`}
                 >
                   3
                 </div>
-                <span className={`text-[11px] font-semibold ${signupStep === 3 ? 'text-[#354B3A]' : 'text-[#7E8276]'}`}>
+                <span className={`text-xs font-black ${signupStep === 3 ? 'text-[#6C5CE7]' : 'text-[#7E7E8F]'}`}>
                   Language
                 </span>
               </div>
@@ -313,24 +313,24 @@ export default function AuthPage() {
             {signupStep === 1 && (
               <form onSubmit={handleProceedToStep2} className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-semibold text-[#252820] mb-1">Full Name</label>
+                  <label className="block font-bold text-[#1E1E24] mb-1">Full Name</label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                    <User className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
                     <input
                       type="text"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Arjun Sharma"
-                      className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-[#252820] mb-1">Email Address</label>
+                  <label className="block font-bold text-[#1E1E24] mb-1">Email Address</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                    <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
                     <input
                       type="email"
                       required
@@ -338,24 +338,24 @@ export default function AuthPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       onBlur={() => setEmail((prev) => prev.trim())}
                       placeholder="your.email@example.com"
-                      className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-[#252820] mb-1">
+                  <label className="block font-bold text-[#1E1E24] mb-1">
                     Create Password (min 6 characters)
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-[#7E8276] absolute left-3 top-2.5" />
+                    <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-2.5" />
                     <input
                       type="password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Create a secure password"
-                      className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
+                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
                     />
                   </div>
                 </div>
@@ -363,19 +363,19 @@ export default function AuthPage() {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full btn-primary py-2.5 text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5"
+                    className="btn-game-purple w-full py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24]"
                   >
                     <span>Continue to Step 2: Choose Class</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <div className="text-center pt-2 text-[#7E8276]">
+                <div className="text-center pt-2 text-[#7E7E8F]">
                   Already registered?{' '}
                   <button
                     type="button"
                     onClick={() => setIsSignUp(false)}
-                    className="text-[#354B3A] font-semibold underline cursor-pointer"
+                    className="text-[#6C5CE7] font-black underline cursor-pointer"
                   >
                     Sign In instead
                   </button>
@@ -383,15 +383,15 @@ export default function AuthPage() {
               </form>
             )}
 
-            {/* STEP 2: CLASS SELECTION (Kept separately & only 12th pass) */}
+            {/* STEP 2: CLASS SELECTION */}
             {signupStep === 2 && (
               <div className="space-y-4 text-xs">
                 <div>
-                  <div className="font-serif font-bold text-sm text-[#252820] mb-1">
+                  <div className="font-serif font-black text-sm text-[#1E1E24] mb-1">
                     Step 2: Choose Your Class Standard
                   </div>
-                  <p className="text-[#575A51] text-[11px] mb-3">
-                    Each class level is kept separate (up to 12th Pass only):
+                  <p className="text-[#4A4A58] text-[11px] mb-3">
+                    Each class curriculum is tailored separately (up to 12th Pass only):
                   </p>
                 </div>
 
@@ -402,31 +402,24 @@ export default function AuthPage() {
                       <div
                         key={cls}
                         onClick={() => setStudentClass(cls)}
-                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
+                        className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex items-center justify-between ${
                           isSelected
-                            ? 'bg-[#E9DFC9] border-[#354B3A] shadow-xs ring-1 ring-[#354B3A]'
-                            : 'bg-[#FAF8F5] border-[#D8CFC0] hover:bg-white hover:border-[#354B3A]/60'
+                            ? 'bg-[#FBBF24] shadow-[3px_3px_0px_#1E1E24] font-black'
+                            : 'bg-white hover:bg-[#F2ECE0] shadow-[2px_2px_0px_#1E1E24]'
                         }`}
                       >
                         <div className="flex items-center gap-2.5">
-                          <div
-                            className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              isSelected ? 'border-[#354B3A] bg-[#354B3A]' : 'border-[#7E8276] bg-white'
-                            }`}
-                          >
-                            {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                          </div>
-                          <span className="font-bold text-xs text-[#252820]">{cls}</span>
+                          <span className="font-black text-xs text-[#1E1E24]">{cls}</span>
                         </div>
 
-                        <span className="text-[10px] text-[#575A51] font-medium">
+                        <span className="text-[10px] text-[#4A4A58] font-bold">
                           {cls === 'Class 9'
                             ? 'Foundations & Algorithmic Logic'
                             : cls === 'Class 10'
-                            ? 'Core Problem Solving & Board Prep'
+                            ? 'Core Problem Solving & Python'
                             : cls === 'Class 11'
-                            ? 'CS Principles & Loop Engineering'
-                            : 'Advanced Systems & Competitive Prep'}
+                            ? 'CS Principles & Loops'
+                            : 'Advanced Systems & Capstones'}
                         </span>
                       </div>
                     );
@@ -437,14 +430,14 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setSignupStep(1)}
-                    className="px-4 py-2 border border-[#D8CFC0] rounded hover:bg-[#E9DFC9] text-[#575A51] font-semibold text-xs transition-colors"
+                    className="btn-game-white py-2 px-4 text-xs font-black"
                   >
                     ← Back
                   </button>
                   <button
                     type="button"
                     onClick={handleProceedToStep3}
-                    className="btn-primary py-2 px-5 text-xs font-semibold shadow-xs flex items-center gap-1.5"
+                    className="btn-game-purple py-2 px-5 text-xs shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5"
                   >
                     <span>Continue to Step 3: Select Language</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -457,23 +450,23 @@ export default function AuthPage() {
             {signupStep === 3 && (
               <form onSubmit={handleFinalSignUp} className="space-y-4 text-xs">
                 <div>
-                  <div className="font-serif font-bold text-sm text-[#252820] mb-1">
-                    Step 3: Select Programming Language
+                  <div className="font-black text-sm text-[#1E1E24] mb-1">
+                    Step 3: Select Programming Realm
                   </div>
-                  <p className="text-[#575A51] text-[11px] mb-3">
-                    Choose the language you want to learn through playable 2D games:
+                  <p className="text-[#4A4A58] text-[11px] mb-3">
+                    Choose the language you want to learn through playable 2D games and quests:
                   </p>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-[#252820] mb-1.5">
+                  <label className="block font-black text-[#1E1E24] mb-1.5">
                     Programming Language (Select from dropdown):
                   </label>
                   <div className="relative">
                     <select
                       value={targetSubject}
                       onChange={(e) => setTargetSubject(e.target.value)}
-                      className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#354B3A] rounded-xl bg-white text-xs font-bold text-[#252820] focus:outline-none shadow-xs cursor-pointer pr-10"
+                      className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#1E1E24] rounded-xl bg-white text-xs font-black text-[#1E1E24] focus:outline-none shadow-[3px_3px_0px_#1E1E24] cursor-pointer pr-10"
                     >
                       {AVAILABLE_SUBJECTS.map((sub) => (
                         <option key={sub.id} value={sub.id}>
@@ -481,17 +474,17 @@ export default function AuthPage() {
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className="w-4 h-4 text-[#354B3A] absolute right-3.5 top-3 pointer-events-none" />
+                    <ChevronDown className="w-4 h-4 text-[#1E1E24] absolute right-3.5 top-3 pointer-events-none" />
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#B49A65] space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#354B3A]">
-                    <Gamepad2 className="w-4 h-4 text-[#A65F43]" />
-                    <span>Included Game: Rescue the Robot with Python Loops</span>
+                <div className="p-3.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs font-black text-[#6C5CE7]">
+                    <Gamepad2 className="w-4 h-4 text-[#EF4444]" />
+                    <span>Included Mission: Rescue the Robot with Python Loops</span>
                   </div>
-                  <p className="text-[11px] text-[#575A51] leading-relaxed">
-                    You will play an animated 2D grid game to steer the robot, collect energy cells, avoid space rocks, and reach the base beacon.
+                  <p className="text-[11px] text-[#4A4A58] font-medium leading-relaxed">
+                    You will play an animated 2D grid game to steer the robot, collect energy cells, avoid space obstacles, and reach the base beacon.
                   </p>
                 </div>
 
@@ -499,14 +492,14 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setSignupStep(2)}
-                    className="px-4 py-2 border border-[#D8CFC0] rounded hover:bg-[#E9DFC9] text-[#575A51] font-semibold text-xs transition-colors"
+                    className="btn-game-white py-2 px-4 text-xs font-black"
                   >
                     ← Back
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="btn-primary py-2.5 px-6 text-xs font-bold shadow-md flex items-center gap-1.5"
+                    className="btn-game-yellow py-2.5 px-6 text-xs font-black shadow-[4px_4px_0px_#1E1E24] flex items-center gap-1.5"
                   >
                     <span>{isSubmitting ? 'Setting up...' : '🚀 Finish Setup & Enter Game Arena'}</span>
                   </button>

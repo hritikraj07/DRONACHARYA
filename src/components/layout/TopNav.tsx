@@ -27,6 +27,8 @@ import {
   BookOpen,
   ChevronDown,
   Heart,
+  Gamepad2,
+  ChevronRight,
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -90,29 +92,30 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
   const navLinks = [
-    { name: 'Dashboard', href: '/dashboard', icon: Target },
-    { name: 'Learn', href: '/paths', icon: BookOpen },
-    { name: 'Missions', href: '/simulator', icon: Code2 },
+    { name: 'World Map', href: '/paths', icon: Compass },
+    { name: 'Missions', href: '/simulator', icon: Gamepad2 },
+    { name: 'Quest Hub', href: '/dashboard', icon: Target },
+    { name: 'Mastery Seals', href: '/achievements', icon: Award },
     { name: 'Projects', href: '/projects', icon: FolderGit2 },
-    { name: 'My Progress', href: '/portfolio', icon: Award },
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#F6F1E7]/95 backdrop-blur-md border-b border-[#D8CFC0]">
+      <header className="sticky top-0 z-40 w-full bg-[#FAF6EE]/95 backdrop-blur-md border-b-2 border-[#1E1E24] shadow-xs">
         <div className="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Brand Mark & Title */}
           <div className="flex items-center gap-4 sm:gap-6 min-w-0">
             <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="w-8 h-8 rounded bg-[#354B3A] text-[#F6F1E7] flex items-center justify-center font-serif text-lg font-bold shadow-xs group-hover:bg-[#2B3D2F]">
+              <div className="w-9 h-9 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-lg font-bold border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-[1px_1px_0px_#1E1E24] transition-all">
                 द्रो
               </div>
               <div className="flex flex-col">
-                <span className="font-serif font-bold text-base sm:text-lg text-[#252820] tracking-wide leading-none">
+                <span className="font-serif font-black text-base sm:text-lg text-[#1E1E24] tracking-tight leading-none flex items-center gap-1.5">
                   DRONACHARYA
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
                 </span>
-                <span className="text-[9px] tracking-widest uppercase text-[#7E8276] font-medium mt-0.5">
-                  AI Learning Platform
+                <span className="text-[9px] tracking-widest uppercase text-[#6C5CE7] font-black mt-0.5">
+                  Coding Adventure
                 </span>
               </div>
             </Link>
@@ -121,18 +124,18 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             {currentUser && (
               <button
                 onClick={() => setSwitchModalOpen(true)}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E9DFC9] hover:bg-[#D8CFC0] text-xs border border-[#B49A65] text-[#252820] transition-colors cursor-pointer"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#FFFFFF] hover:bg-[#F2ECE0] text-xs font-bold border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[#1E1E24] transition-all cursor-pointer"
                 title="Click to Switch Learning Topic"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#354B3A]" />
-                <span className="font-medium truncate max-w-[200px]">{activeSubjectObj.name}</span>
-                <ChevronDown className="w-3 h-3 text-[#7E8276]" />
+                <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                <span className="truncate max-w-[180px]">{activeSubjectObj.name}</span>
+                <ChevronDown className="w-3 h-3 text-[#7E7E8F]" />
               </button>
             )}
 
             {/* Desktop Navigation Links */}
             {currentUser && (
-              <nav className="hidden xl:flex items-center gap-1">
+              <nav className="hidden xl:flex items-center gap-1.5">
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -140,10 +143,10 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border-2 ${
                         isActive
-                          ? 'bg-[#354B3A] text-[#F6F1E7]'
-                          : 'text-[#575A51] hover:text-[#252820] hover:bg-[#E9DFC9]/60'
+                          ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                          : 'border-transparent text-[#4A4A58] hover:text-[#1E1E24] hover:bg-[#F2ECE0] hover:border-[#1E1E24]'
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -155,58 +158,50 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             )}
           </div>
 
-          {/* Right Status Controls */}
+          {/* Right Status Controls / Player HUD */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {currentUser ? (
               <>
-                {/* User Identity Pill */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#E9DFC9] border border-[#B49A65]/50 text-xs text-[#252820]">
-                  <div className="w-5 h-5 rounded-full bg-[#354B3A] text-white flex items-center justify-center font-bold text-[10px]">
-                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'S'}
-                  </div>
-                  <span className="font-semibold max-w-[90px] sm:max-w-[120px] truncate">{currentUser.name}</span>
-                </div>
-
                 {/* Game Hearts/Lives */}
                 <div
-                  className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#FAF4F0] border border-[#A65F43]/40 text-xs font-bold text-[#A65F43]"
-                  title="Game Hearts"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEE2E2] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#EF4444]"
+                  title="Player Hearts Remaining"
                 >
-                  <Heart className="w-3.5 h-3.5 fill-[#A65F43]" />
-                  <span>{currentUser.hearts || 3}</span>
+                  <Heart className="w-3.5 h-3.5 fill-[#EF4444]" />
+                  <span>{currentUser.hearts ?? 3}</span>
                 </div>
 
                 {/* Daily Streak Indicator */}
                 <div
-                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#E9DFC9] border border-[#D8CFC0] text-xs font-semibold text-[#A65F43]"
-                  title={`${currentUser.currentStreak} Day Focus Streak`}
+                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#D97706]"
+                  title={`${currentUser.currentStreak} Day Quest Streak`}
                 >
-                  <Flame className="w-3.5 h-3.5 fill-[#A65F43]" />
+                  <Flame className="w-3.5 h-3.5 fill-[#F59E0B]" />
                   <span>{currentUser.currentStreak}d</span>
                 </div>
 
                 {/* XP & Level Badge */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FBF8F2] border border-[#B49A65] text-xs font-medium text-[#7A6230]">
-                  <Award className="w-3.5 h-3.5 text-[#B49A65]" />
-                  <span className="font-bold">{currentUser.totalXp} XP</span>
-                  <span className="text-[#A6AC9B] hidden sm:inline">•</span>
-                  <span className="hidden sm:inline font-semibold">Lvl {currentUser.level || 1}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#FBBF24] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#1E1E24]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#1E1E24]" />
+                  <span>{currentUser.totalXp} XP</span>
+                  <span className="opacity-40">•</span>
+                  <span>Lv.{currentUser.level || 1}</span>
                 </div>
 
                 {/* AI Mentor Trigger Button */}
                 <button
                   onClick={onOpenMentor}
-                  className="btn-brass text-xs py-1.5 px-2.5 shadow-2xs"
+                  className="btn-game-purple text-xs py-1.5 px-3"
                   title="Open AI Mentor Guidance"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#B49A65]" />
-                  <span className="hidden md:inline">AI Mentor</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#FBBF24]" />
+                  <span className="hidden md:inline">Mentor AI</span>
                 </button>
 
                 {/* Logout Action */}
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 rounded hover:bg-[#E9DFC9] text-[#7E8276] hover:text-[#A65F43]"
+                  className="p-1.5 rounded-lg border-2 border-transparent hover:border-[#1E1E24] hover:bg-[#FEE2E2] text-[#7E7E8F] hover:text-[#EF4444] transition-all"
                   title="Sign Out"
                   aria-label="Sign Out"
                 >
@@ -216,15 +211,16 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 {/* Mobile Menu Toggle */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="xl:hidden p-1.5 rounded hover:bg-[#E9DFC9] text-[#252820]"
+                  className="xl:hidden p-1.5 rounded-lg border-2 border-[#1E1E24] bg-white shadow-[2px_2px_0px_#1E1E24] text-[#1E1E24]"
                   aria-label="Toggle Navigation Menu"
                 >
-                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5 text-[#252820]" />}
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5 text-[#1E1E24]" />}
                 </button>
               </>
             ) : (
-              <Link href="/auth" className="btn-primary text-xs py-1.5 px-4 shadow-xs">
-                Sign In / Register
+              <Link href="/auth" className="btn-game-yellow text-xs py-2 px-4">
+                <span>Start Adventure</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             )}
           </div>

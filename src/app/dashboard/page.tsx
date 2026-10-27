@@ -1,4 +1,4 @@
-// Student Dashboard: Clean & Useful Learning Hub
+// Student Quest Hub: CodeDex-inspired Player Headquarters
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -15,6 +15,14 @@ import {
   CheckCircle2,
   BookOpen,
   Sparkles,
+  Award,
+  Zap,
+  Gamepad2,
+  Compass,
+  Star,
+  Flame,
+  Heart,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -31,206 +39,190 @@ export default function DashboardPage() {
     }
   }, [router]);
 
-  const activePath = state.learningPaths[0];
-  const nextMission = activePath?.missions.find((m) => !m.isCompleted) || activePath?.missions[0];
-  const completedMissionsCount = activePath?.missions.filter((m) => m.isCompleted).length || 0;
-  const totalMissionsCount = activePath?.missions.length || 2;
-  const progressPercent = Math.round((completedMissionsCount / totalMissionsCount) * 100);
-
   const activeSubjectObj =
     AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
-  const practicalProject = state.capstones[0];
+  const totalXp = currentUser?.totalXp || 0;
+  const currentLevel = currentUser?.level || 1;
+  const nextLevelXp = currentLevel * 200;
+  const currentLevelProgress = Math.min(100, Math.round(((totalXp % 200) / 200) * 100));
 
   return (
-    <div className="w-full px-4 sm:px-8 py-8 max-w-6xl mx-auto">
-      {/* 1. Continue Learning Banner */}
-      <div className="bg-[#E9DFC9] border border-[#D8CFC0] rounded-2xl p-6 sm:p-8 mb-8 shadow-xs">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-8">
+      {/* 1. Player Status Hero Banner */}
+      <div className="card-game p-6 sm:p-8 bg-[#FAF6EE] shadow-[6px_6px_0px_#1E1E24]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F6F1E7] border border-[#D8CFC0] text-xs font-semibold text-[#354B3A] mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#B49A65]" />
-              <span>Learning Dashboard</span>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE] border-2 border-[#1E1E24] text-xs font-black text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24]">
+              <Sparkles className="w-3.5 h-3.5 text-[#6C5CE7]" />
+              <span>Adventurer Headquarters</span>
             </div>
-            <h1 className="font-serif font-bold text-3xl sm:text-4xl text-[#252820]">
-              Welcome, {currentUser?.name || state.user.fullName || 'Student'}
+            <h1 className="font-serif font-black text-3xl sm:text-4xl text-[#1E1E24]">
+              Welcome back, {currentUser?.name || 'Apprentice'}!
             </h1>
-            <p className="text-xs sm:text-sm text-[#575A51] mt-1.5 max-w-xl">
-              Currently learning: <strong className="text-[#252820]">{activeSubjectObj.name}</strong> • Level: <strong>{currentUser?.studentClass || 'Beginner'}</strong>
+            <p className="text-xs sm:text-sm text-[#4A4A58] font-medium max-w-xl">
+              Current Curriculum: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong> • Level: <strong>{currentUser?.studentClass || 'Class 10'}</strong>
             </p>
           </div>
 
-          <Link
-            href="/simulator?mission=mission-rescue-robot"
-            className="btn-primary text-xs py-3 px-6 shadow-sm self-start md:self-auto flex items-center gap-2"
-          >
-            <span>Continue Learning</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          {/* Quick HUD Metrics */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="bg-[#FEF3C7] border-2 border-[#1E1E24] rounded-xl px-4 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+              <span className="text-[10px] font-black uppercase text-[#D97706] block">Level</span>
+              <span className="font-serif font-black text-xl text-[#1E1E24]">Lv. {currentLevel}</span>
+            </div>
+            <div className="bg-[#D1FAE5] border-2 border-[#1E1E24] rounded-xl px-4 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+              <span className="text-[10px] font-black uppercase text-[#059669] block">Total XP</span>
+              <span className="font-serif font-black text-xl text-[#059669]">{totalXp}</span>
+            </div>
+            <div className="bg-[#FEE2E2] border-2 border-[#1E1E24] rounded-xl px-4 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+              <span className="text-[10px] font-black uppercase text-[#DC2626] block">Hearts</span>
+              <span className="font-serif font-black text-xl text-[#EF4444]">{currentUser?.hearts ?? 3} ❤️</span>
+            </div>
+          </div>
         </div>
 
-        {/* Real Progress Bar */}
-        <div className="mt-6 pt-4 border-t border-[#D8CFC0]/60">
-          <div className="flex items-center justify-between text-xs text-[#575A51] mb-1.5">
-            <span>Overall Topic Completion</span>
-            <span className="font-semibold text-[#252820]">{completedMissionsCount} of {totalMissionsCount} missions completed ({progressPercent}%)</span>
+        {/* Level XP Progress Bar */}
+        <div className="mt-6 pt-4 border-t-2 border-[#1E1E24]/15">
+          <div className="flex items-center justify-between text-xs font-bold text-[#4A4A58] mb-1.5">
+            <span>Next Level Progression</span>
+            <span>{totalXp % 200} / 200 XP to Level {currentLevel + 1}</span>
           </div>
-          <div className="w-full h-2.5 bg-[#D8CFC0] rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-white border-2 border-[#1E1E24] rounded-full overflow-hidden shadow-xs">
             <div
-              className="h-full bg-[#354B3A] transition-all duration-500 rounded-full"
-              style={{ width: `${progressPercent}%` }}
+              className="h-full bg-[#6C5CE7] transition-all duration-500 rounded-full"
+              style={{ width: `${currentLevelProgress}%` }}
             />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* 2. Next Recommended Mission */}
+      {/* 2. Main Two-Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Active Quests */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="bg-white border-2 border-[#354B3A]/30 rounded-2xl p-6 shadow-sm relative">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-[#354B3A] uppercase tracking-wider flex items-center gap-1.5">
-                <Target className="w-4 h-4" />
-                Next Recommended Mission
+          {/* Active Featured Mission: Rescue the Robot */}
+          <div className="card-game p-6 bg-white shadow-[4px_4px_0px_#6C5CE7] relative">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-black text-[#6C5CE7] bg-[#EDE9FE] px-3 py-1 rounded-full border border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24]">
+                Next Quest: Stage 3 • Loop Lab
               </span>
-              <span className="text-xs text-[#7A6230] font-semibold bg-[#FBF8F2] px-2.5 py-0.5 rounded border border-[#B49A65]">
-                Interactive Challenge
+              <span className="text-xs font-black text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded border border-[#1E1E24]">
+                +150 XP
               </span>
             </div>
 
-            <h2 className="font-serif font-bold text-2xl text-[#252820] mt-1">
-              {nextMission?.title || 'Rescue the Robot'}
+            <h2 className="font-serif font-black text-2xl text-[#1E1E24] mb-1">
+              Rescue the Robot: Facility Navigation
             </h2>
-            <p className="text-xs font-semibold text-[#A65F43] mt-0.5">
-              {nextMission?.subtitle || 'Learn Python Loops'}
+            <p className="text-xs font-bold text-[#6C5CE7] mb-2">
+              Concept: Python Loops &amp; Machine Steps
             </p>
-            <p className="text-xs sm:text-sm text-[#575A51] mt-3 leading-relaxed">
-              {nextMission?.narrativeContext || 'A small rescue robot has low battery power. Write a Python loop to calculate the total energy gathered from all battery cells.'}
+            <p className="text-xs text-[#4A4A58] leading-relaxed mb-5">
+              Rover Arya is stranded! Program a series of for-loops to navigate through the 6x6 facility grid, collect energy cells, and dock at the emergency beacon without hitting obstacle blast doors.
             </p>
 
-            <div className="mt-6 pt-4 border-t border-[#D8CFC0] flex items-center justify-between">
-              <div className="text-xs text-[#7E8276]">
-                Hands-on coding in browser sandbox
-              </div>
+            <div className="flex items-center justify-between pt-4 border-t-2 border-[#1E1E24]/15">
+              <span className="text-xs font-bold text-[#7E7E8F]">
+                Real Python Code • 2D Interactive Grid
+              </span>
+
               <Link
-                href={`/simulator?mission=${nextMission?.id || 'mission-rescue-robot'}`}
-                className="btn-primary text-xs py-2 px-4 shadow-sm"
+                href="/simulator?mission=mission-rescue-robot"
+                className="btn-game-purple text-xs py-2 px-5 shadow-[3px_3px_0px_#1E1E24]"
               >
-                <span>Start Mission</span>
-                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Launch Mission</span>
+                <Play className="w-3.5 h-3.5 fill-white" />
               </Link>
             </div>
           </div>
 
-          {/* Missions List */}
-          <div className="bg-white border border-[#D8CFC0] rounded-2xl p-6 shadow-sm">
-            <h3 className="font-serif font-bold text-lg text-[#252820] mb-3 flex items-center gap-2">
-              <Code2 className="w-4 h-4 text-[#354B3A]" />
-              <span>Available Missions</span>
-            </h3>
-
-            <div className="space-y-3">
-              {activePath.missions.map((m, idx) => (
-                <div
-                  key={m.id}
-                  className={`p-3.5 rounded-xl border flex items-center justify-between transition-all ${
-                    m.isCompleted
-                      ? 'bg-[#E2E8E3] border-[#354B3A]'
-                      : 'bg-[#FAF8F5] border-[#D8CFC0] hover:bg-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
-                        m.isCompleted
-                          ? 'bg-[#354B3A] text-white'
-                          : 'bg-[#E9DFC9] text-[#252820]'
-                      }`}
-                    >
-                      {m.isCompleted ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
-                    </div>
-                    <div>
-                      <h4 className="font-serif font-bold text-sm text-[#252820]">
-                        {m.title}
-                      </h4>
-                      <p className="text-[11px] text-[#575A51]">{m.subtitle}</p>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/simulator?mission=${m.id}`}
-                    className="btn-primary text-[11px] py-1.5 px-3"
-                  >
-                    {m.isCompleted ? 'Review' : 'Enter'}
-                  </Link>
-                </div>
-              ))}
+          {/* Quick World Map Link Card */}
+          <div className="card-game p-6 bg-white flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#EDE9FE] border-2 border-[#1E1E24] flex items-center justify-center text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24]">
+                <Compass className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-serif font-black text-lg text-[#1E1E24]">
+                  Interactive World Map
+                </h3>
+                <p className="text-xs text-[#4A4A58]">
+                  Explore all 8 programming regions from Starter Village to Project Kingdom.
+                </p>
+              </div>
             </div>
+
+            <Link
+              href="/paths"
+              className="btn-game-white text-xs py-2 px-4 shadow-[2px_2px_0px_#1E1E24]"
+            >
+              <span>View Map</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
 
-        {/* 3. Relevant Practical Project & Actual Skills */}
+        {/* Right Column: Practical Projects & Mastery */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Practical Project Card */}
-          {practicalProject && (
-            <div className="bg-white border border-[#D8CFC0] rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#A65F43] uppercase tracking-wider flex items-center gap-1.5">
-                  <FolderGit2 className="w-4 h-4" />
-                  Practical Project
-                </span>
-                <span className="text-[10px] text-[#354B3A] font-semibold bg-[#E2E8E3] px-2 py-0.5 rounded">
-                  Connected to Loops
-                </span>
-              </div>
-
-              <h3 className="font-serif font-bold text-lg text-[#252820]">
-                {practicalProject.title}
-              </h3>
-              <p className="text-xs text-[#575A51] mt-2 leading-relaxed">
-                {practicalProject.description}
-              </p>
-
-              <div className="mt-4 pt-3 border-t border-[#D8CFC0]">
-                <div className="text-xs font-semibold text-[#252820] mb-2">Key Skills Practiced:</div>
-                <ul className="space-y-1 text-xs text-[#575A51]">
-                  {practicalProject.learningObjectives.slice(0, 3).map((obj, i) => (
-                    <li key={i} className="flex items-start gap-1.5">
-                      <span className="text-[#354B3A] font-bold">✓</span>
-                      <span>{obj}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-5">
-                <Link
-                  href="/projects"
-                  className="btn-primary w-full text-xs py-2.5 justify-center flex items-center gap-2"
-                >
-                  <span>Open Project Workspace</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+          {/* Capstone Project Card */}
+          <div className="card-game p-6 bg-[#FEF3C7]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-black uppercase tracking-wider text-[#D97706] flex items-center gap-1.5">
+                <FolderGit2 className="w-4 h-4" />
+                Practical Project
+              </span>
+              <span className="text-[10px] font-black bg-white px-2 py-0.5 rounded border border-[#1E1E24]">
+                Capstone Track
+              </span>
             </div>
-          )}
 
-          {/* Actual Learning Progress Card */}
-          <div className="bg-white border border-[#D8CFC0] rounded-2xl p-6 shadow-sm">
-            <h3 className="font-serif font-bold text-base text-[#252820] mb-2">
-              Demonstrated Skills
+            <h3 className="font-serif font-black text-xl text-[#1E1E24] mb-2">
+              Autonomous Robot Fleet Controller
             </h3>
-            <p className="text-xs text-[#575A51] mb-3">
-              Skills you build through working code and practical challenge execution:
+            <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
+              Build a complete command-line Python software system that coordinates multiple exploration rovers, schedules battery routes, and exports performance logs.
+            </p>
+
+            <Link
+              href="/projects"
+              className="btn-game-yellow w-full text-xs py-2.5 text-center shadow-[3px_3px_0px_#1E1E24]"
+            >
+              <span>Open Project Lab</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {/* Mastery Seals Card */}
+          <div className="card-game p-6 bg-white">
+            <h3 className="font-serif font-black text-base text-[#1E1E24] mb-2 flex items-center gap-2">
+              <Award className="w-5 h-5 text-[#F59E0B]" />
+              <span>Verifiable Mastery Seals</span>
+            </h3>
+            <p className="text-xs text-[#4A4A58] mb-4">
+              Seals unlocked by proving independent coding mastery in the Bug-to-Battle arena:
             </p>
 
             <div className="space-y-2.5">
-              {state.skills.map((skill) => (
-                <div key={skill.id} className="p-2.5 rounded-lg bg-[#FAF8F5] border border-[#D8CFC0]">
-                  <div className="text-xs font-semibold text-[#252820]">{skill.name}</div>
-                  <div className="text-[11px] text-[#7E8276] mt-0.5">{skill.description}</div>
+              <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#10B981] border border-[#1E1E24] flex items-center justify-center text-white font-bold text-xs">
+                  ✓
                 </div>
-              ))}
+                <div>
+                  <span className="font-black text-xs text-[#1E1E24] block">Loop Navigator Seal</span>
+                  <span className="text-[11px] text-[#7E7E8F]">Demonstrated sequential range loops and state accumulators</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center gap-3 opacity-60">
+                <div className="w-8 h-8 rounded-lg bg-[#E8E1D2] border border-[#1E1E24] flex items-center justify-center text-[#7E7E8F] font-bold text-xs">
+                  🔒
+                </div>
+                <div>
+                  <span className="font-black text-xs text-[#1E1E24] block">Condition Sentinel Seal</span>
+                  <span className="text-[11px] text-[#7E7E8F]">Requires completing Stage 4: Hazard Filter</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

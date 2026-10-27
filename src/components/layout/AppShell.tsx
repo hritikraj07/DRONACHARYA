@@ -14,8 +14,8 @@ export function AppShell({ children }: AppShellProps) {
   const [isMentorOpen, setIsMentorOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F1E7] text-[#252820]">
-      <Suspense fallback={<div className="h-16 border-b border-[#D8CFC0] bg-[#F6F1E7]" />}>
+    <div className="min-h-screen flex flex-col bg-[#FAF6EE] text-[#1E1E24]">
+      <Suspense fallback={<div className="h-16 border-b-2 border-[#1E1E24] bg-[#FAF6EE]" />}>
         <TopNav onOpenMentor={() => setIsMentorOpen(true)} />
       </Suspense>
 

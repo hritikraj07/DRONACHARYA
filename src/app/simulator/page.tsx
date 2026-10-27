@@ -1,13 +1,16 @@
 // Dronacharya Mission Simulator & Bug-to-Battle Arena
-// Executes student Python code safely, displays responsive 2D grid feedback, and evaluates follow-up understanding
+// Immersive 3-Panel Game Workspace: Real Python Execution, Interactive 2D Grid / Laser Chamber, Progressive Hints & Battle Challenges
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useDronacharya } from '@/lib/store';
+import { executeRobotCode, RobotSimulationResult, RobotSimulationFrame } from '@/lib/simulator/robot-code-executor';
 import { executePythonChallenge, ExecutionResult } from '@/lib/simulator/python-runner';
-import { XpCelebrationModal } from '@/components/gamification/XpCelebrationModal';
+import { PlayableGridEngine } from '@/components/game/PlayableGridEngine';
+import { CellFilterEngine, BioCell } from '@/components/game/CellFilterEngine';
+import { recordGameProgress, deductHeart, getActiveSession } from '@/lib/db/auth-db';
 import { AcharyaDrawer } from '@/components/mentor/AcharyaDrawer';
 import {
   Code2,
@@ -17,7 +20,6 @@ import {
   XCircle,
   Terminal,
   RefreshCw,
-  FolderGit2,
   ArrowRight,
   HelpCircle,
   AlertTriangle,
@@ -27,575 +29,897 @@ import {
   Award,
   ChevronRight,
   RotateCcw,
+  Target,
+  Flame,
+  Star,
+  Layers,
+  ChevronDown,
+  X,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+
+interface MissionSpec {
+  id: string;
+  stageNumber: number;
+  realmName: string;
+  title: string;
+  concept: string;
+  story: string;
+  instructions: string[];
+  initialCode: string;
+  xpReward: number;
+  initialCells?: BioCell[];
+}
+
+const MISSIONS: Record<string, MissionSpec> = {
+  'mission-rescue-robot': {
+    id: 'mission-rescue-robot',
+    stageNumber: 3,
+    realmName: 'Loop Lab',
+    title: 'Rescue the Robot: Facility Navigation',
+    concept: 'Loops & Sequential Automation',
+    story:
+      'The research facility has suffered a sudden containment breach. Exploration rover Arya is stranded at tile (0, 0). Program its propulsion system using Python loops and movement commands to navigate around obstacle barriers, collect energy cells, and dock at the Emergency Beacon at tile (5, 5).',
+    instructions: [
+      'Write for-loops with range(count) to repeat steps efficiently.',
+      'Use robot.move_right(), robot.move_down(), robot.move_left(), robot.move_up().',
+      'Collect energy cells with robot.collect() to keep power above 0%.',
+      'Avoid damaged blast doors at (1,1), (1,2), (3,2), and (2,3).',
+    ],
+    initialCode: `# Mission 1: Rescue Rover Arya
+# Objective: Reach Extraction Beacon at (5, 5) with battery > 0%
+# Available commands:
+#   robot.move_right(n)
+#   robot.move_down(n)
+#   robot.move_left(n)
+#   robot.move_up(n)
+#   robot.collect()
+
+# Step 1: Move right along row 0 to the first energy cell
+for step in range(2):
+    robot.move_right()
+
+robot.collect()
+
+# Step 2: Navigate around the central obstacles
+# TODO: Program the remaining loops to guide Arya safely to (5, 5)!
+`,
+    xpReward: 150,
+  },
+  'mission-hazard-filter': {
+    id: 'mission-hazard-filter',
+    stageNumber: 4,
+    realmName: 'Decision Forest',
+    title: 'Filter Damaged Cells: Hazard Decontamination',
+    concept: 'Conditions & Boolean Logic',
+    story:
+      'Radiation inside the bio-computing vault has corrupted data cells. You must program the sterilization drone to filter incoming streams of cells, admitting uncorrupted cells (positive values) while purging contaminated specimens (negative values).',
+    instructions: [
+      'Define filter_healthy_cells(data_cells: list) -> list.',
+      'Loop through data_cells using for cell in data_cells:.',
+      'Check if cell > 0 before adding it to clean_vault.',
+      'Return the clean_vault list containing only positive charges.',
+    ],
+    initialCode: `# Mission 2: Hazard Filter Protocol
+# Objective: Return a new list containing ONLY healthy cells (charge > 0)
+
+def filter_healthy_cells(data_cells: list) -> list:
+    clean_vault = []
+    
+    # TODO: Loop through data_cells and append only positive cells
+    for cell in data_cells:
+        if cell > 0:
+            clean_vault.append(cell)
+            
+    return clean_vault
+`,
+    xpReward: 150,
+    initialCells: [
+      { id: 1, charge: 45, isContaminated: false },
+      { id: 2, charge: -20, isContaminated: true },
+      { id: 3, charge: 80, isContaminated: false },
+      { id: 4, charge: -35, isContaminated: true },
+      { id: 5, charge: 65, isContaminated: false },
+    ],
+  },
+};
 
 function SimulatorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const missionParam = searchParams.get('mission');
-  const { state, completeMission } = useDronacharya();
+  const missionParam = searchParams.get('mission') || 'mission-rescue-robot';
+  const { state } = useDronacharya();
 
-  // Active Path & Mission
-  const activePath = state.learningPaths[0];
-  const activeMissionId = missionParam || 'mission-rescue-robot';
-  const currentMission =
-    activePath?.missions.find((m) => m.id === activeMissionId) || activePath?.missions[0];
+  const currentMission = MISSIONS[missionParam] || MISSIONS['mission-rescue-robot'];
 
-  // Code Editor State
+  // Code & Execution State
   const [code, setCode] = useState(currentMission.initialCode);
   const [isRunning, setIsRunning] = useState(false);
-  const [execResult, setExecResult] = useState<ExecutionResult | null>(null);
-  const [hintsRevealed, setHintsRevealed] = useState(0);
-  const [attemptsCount, setAttemptsCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<'arena' | 'code' | 'guide' | 'terminal'>('arena');
+  const [terminalSubTab, setTerminalSubTab] = useState<'console' | 'diagnostics' | 'tests'>('console');
+  const [consoleLogs, setConsoleLogs] = useState<string[]>([
+    `🎮 Initialized mission: ${currentMission.title}`,
+    '💡 Ready for Python code execution.',
+  ]);
 
-  // 2D Visual Grid State
-  const [gridRoverState, setGridRoverState] = useState<'idle' | 'running' | 'success' | 'failed'>('idle');
-  const [robotEnergy, setRobotEnergy] = useState(0);
+  // Robot Grid Simulation State
+  const [robotSimResult, setRobotSimResult] = useState<RobotSimulationResult | null>(null);
+  const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationSpeed, setAnimationSpeed] = useState<number>(1);
+  const [collectedBatteries, setCollectedBatteries] = useState<number[]>([]);
 
-  // Follow-Up Understanding Check State (Section 8)
-  const [showUnderstandingCheck, setShowUnderstandingCheck] = useState(false);
-  const [followUpCode, setFollowUpCode] = useState(
-    `# Follow-Up Challenge: Booster Protocol
-# The rover has activated a booster cell!
-# Multiply each positive battery cell by 2 before adding it to total_energy.
+  // Cell Filter Simulation State
+  const [cells, setCells] = useState<BioCell[]>(currentMission.initialCells || []);
+  const [activeCellIndex, setActiveCellIndex] = useState(-1);
+  const [matrixVaultCount, setMatrixVaultCount] = useState(0);
+  const [quarantineCount, setQuarantineCount] = useState(0);
+  const [filterSimResult, setFilterSimResult] = useState<ExecutionResult | null>(null);
 
-def boosted_rescue_robot(battery_cells: list) -> int:
-    total_energy = 0
-    # TODO: Loop and multiply each cell by 2
-    
-    return total_energy
+  // Progressive Hints (4 Tiers)
+  const [hintTier, setHintTier] = useState<number>(0);
+
+  // Modals & Battle Challenge State
+  const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
+  const [isBattleChallengeOpen, setIsBattleChallengeOpen] = useState(false);
+  const [isMentorOpen, setIsMentorOpen] = useState(false);
+  const [battleCode, setBattleCode] = useState(
+    `# Battle Challenge: Booster Protocol
+# The rover activated an auxiliary capacitor!
+# Multiply each positive energy cell by 2 before appending.
+
+def boosted_rescue(cells: list) -> list:
+    boosted = []
+    # TODO: Multiply positive cells by 2
+    for c in cells:
+        if c > 0:
+            boosted.append(c * 2)
+    return boosted
 `
   );
-  const [followUpResult, setFollowUpResult] = useState<ExecutionResult | null>(null);
-  const [followUpCompleted, setFollowUpCompleted] = useState(false);
+  const [battleResult, setBattleResult] = useState<ExecutionResult | null>(null);
+  const [battleCompleted, setBattleCompleted] = useState(false);
 
-  // Modals & Drawers
-  const [isMentorOpen, setIsMentorOpen] = useState(false);
-  const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
-  const [awardedXp, setAwardedXp] = useState(0);
-  const [awardedSeal, setAwardedSeal] = useState<any>(null);
+  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Synchronize when mission changes
+  // Synchronize on mission change
   useEffect(() => {
     setCode(currentMission.initialCode);
-    setExecResult(null);
-    setHintsRevealed(0);
-    setGridRoverState('idle');
-    setRobotEnergy(0);
-    setShowUnderstandingCheck(false);
-    setFollowUpCompleted(false);
-    setFollowUpResult(null);
+    setRobotSimResult(null);
+    setCurrentFrameIndex(0);
+    setIsAnimating(false);
+    setCollectedBatteries([]);
+    setHintTier(0);
+    setIsCelebrationOpen(false);
+    setIsBattleChallengeOpen(false);
+    setBattleCompleted(false);
+    setCells(currentMission.initialCells || []);
+    setMatrixVaultCount(0);
+    setQuarantineCount(0);
+    setActiveCellIndex(-1);
+    setConsoleLogs([
+      `🎮 Realm: ${currentMission.realmName} — ${currentMission.title}`,
+      '💡 Review your mission objectives and write code to control the simulation.',
+    ]);
   }, [currentMission.id]);
 
-  // Progressive Hints per Mission
-  const progressiveHints =
-    currentMission.id === 'mission-rescue-robot'
-      ? [
-          'Hint 1: Use a for-loop: "for cell in battery_cells:" to look at each number in the list.',
-          'Hint 2: Inside the indented loop block, add the current cell to your total: "total_energy += cell".',
-          'Hint 3: Ensure "return total_energy" is on the left margin outside the loop, so it returns after all cells are counted.',
-        ]
-      : [
-          'Hint 1: Loop through each cell: "for cell in battery_cells:".',
-          'Hint 2: Add an if condition: "if cell > 0:" before adding to total_energy.',
-          'Hint 3: Only positive cells should be added; negative numbers are automatically skipped.',
-        ];
+  // Clean timer on unmount
+  useEffect(() => {
+    return () => {
+      if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+    };
+  }, []);
 
-  // Execute Code in Python Sandbox
-  const handleRunCode = async () => {
-    setIsRunning(true);
-    setGridRoverState('running');
-    setAttemptsCount((prev) => prev + 1);
-
-    const allTests = [...currentMission.visibleTests, ...currentMission.hiddenTests];
-    const result = await executePythonChallenge(code, allTests, currentMission.id);
-    setExecResult(result);
-    setIsRunning(false);
-
-    if (result.allPassed) {
-      setGridRoverState('success');
-      setRobotEnergy(100);
-
-      try {
-        confetti({
-          particleCount: 75,
-          spread: 60,
-          origin: { y: 0.6 },
-        });
-      } catch (e) {}
-
-      const award = completeMission(currentMission.id, hintsRevealed);
-      setAwardedXp(award.earnedXp);
-      setAwardedSeal(award.awardedSeal);
-      setShowUnderstandingCheck(true);
-    } else {
-      setGridRoverState('failed');
-      setRobotEnergy(0);
-    }
+  // Reset simulation arena
+  const handleReset = () => {
+    if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+    setIsAnimating(false);
+    setCurrentFrameIndex(0);
+    setCollectedBatteries([]);
+    setCells(currentMission.initialCells || []);
+    setActiveCellIndex(-1);
+    setMatrixVaultCount(0);
+    setQuarantineCount(0);
+    setConsoleLogs((prev) => [...prev.slice(-4), '🔄 Simulation reset to initial coordinates.']);
   };
 
-  // Run Follow-Up Understanding Check
-  const handleRunFollowUpCheck = async () => {
+  // Run Robot Code Simulation
+  const handleRunRobotCode = () => {
+    if (isAnimating) return;
+    handleReset();
     setIsRunning(true);
-    const followUpTests = [
-      { id: 'f1', inputDescription: 'boosted_rescue_robot([10, 20])', expectedOutput: '60', codeSnippet: 'assert boosted_rescue_robot([10, 20]) == 60' },
-      { id: 'f2', inputDescription: 'boosted_rescue_robot([5, 15, 25])', expectedOutput: '90', codeSnippet: 'assert boosted_rescue_robot([5, 15, 25]) == 90' },
+
+    const result = executeRobotCode(code);
+    setRobotSimResult(result);
+
+    // Stream console logs
+    setConsoleLogs((prev) => [
+      ...prev,
+      '▶ Compiling & executing Python commands...',
+      `⚡ Interpreted ${result.frames.length - 1} actions. Commencing rover simulation...`,
+    ]);
+
+    // Animate frames step-by-step
+    setIsAnimating(true);
+    let frameIdx = 0;
+    const frames = result.frames;
+    const collected: number[] = [];
+
+    const delay = Math.max(120, 500 / animationSpeed);
+
+    const stepAnimation = () => {
+      if (frameIdx < frames.length) {
+        const frame = frames[frameIdx];
+        setCurrentFrameIndex(frameIdx);
+
+        if (frame.collectedBatteryIndex !== undefined) {
+          collected.push(frame.collectedBatteryIndex);
+          setCollectedBatteries([...collected]);
+        }
+
+        setConsoleLogs((prev) => [...prev.slice(-6), frame.logMessage]);
+
+        frameIdx++;
+        animationTimerRef.current = setTimeout(stepAnimation, delay);
+      } else {
+        // Animation completed
+        setIsAnimating(false);
+        setIsRunning(false);
+
+        if (result.success) {
+          try {
+            confetti({
+              particleCount: 90,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          } catch (e) {}
+
+          // Record progress to Supabase and local store
+          recordGameProgress({
+            missionId: currentMission.id,
+            earnedXp: currentMission.xpReward,
+            subject: 'python-basics',
+          });
+
+          setIsCelebrationOpen(true);
+        } else {
+          // Deduct a heart on collision/failure
+          deductHeart();
+          setTerminalSubTab('diagnostics');
+        }
+      }
+    };
+
+    animationTimerRef.current = setTimeout(stepAnimation, delay);
+  };
+
+  // Run Cell Filter Simulation
+  const handleRunCellFilter = async () => {
+    setIsRunning(true);
+    handleReset();
+
+    const testCases = [
+      { id: 't1', inputDescription: 'filter_healthy_cells([45, -20, 80])', expectedOutput: '[45, 80]', codeSnippet: 'assert filter_healthy_cells([45, -20, 80]) == [45, 80]' },
+      { id: 't2', inputDescription: 'filter_healthy_cells([-5, -10, -15])', expectedOutput: '[]', codeSnippet: 'assert filter_healthy_cells([-5, -10, -15]) == []' },
+      { id: 't3', inputDescription: 'filter_healthy_cells([10, 20, 30])', expectedOutput: '[10, 20, 30]', codeSnippet: 'assert filter_healthy_cells([10, 20, 30]) == [10, 20, 30]' },
     ];
 
-    const result = await executePythonChallenge(followUpCode, followUpTests, 'mission-followup');
-    setFollowUpResult(result);
+    const result = await executePythonChallenge(code, testCases, currentMission.id);
+    setFilterSimResult(result);
     setIsRunning(false);
 
-    if (result.allPassed) {
-      setFollowUpCompleted(true);
+    // Animate conveyor inspection
+    const testCells = currentMission.initialCells || [];
+    let idx = 0;
+    let vault = 0;
+    let purged = 0;
+
+    const animateConveyor = () => {
+      if (idx < testCells.length) {
+        setActiveCellIndex(idx);
+        const cell = testCells[idx];
+        if (cell.charge > 0) {
+          vault++;
+          setMatrixVaultCount(vault);
+        } else {
+          purged++;
+          setQuarantineCount(purged);
+        }
+        idx++;
+        setTimeout(animateConveyor, 400);
+      } else {
+        if (result.allPassed) {
+          try {
+            confetti({
+              particleCount: 90,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          } catch (e) {}
+
+          recordGameProgress({
+            missionId: currentMission.id,
+            earnedXp: currentMission.xpReward,
+            subject: 'python-basics',
+          });
+
+          setIsCelebrationOpen(true);
+        } else {
+          deductHeart();
+          setTerminalSubTab('diagnostics');
+        }
+      }
+    };
+
+    animateConveyor();
+  };
+
+  // Run Follow-Up Battle Challenge
+  const handleRunBattleChallenge = async () => {
+    setIsRunning(true);
+    const battleTests = [
+      { id: 'b1', inputDescription: 'boosted_rescue([10, -5, 20])', expectedOutput: '[20, 40]', codeSnippet: 'assert boosted_rescue([10, -5, 20]) == [20, 40]' },
+      { id: 'b2', inputDescription: 'boosted_rescue([5, 15])', expectedOutput: '[10, 30]', codeSnippet: 'assert boosted_rescue([5, 15]) == [10, 30]' },
+    ];
+
+    const res = await executePythonChallenge(battleCode, battleTests, 'mission-battle');
+    setBattleResult(res);
+    setIsRunning(false);
+
+    if (res.allPassed) {
+      setBattleCompleted(true);
       try {
         confetti({
-          particleCount: 90,
+          particleCount: 100,
           spread: 80,
           origin: { y: 0.5 },
         });
       } catch (e) {}
+      recordGameProgress({
+        missionId: 'battle-challenge-booster',
+        earnedXp: 50,
+        subject: 'python-basics',
+      });
     }
   };
 
-  const handleRevealNextHint = () => {
-    if (hintsRevealed < progressiveHints.length) {
-      setHintsRevealed((prev) => prev + 1);
-    }
-  };
+  const currentFrame = robotSimResult?.frames[currentFrameIndex];
 
   return (
-    <div className="flex-1 flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-      {/* Top Breadcrumb & Mission Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D8CFC0] pb-4 mb-6">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-1 flex flex-col gap-5">
+      {/* Top Mission Banner & Realm Switcher */}
+      <div className="bg-white border-2 border-[#1E1E24] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#1E1E24] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#A65F43] uppercase tracking-wider">
-            <Code2 className="w-4 h-4" />
-            <span>Interactive Mission Arena</span>
-            <span className="text-[#7E8276]">•</span>
-            <span className="text-[#354B3A]">Attempts: {attemptsCount}</span>
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] text-[11px] font-black text-[#6C5CE7]">
+              Stage {currentMission.stageNumber}: {currentMission.realmName}
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#1E1E24] text-[11px] font-black text-[#D97706] flex items-center gap-1">
+              <Star className="w-3 h-3 fill-[#F59E0B]" />
+              <span>+{currentMission.xpReward} XP</span>
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#D1FAE5] border border-[#1E1E24] text-[11px] font-black text-[#059669]">
+              Concept: {currentMission.concept}
+            </span>
           </div>
-          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#252820] mt-0.5">
+
+          <h1 className="font-serif font-black text-xl sm:text-2xl text-[#1E1E24]">
             {currentMission.title}
           </h1>
-          <p className="text-xs text-[#575A51] mt-0.5">
-            {currentMission.subtitle} • Bug-to-Battle Real Code Execution
-          </p>
         </div>
 
-        {/* Mission Switcher Tabs */}
+        {/* Mission Switcher Dropdown */}
         <div className="flex items-center gap-2">
-          {activePath.missions.map((m, idx) => {
-            const isActive = m.id === currentMission.id;
-            return (
-              <Link
-                key={m.id}
-                href={`/simulator?mission=${m.id}`}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 ${
-                  isActive
-                    ? 'bg-[#354B3A] text-white border-[#354B3A] shadow-xs'
-                    : 'bg-white text-[#575A51] border-[#D8CFC0] hover:bg-[#FAF8F5]'
-                }`}
-              >
-                <span>Mission {idx + 1}</span>
-                {m.isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-[#B49A65]" />}
-              </Link>
-            );
-          })}
+          <Link
+            href="/simulator?mission=mission-rescue-robot"
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition-all ${
+              currentMission.id === 'mission-rescue-robot'
+                ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                : 'bg-white text-[#1E1E24] border-[#1E1E24] hover:bg-[#F2ECE0]'
+            }`}
+          >
+            Quest 1: Rescue Robot
+          </Link>
+          <Link
+            href="/simulator?mission=mission-hazard-filter"
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition-all ${
+              currentMission.id === 'mission-hazard-filter'
+                ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                : 'bg-white text-[#1E1E24] border-[#1E1E24] hover:bg-[#F2ECE0]'
+            }`}
+          >
+            Quest 2: Filter Cells
+          </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: 2D GAME AREA + BUG-TO-BATTLE DIAGNOSTICS */}
-        <div className="lg:col-span-5 space-y-5">
-          {/* 1. VISIBLE 2D GRID GAME AREA */}
-          <div className="bg-[#252820] text-[#F6F1E7] rounded-2xl p-4 border-2 border-[#3A3E34] shadow-xl">
-            <div className="flex items-center justify-between border-b border-[#3A3E34] pb-2 mb-3">
-              <div className="flex items-center gap-2">
-                <Gamepad2 className="w-4 h-4 text-[#B49A65]" />
-                <span className="font-serif font-bold text-xs uppercase tracking-wider text-[#E9DFC9]">
-                  Live 2D Grid Game Arena
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[11px] text-[#A6AC9B]">
-                <Zap className={`w-3.5 h-3.5 ${robotEnergy > 0 ? 'text-[#F6E05E]' : 'text-[#7E8276]'}`} />
-                <span>Rover Power: {robotEnergy}%</span>
-              </div>
-            </div>
+      {/* Mobile Tab Switcher */}
+      <div className="flex lg:hidden border-2 border-[#1E1E24] rounded-xl bg-white p-1 gap-1 shadow-[2px_2px_0px_#1E1E24]">
+        <button
+          onClick={() => setActiveTab('arena')}
+          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'arena' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          }`}
+        >
+          🎮 Game Arena
+        </button>
+        <button
+          onClick={() => setActiveTab('code')}
+          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'code' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          }`}
+        >
+          💻 Code Editor
+        </button>
+        <button
+          onClick={() => setActiveTab('guide')}
+          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'guide' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          }`}
+        >
+          📜 Codex Guide
+        </button>
+        <button
+          onClick={() => setActiveTab('terminal')}
+          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'terminal' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          }`}
+        >
+          📟 Output
+        </button>
+      </div>
 
-            {/* Visual 4x4 Grid Board */}
-            <div className="bg-[#1A1C16] p-3 rounded-xl border border-[#2D3126] max-w-[280px] mx-auto">
-              <div className="grid grid-cols-4 gap-1.5 aspect-square">
-                {Array.from({ length: 16 }).map((_, i) => {
-                  const x = i % 4;
-                  const y = Math.floor(i / 4);
-                  const isStart = x === 0 && y === 0;
-                  const isBattery1 = x === 2 && y === 0;
-                  const isBattery2 = x === 1 && y === 2;
-                  const isBeacon = x === 3 && y === 3;
+      {/* =========================================================================
+          COORDINATED 3-PANEL GAMEPLAY WORKSPACE (Desktop: 3 Columns)
+         ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start">
+        {/* PANEL A: QUEST CODEX (Left, 3.5 cols) */}
+        <div className={`lg:col-span-4 space-y-4 ${activeTab !== 'guide' ? 'hidden lg:block' : 'block'}`}>
+          {/* Mission Story & Objective Card */}
+          <div className="card-game p-5 bg-white">
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-[#FEF3C7] border border-[#1E1E24] text-[#D97706] mb-2 inline-block">
+              Quest Briefing
+            </span>
+            <h2 className="font-serif font-black text-lg text-[#1E1E24] mb-2">
+              Story Narrative
+            </h2>
+            <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
+              {currentMission.story}
+            </p>
 
-                  return (
-                    <div
-                      key={i}
-                      className={`relative rounded-lg flex items-center justify-center transition-all duration-300 ${
-                        isStart && gridRoverState !== 'success'
-                          ? 'bg-[#354B3A] text-white ring-2 ring-[#B49A65]'
-                          : isBeacon && gridRoverState === 'success'
-                          ? 'bg-[#354B3A] text-white ring-2 ring-[#68D391] scale-105'
-                          : isBeacon
-                          ? 'bg-[#2B3D2F] border-2 border-dashed border-[#B49A65]'
-                          : isBattery1 || isBattery2
-                          ? 'bg-[#332E1D] border border-[#B49A65]/40'
-                          : 'bg-[#23271E] border border-[#30362A]'
-                      }`}
-                    >
-                      <span className="absolute top-0.5 left-1 text-[7px] text-[#7E8276]/60 font-mono">
-                        {x},{y}
-                      </span>
-                      {isStart && gridRoverState !== 'success' && (
-                        <span className="text-lg animate-bounce">🤖</span>
-                      )}
-                      {isBeacon && gridRoverState === 'success' && (
-                        <span className="text-xl animate-bounce">🤖</span>
-                      )}
-                      {isBeacon && gridRoverState !== 'success' && (
-                        <span className="text-base">🏁</span>
-                      )}
-                      {(isBattery1 || isBattery2) && gridRoverState !== 'success' && (
-                        <span className="text-sm animate-pulse">⚡</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+            <h3 className="font-serif font-black text-sm text-[#1E1E24] mb-2 flex items-center gap-1.5">
+              <Target className="w-4 h-4 text-[#6C5CE7]" />
+              <span>Directives & Constraints</span>
+            </h3>
+            <ul className="space-y-1.5 mb-4">
+              {currentMission.instructions.map((inst, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-[#1E1E24]">
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#10B981] text-white flex items-center justify-center text-[9px] font-black shrink-0 mt-0.5">
+                    ✓
+                  </span>
+                  <span>{inst}</span>
+                </li>
+              ))}
+            </ul>
 
-              {/* Status readout under grid */}
-              <div className="mt-3 text-center text-xs font-mono">
-                {gridRoverState === 'idle' && (
-                  <span className="text-[#A6AC9B]">Rover awaiting Python loop execution...</span>
-                )}
-                {gridRoverState === 'running' && (
-                  <span className="text-[#B49A65] flex items-center justify-center gap-1.5 animate-pulse">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Evaluating your loop in sandbox...</span>
-                  </span>
-                )}
-                {gridRoverState === 'success' && (
-                  <span className="text-[#68D391] font-bold">
-                    🌟 All battery energy added! Rover reached beacon!
-                  </span>
-                )}
-                {gridRoverState === 'failed' && (
-                  <span className="text-[#FC8181] font-bold">
-                    ⚠️ Loop incomplete: Rover did not receive required energy.
-                  </span>
-                )}
+            {/* Optional Bonus Stars */}
+            <div className="pt-3 border-t-2 border-[#1E1E24]/15">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#7E7E8F] block mb-1.5">
+                Optional Challenge Stars
+              </span>
+              <div className="space-y-1 text-[11px] font-bold text-[#4A4A58]">
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <span>Energy Conservation: Finish with &gt; 20% battery</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <span>Flawless Flight: 0 barrier collisions</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* 2. BUG-TO-BATTLE DIAGNOSTIC PANEL (Activates on error) */}
-          {execResult && !execResult.allPassed && (
-            <div className="bg-[#FAF4F0] border-2 border-[#A65F43] rounded-2xl p-5 shadow-md animate-in fade-in">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#A65F43] uppercase tracking-wider mb-2">
-                <AlertTriangle className="w-4 h-4" />
-                <span>Bug-to-Battle: Observable Failure</span>
+          {/* Progressive 4-Tier Hints Card */}
+          <div className="card-game p-5 bg-[#FAF6EE]">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-[#6C5CE7]" />
+                <h3 className="font-serif font-black text-sm text-[#1E1E24]">
+                  Socratic Hints ({hintTier}/4)
+                </h3>
               </div>
+              {hintTier < 4 && (
+                <button
+                  onClick={() => setHintTier((prev) => Math.min(4, prev + 1))}
+                  className="px-2.5 py-1 rounded-lg bg-white border border-[#1E1E24] text-[10px] font-black text-[#6C5CE7] hover:bg-[#EDE9FE] shadow-xs"
+                >
+                  Unlock Hint {hintTier + 1}
+                </button>
+              )}
+            </div>
 
-              <p className="text-xs text-[#252820] leading-relaxed mb-3">
-                {execResult.diagnosticExplanation}
+            {hintTier === 0 ? (
+              <p className="text-xs text-[#7E7E8F] italic">
+                Stuck on logic? Click "Unlock Hint" to reveal progressive clues from Mentor Dronacharya.
               </p>
-
-              {/* Suggested Socratic Hint */}
-              {execResult.suggestedHint && (
-                <div className="p-3 rounded-xl bg-white border border-[#A65F43]/40 text-xs text-[#7A6230] mb-3">
-                  <div className="font-semibold text-[#A65F43] flex items-center gap-1.5 mb-1">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Dronacharya Socratic Hint:</span>
+            ) : (
+              <div className="space-y-2 text-xs">
+                {hintTier >= 1 && (
+                  <div className="p-2.5 rounded-lg bg-white border border-[#1E1E24]">
+                    <span className="font-bold text-[#10B981] block mb-0.5">Tier 1 • Concept:</span>
+                    <span>Use for-loops with range(n) to group repeated directional steps.</span>
                   </div>
-                  <p className="italic">{execResult.suggestedHint}</p>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-1">
-                <button
-                  onClick={handleRevealNextHint}
-                  disabled={hintsRevealed >= progressiveHints.length}
-                  className="text-xs font-semibold text-[#354B3A] underline disabled:opacity-50 cursor-pointer"
-                >
-                  {hintsRevealed < progressiveHints.length
-                    ? `Unlock Step Hint (${hintsRevealed + 1}/${progressiveHints.length})`
-                    : 'All hints unlocked'}
-                </button>
-
-                <button
-                  onClick={() => {
-                    // Refocus and clear result to retry
-                    setGridRoverState('idle');
-                  }}
-                  className="px-3 py-1 rounded bg-[#A65F43] text-white text-xs font-semibold hover:bg-[#8B4E36] transition-colors"
-                >
-                  Retry Code ↻
-                </button>
+                )}
+                {hintTier >= 2 && (
+                  <div className="p-2.5 rounded-lg bg-white border border-[#1E1E24]">
+                    <span className="font-bold text-[#3B82F6] block mb-0.5">Tier 2 • Direction:</span>
+                    <span>Tile (2,0) contains an energy cell. Collect it early to keep Arya powered.</span>
+                  </div>
+                )}
+                {hintTier >= 3 && (
+                  <div className="p-2.5 rounded-lg bg-white border border-[#1E1E24]">
+                    <span className="font-bold text-[#D97706] block mb-0.5">Tier 3 • Debugging:</span>
+                    <span>Avoid the rock at (1,1). Moving right along row 0 avoids all central walls!</span>
+                  </div>
+                )}
+                {hintTier >= 4 && (
+                  <div className="p-2.5 rounded-lg bg-[#FEF3C7] border border-[#1E1E24]">
+                    <span className="font-bold text-[#DC2626] block mb-0.5">Tier 4 • Code Template:</span>
+                    <pre className="font-mono text-[10px] text-[#1E1E24] bg-white p-2 rounded border border-[#1E1E24]/20 overflow-x-auto">
+{`for step in range(3):
+    robot.move_right()
+robot.collect()
+for step in range(4):
+    robot.move_down()`}
+                    </pre>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* 3. STORY & PROGRESSIVE HINTS ACCORDION */}
-          <div className="bg-white border border-[#D8CFC0] rounded-2xl p-5 shadow-xs space-y-3">
-            <div>
-              <div className="text-xs font-bold text-[#354B3A] uppercase tracking-wider mb-1">
-                Mission Objective
-              </div>
-              <p className="text-xs text-[#252820] leading-relaxed">
-                {currentMission.narrativeContext}
-              </p>
-            </div>
-
-            <div className="pt-3 border-t border-[#D8CFC0]">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-xs font-bold text-[#252820] flex items-center gap-1.5">
-                  <HelpCircle className="w-4 h-4 text-[#B49A65]" />
-                  <span>Progressive Hints</span>
-                </div>
-                <span className="text-[11px] text-[#7E8276]">
-                  {hintsRevealed} of {progressiveHints.length} revealed
-                </span>
-              </div>
-
-              {hintsRevealed === 0 ? (
-                <p className="text-xs text-[#575A51]">
-                  Try coding the loop first. If you get stuck, progressive hints unlock step-by-step.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {progressiveHints.slice(0, hintsRevealed).map((hint, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-lg bg-[#FBF8F2] border border-[#B49A65] text-xs text-[#7A6230]"
-                    >
-                      {hint}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {hintsRevealed < progressiveHints.length && (
-                <button
-                  onClick={handleRevealNextHint}
-                  className="mt-2.5 text-xs font-semibold text-[#354B3A] underline hover:text-[#2B3D2F] cursor-pointer"
-                >
-                  {hintsRevealed === 0 ? 'Reveal Hint 1' : `Reveal Hint ${hintsRevealed + 1}`}
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: CODE EDITOR, RUNNER & UNDERSTANDING CHECK */}
-        <div className="lg:col-span-7 flex flex-col gap-5">
-          {/* Code Editor Box */}
-          <div className="bg-white rounded-2xl overflow-hidden border-2 border-[#D8CFC0] shadow-md flex flex-col">
-            {/* Editor Bar */}
-            <div className="bg-[#252820] px-4 py-2.5 flex items-center justify-between text-xs text-[#F6F1E7]">
-              <div className="flex items-center gap-2 font-mono text-[11px]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#B49A65]" />
-                <span>solution.py</span>
-                <span className="text-[#A6AC9B]">• Python 3.11</span>
+        {/* PANEL B: PLAYABLE GAME ARENA (Middle, 4 cols) */}
+        <div className={`lg:col-span-4 ${activeTab !== 'arena' ? 'hidden lg:block' : 'block'}`}>
+          {currentMission.id === 'mission-rescue-robot' ? (
+            <PlayableGridEngine
+              currentFrame={currentFrame}
+              isAnimating={isAnimating}
+              onReset={handleReset}
+              speed={animationSpeed}
+              onSetSpeed={setAnimationSpeed}
+              collectedBatteries={collectedBatteries}
+            />
+          ) : (
+            <CellFilterEngine
+              cells={cells}
+              activeCellIndex={activeCellIndex}
+              isScanning={isRunning}
+              matrixVaultCount={matrixVaultCount}
+              quarantineCount={quarantineCount}
+              onReset={handleReset}
+            />
+          )}
+        </div>
+
+        {/* PANEL C: CODE STUDIO & MULTI-TAB TERMINAL (Right, 4 cols) */}
+        <div className={`lg:col-span-4 space-y-4 ${activeTab !== 'code' && activeTab !== 'terminal' ? 'hidden lg:block' : 'block'}`}>
+          {/* Real Code Workspace */}
+          <div className="card-game p-4 bg-white flex flex-col justify-between">
+            <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b-2 border-[#1E1E24]/15">
+              <div className="flex items-center gap-1.5">
+                <Code2 className="w-4 h-4 text-[#6C5CE7]" />
+                <span className="font-serif font-black text-xs text-[#1E1E24]">
+                  Python Code Studio
+                </span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCode(currentMission.initialCode)}
-                  className="p-1 text-[#A6AC9B] hover:text-white"
-                  title="Reset to Starter Code"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button
+                onClick={() => setCode(currentMission.initialCode)}
+                className="text-[11px] font-bold text-[#7E7E8F] hover:text-[#EF4444] flex items-center gap-1"
+                title="Reset code template"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset Template</span>
+              </button>
             </div>
 
-            {/* Code Textarea */}
-            <textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              rows={11}
-              className="w-full p-4 bg-[#1E201B] text-[#E9DFC9] font-mono text-xs leading-relaxed focus:outline-none resize-none"
-              spellCheck={false}
-            />
+            {/* Code Textarea with line numbers aesthetic */}
+            <div className="relative rounded-xl border-2 border-[#1E1E24] bg-[#1E1E24] p-3 shadow-[2px_2px_0px_#1E1E24] overflow-hidden">
+              <textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                rows={13}
+                spellCheck={false}
+                className="w-full bg-transparent font-mono text-xs text-[#FAF6EE] focus:outline-none resize-none leading-relaxed selection:bg-[#6C5CE7]"
+                placeholder="Write your Python commands here..."
+              />
+            </div>
 
-            {/* Run Action Bar */}
-            <div className="bg-[#FAF8F5] px-4 py-3 border-t border-[#D8CFC0] flex items-center justify-between">
-              <div className="text-[11px] text-[#7E8276] flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#354B3A]" />
-                <span>Runs securely in client WebAssembly sandbox</span>
-              </div>
+            {/* Action Bar: Run Mission */}
+            <div className="mt-4 flex items-center gap-2">
               <button
-                onClick={handleRunCode}
-                disabled={isRunning}
-                className="btn-primary text-xs py-2.5 px-6 font-bold shadow-sm flex items-center gap-2"
+                onClick={
+                  currentMission.id === 'mission-rescue-robot'
+                    ? handleRunRobotCode
+                    : handleRunCellFilter
+                }
+                disabled={isRunning || isAnimating}
+                className="btn-game-purple flex-1 py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24]"
               >
-                <Play className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
-                <span>{isRunning ? 'Executing...' : 'Run Mission Tests ▶'}</span>
+                {isRunning || isAnimating ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Executing Game Loop...</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 fill-white" />
+                    <span>Run Code &amp; Test Arena</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
 
-          {/* Test Results Console */}
-          <div className="rounded-2xl bg-[#252820] text-[#F6F1E7] p-4 font-mono text-xs shadow-md border border-[#3A3E34]">
-            <div className="flex items-center justify-between border-b border-[#3A3E34] pb-2 mb-2 text-[#A6AC9B] text-[11px]">
-              <div className="flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-[#B49A65]" />
-                <span>Test Suite Evaluation</span>
-              </div>
-              {execResult && (
-                <span className="text-[#B49A65]">{execResult.executionTimeMs} ms</span>
-              )}
+          {/* Multi-Tab Terminal / Diagnostics / Test Results */}
+          <div className="card-game p-4 bg-[#FAF6EE]">
+            {/* Terminal Tab Switcher */}
+            <div className="flex items-center gap-1 border-b-2 border-[#1E1E24]/15 pb-2 mb-3">
+              <button
+                onClick={() => setTerminalSubTab('console')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-black border transition-all ${
+                  terminalSubTab === 'console'
+                    ? 'bg-[#1E1E24] text-white border-[#1E1E24]'
+                    : 'bg-white text-[#4A4A58] border-transparent hover:border-[#1E1E24]'
+                }`}
+              >
+                📟 Console Log
+              </button>
+              <button
+                onClick={() => setTerminalSubTab('diagnostics')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-black border transition-all ${
+                  terminalSubTab === 'diagnostics'
+                    ? 'bg-[#EF4444] text-white border-[#1E1E24]'
+                    : 'bg-white text-[#4A4A58] border-transparent hover:border-[#1E1E24]'
+                }`}
+              >
+                ⚔️ Bug-to-Battle
+              </button>
+              <button
+                onClick={() => setTerminalSubTab('tests')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-black border transition-all ${
+                  terminalSubTab === 'tests'
+                    ? 'bg-[#10B981] text-white border-[#1E1E24]'
+                    : 'bg-white text-[#4A4A58] border-transparent hover:border-[#1E1E24]'
+                }`}
+              >
+                ✓ Test Results
+              </button>
             </div>
 
-            {!execResult && !isRunning && (
-              <div className="text-[#7E8276] italic py-2">
-                Click &apos;Run Mission Tests ▶&apos; to execute your loop against the test harness.
-              </div>
-            )}
-
-            {execResult && (
-              <div className="space-y-2 pt-1 font-sans">
-                {execResult.testResults.map((tr) => (
-                  <div
-                    key={tr.testId}
-                    className={`p-2.5 rounded-lg border flex items-center justify-between text-xs ${
-                      tr.passed
-                        ? 'bg-[#354B3A]/25 border-[#354B3A] text-[#E2E8E3]'
-                        : 'bg-[#A65F43]/25 border-[#A65F43] text-[#FAF4F0]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {tr.passed ? (
-                        <CheckCircle2 className="w-4 h-4 text-[#68D391] shrink-0" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-[#FC8181] shrink-0" />
-                      )}
-                      <div>
-                        <span className="font-mono text-xs">{tr.description}</span>
-                        {!tr.passed && (
-                          <div className="text-[11px] text-[#FC8181] mt-0.5 font-mono">
-                            Expected: {tr.expected} | Your code returned: {tr.actual || 'None'}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono">
-                      {tr.passed ? 'PASSED' : 'FAILED'}
-                    </span>
+            {/* TAB 1: CONSOLE LOG */}
+            {terminalSubTab === 'console' && (
+              <div className="h-32 bg-[#1E1E24] border-2 border-[#1E1E24] rounded-xl p-3 font-mono text-[11px] text-[#A29BFE] overflow-y-auto space-y-1">
+                {consoleLogs.map((log, i) => (
+                  <div key={i} className="leading-tight">
+                    {log}
                   </div>
                 ))}
               </div>
             )}
-          </div>
 
-          {/* SECTION 8: FOLLOW-UP UNDERSTANDING CHECK */}
-          {showUnderstandingCheck && (
-            <div className="p-5 rounded-2xl bg-[#E2E8E3] border-2 border-[#354B3A] shadow-md animate-in zoom-in-95 space-y-3">
-              <div className="flex items-center justify-between border-b border-[#354B3A]/30 pb-2">
-                <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-[#354B3A]" />
-                  <h3 className="font-serif font-bold text-sm text-[#252820]">
-                    Understanding Check: Booster Protocol
-                  </h3>
-                </div>
-                <span className="text-[10px] bg-[#354B3A] text-white px-2 py-0.5 rounded font-bold">
-                  Independent Challenge
-                </span>
+            {/* TAB 2: BUG-TO-BATTLE DIAGNOSTICS */}
+            {terminalSubTab === 'diagnostics' && (
+              <div className="h-32 bg-white border-2 border-[#1E1E24] rounded-xl p-3 text-xs overflow-y-auto">
+                {robotSimResult?.failureReason ? (
+                  <div className="space-y-1.5 text-xs text-[#DC2626]">
+                    <span className="font-bold block flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      {robotSimResult.failureReason}
+                    </span>
+                    <p className="text-[11px] text-[#4A4A58]">
+                      {robotSimResult.diagnostic.hint2}
+                    </p>
+                  </div>
+                ) : filterSimResult?.diagnosticExplanation ? (
+                  <div className="space-y-1 text-xs text-[#4A4A58]">
+                    <span className="font-bold text-[#DC2626] block">
+                      Diagnostic Notice:
+                    </span>
+                    <p className="text-[11px] leading-relaxed">
+                      {filterSimResult.diagnosticExplanation}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[#10B981] font-bold">
+                    ✓ No active runtime bugs detected. Your code passed all observable boundary checks!
+                  </p>
+                )}
               </div>
+            )}
 
-              <p className="text-xs text-[#252820] leading-relaxed">
-                Great job solving the first challenge! Now let&apos;s verify you can apply the loop concept independently.
-                The rover&apos;s booster cell is online: <strong>multiply each cell by 2</strong> before adding it to <code>total_energy</code>.
-              </p>
-
-              <textarea
-                value={followUpCode}
-                onChange={(e) => setFollowUpCode(e.target.value)}
-                rows={7}
-                className="w-full p-3 bg-[#1E201B] text-[#E9DFC9] font-mono text-xs rounded-xl focus:outline-none resize-none leading-relaxed"
-                spellCheck={false}
-              />
-
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-[11px] text-[#354B3A] font-semibold">
-                  {followUpCompleted ? '✓ Understanding Check Mastered!' : 'Test your independent application'}
-                </span>
-
-                <button
-                  onClick={handleRunFollowUpCheck}
-                  disabled={isRunning || followUpCompleted}
-                  className="btn-primary text-xs py-2 px-5 font-bold shadow-xs flex items-center gap-1.5"
-                >
-                  <Play className="w-3.5 h-3.5" />
-                  <span>{followUpCompleted ? 'Completed ✓' : 'Run Booster Check'}</span>
-                </button>
-              </div>
-
-              {followUpResult && (
-                <div className="mt-2 text-xs">
-                  {followUpResult.allPassed ? (
-                    <div className="p-2.5 rounded bg-[#354B3A]/20 border border-[#354B3A] text-[#354B3A] font-semibold">
-                      🎉 Splendid! You demonstrated true conceptual mastery of loops!
+            {/* TAB 3: UNIT TEST RESULTS */}
+            {terminalSubTab === 'tests' && (
+              <div className="h-32 bg-white border-2 border-[#1E1E24] rounded-xl p-3 text-xs overflow-y-auto space-y-1.5">
+                {currentMission.id === 'mission-rescue-robot' ? (
+                  <div className="space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between">
+                      <span>Reach Beacon (5, 5):</span>
+                      <span className={robotSimResult?.reachedTarget ? 'text-[#10B981] font-bold' : 'text-[#7E7E8F]'}>
+                        {robotSimResult?.reachedTarget ? 'PASSED' : 'PENDING'}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="p-2.5 rounded bg-[#A65F43]/20 border border-[#A65F43] text-[#A65F43]">
-                      Not quite: verify that you multiplied each cell by 2 (e.g. <code>cell * 2</code>).
+                    <div className="flex items-center justify-between">
+                      <span>Avoid Barriers:</span>
+                      <span className={robotSimResult && !robotSimResult.hitObstacle ? 'text-[#10B981] font-bold' : 'text-[#7E7E8F]'}>
+                        {robotSimResult && !robotSimResult.hitObstacle ? 'PASSED' : 'PENDING'}
+                      </span>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Link to Practical Project */}
-          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#B49A65] flex items-center justify-between shadow-2xs">
-            <div>
-              <div className="text-[10px] text-[#A65F43] font-bold uppercase tracking-wider">
-                Connect Concept to Practical Project
+                    <div className="flex items-center justify-between">
+                      <span>Battery &gt; 0%:</span>
+                      <span className={robotSimResult && !robotSimResult.depleted ? 'text-[#10B981] font-bold' : 'text-[#7E7E8F]'}>
+                        {robotSimResult && !robotSimResult.depleted ? 'PASSED' : 'PENDING'}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  filterSimResult?.testResults?.map((t) => (
+                    <div key={t.testId} className="flex items-center justify-between text-[11px]">
+                      <span className="truncate max-w-[200px]">{t.description}</span>
+                      <span className={t.passed ? 'text-[#10B981] font-bold' : 'text-[#EF4444] font-bold'}>
+                        {t.passed ? 'PASSED' : 'FAILED'}
+                      </span>
+                    </div>
+                  )) || <p className="text-xs text-[#7E7E8F]">Run the filter mission to inspect unit tests.</p>
+                )}
               </div>
-              <div className="text-xs font-bold text-[#252820] mt-0.5">
-                Robot Grid Navigator Project
-              </div>
-              <div className="text-[11px] text-[#575A51]">
-                Apply loops to guide the robot across coordinates and manage battery power.
-              </div>
-            </div>
-            <Link
-              href="/projects"
-              className="btn-brass text-xs py-1.5 px-3.5 shrink-0 flex items-center gap-1.5"
-            >
-              <span>Open Project</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            )}
           </div>
         </div>
       </div>
 
-      {/* AI Socratic Mentor Drawer */}
+      {/* =========================================================================
+          POST-MISSION CELEBRATION MODAL (Section 12)
+         ========================================================================= */}
+      {isCelebrationOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E24]/60 backdrop-blur-xs">
+          <div className="relative w-full max-w-lg bg-white border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-6 sm:p-8 animate-in zoom-in-95 text-center">
+            {/* Close button */}
+            <button
+              onClick={() => setIsCelebrationOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#1E1E24] bg-[#F2ECE0] text-[#1E1E24] hover:bg-[#FEE2E2]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Victory Badge */}
+            <div className="w-16 h-16 rounded-2xl bg-[#FBBF24] border-2 border-[#1E1E24] text-[#1E1E24] mx-auto flex items-center justify-center shadow-[3px_3px_0px_#1E1E24] mb-3 animate-bounce">
+              <Award className="w-8 h-8" />
+            </div>
+
+            <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-[#EDE9FE] border-2 border-[#1E1E24] text-[#6C5CE7] inline-block mb-2">
+              Mission Completed
+            </span>
+
+            <h2 className="font-serif font-black text-2xl text-[#1E1E24] mb-1">
+              Quest Cleared: {currentMission.title}!
+            </h2>
+            <p className="text-xs text-[#4A4A58] mb-6 max-w-sm mx-auto">
+              Your Python commands executed flawlessly! You turned theoretical loops into observable machine movement.
+            </p>
+
+            {/* Reward Stats Grid */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-[#FEF3C7] border-2 border-[#1E1E24] rounded-xl p-3 text-center shadow-[2px_2px_0px_#1E1E24]">
+                <span className="text-[10px] font-black uppercase text-[#D97706] block">Mastery XP</span>
+                <span className="font-serif font-black text-xl text-[#1E1E24]">+{currentMission.xpReward}</span>
+              </div>
+              <div className="bg-[#D1FAE5] border-2 border-[#1E1E24] rounded-xl p-3 text-center shadow-[2px_2px_0px_#1E1E24]">
+                <span className="text-[10px] font-black uppercase text-[#059669] block">Tests Passed</span>
+                <span className="font-serif font-black text-xl text-[#059669]">100%</span>
+              </div>
+              <div className="bg-[#EDE9FE] border-2 border-[#1E1E24] rounded-xl p-3 text-center shadow-[2px_2px_0px_#1E1E24]">
+                <span className="text-[10px] font-black uppercase text-[#6C5CE7] block">Realm</span>
+                <span className="font-serif font-black text-base text-[#6C5CE7] truncate block">{currentMission.realmName}</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  setIsCelebrationOpen(false);
+                  setIsBattleChallengeOpen(true);
+                }}
+                className="btn-game-yellow w-full sm:w-auto py-2.5 px-6 text-xs shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <Zap className="w-4 h-4 fill-[#1E1E24]" />
+                <span>Try Battle Challenge (+50 XP)</span>
+              </button>
+
+              <Link
+                href="/paths"
+                className="btn-game-purple w-full sm:w-auto py-2.5 px-6 text-xs shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <span>Continue on World Map</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          FOLLOW-UP BATTLE CHALLENGE MODAL (Section 8 & 9)
+         ========================================================================= */}
+      {isBattleChallengeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E24]/60 backdrop-blur-xs">
+          <div className="relative w-full max-w-lg bg-white border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-6 sm:p-8 animate-in zoom-in-95">
+            <button
+              onClick={() => setIsBattleChallengeOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#1E1E24] bg-[#F2ECE0] text-[#1E1E24] hover:bg-[#FEE2E2]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-2">
+              <Flame className="w-5 h-5 text-[#F59E0B]" />
+              <span className="text-xs font-black uppercase tracking-wider text-[#D97706]">
+                Independent Battle Challenge
+              </span>
+            </div>
+
+            <h3 className="font-serif font-black text-xl text-[#1E1E24] mb-1">
+              Booster Capacitor Protocol
+            </h3>
+            <p className="text-xs text-[#4A4A58] mb-4 leading-relaxed">
+              Prove independent mastery! Modify the loop logic to multiply every positive energy cell by 2 before adding to the returned list.
+            </p>
+
+            <div className="rounded-xl border-2 border-[#1E1E24] bg-[#1E1E24] p-3 mb-4 shadow-[2px_2px_0px_#1E1E24]">
+              <textarea
+                value={battleCode}
+                onChange={(e) => setBattleCode(e.target.value)}
+                rows={7}
+                spellCheck={false}
+                className="w-full bg-transparent font-mono text-xs text-[#FAF6EE] focus:outline-none resize-none leading-relaxed"
+              />
+            </div>
+
+            {battleCompleted && (
+              <div className="mb-4 p-3 rounded-xl bg-[#D1FAE5] border-2 border-[#10B981] text-xs font-black text-[#059669] flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>Battle Challenge Mastered! +50 Bonus XP Awarded!</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setIsBattleChallengeOpen(false)}
+                className="btn-game-white text-xs py-2 px-4"
+              >
+                Done
+              </button>
+              <button
+                onClick={handleRunBattleChallenge}
+                disabled={isRunning}
+                className="btn-game-purple text-xs py-2.5 px-6"
+              >
+                <span>{isRunning ? 'Testing...' : 'Verify Solution'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Mentor Drawer */}
       <AcharyaDrawer
         isOpen={isMentorOpen}
         onClose={() => setIsMentorOpen(false)}
-        contextCode={code}
-        contextError={execResult?.stderr}
-        activeMissionTitle={currentMission.title}
-      />
-
-      {/* XP & Seal Celebration Modal */}
-      <XpCelebrationModal
-        isOpen={isCelebrationOpen}
-        onClose={() => setIsCelebrationOpen(false)}
-        earnedXp={awardedXp}
-        awardedSeal={awardedSeal}
-        onContinue={() => {
-          setIsCelebrationOpen(false);
-        }}
       />
     </div>
   );
@@ -603,7 +927,7 @@ def boosted_rescue_robot(battery_cells: list) -> int:
 
 export default function SimulatorPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[#7E8276]">Loading Mission Simulator...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs font-bold">Loading Game Arena...</div>}>
       <SimulatorContent />
     </Suspense>
   );

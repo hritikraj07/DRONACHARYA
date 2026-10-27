@@ -23,9 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Dronacharya — The Digital Gurukul',
+  title: 'Dronacharya AI — Gamified Coding Adventure',
   description:
-    'An AI-powered gamified learning platform transforming theoretical knowledge into practical mastery through Socratic mentorship, live simulators, and verifiable portfolios.',
+    'Explore interactive programming worlds, write real code to control characters, defeat challenges, and level up your coding skills with your AI mentor.',
 };
 
 export default function RootLayout({
@@ -38,7 +38,7 @@ export default function RootLayout({
       lang="en"
       className={`${lora.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-[#F6F1E7] text-[#252820]">
+      <body className="min-h-full flex flex-col font-sans bg-[#FAF6EE] text-[#1E1E24]">
         <AppShell>{children}</AppShell>
       </body>
     </html>

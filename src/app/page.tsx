@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   getActiveSession,
   setActiveSession,
@@ -55,6 +56,7 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function HomePage() {
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -87,30 +89,29 @@ export default function HomePage() {
   // Hero In-Browser Code Studio State
   const [activeCodeTab, setActiveCodeTab] = useState<'python' | 'html' | 'javascript'>('python');
   const [isExecutingCode, setIsExecutingCode] = useState(false);
-  const [codeOutput, setCodeOutput] = useState<string>(
-    `> Python 3.12 initialized in browser via Pyodide.\n> Ready to run! Click "Run Code ▶" above.`
-  );
+  const [hasExecuted, setHasExecuted] = useState(false);
+  const [codeOutput, setCodeOutput] = useState<string>('');
 
   const CODE_SNIPPETS = {
     python: {
       fileName: 'main.py',
-      badge: 'Python 101',
+      badge: 'Python',
       badgeColor: '#306998',
       code: [
-        '# 🐍 Python 101: Your First Quest',
+        '# 🐍 Python: Your First Quest',
         'adventurer = "Scholar"',
         'xp = 100',
         'skills = ["Loops", "Functions", "Logic"]',
         '',
         'print(f"🌟 Welcome to Gurukul, {adventurer}!")',
         'print(f"⚔️ Mastered {len(skills)} core skills.")',
-        'print(f"✨ Quest 1 Complete • +{xp} XP Earned!")',
+        'print(f"✨ Quest Complete • +{xp} XP Earned!")',
       ],
-      defaultOutput: `> 🌟 Welcome to Gurukul, Scholar!\n> ⚔️ Mastered 3 core skills.\n> ✨ Quest 1 Complete • +100 XP Earned!\n> Status: 100% Success • Level Up Available`,
+      defaultOutput: `> 🌟 Welcome to Gurukul, Scholar!\n> ⚔️ Mastered 3 core skills.\n> ✨ Quest Complete • +100 XP Earned!\n> Status: 100% Success • Level Up Available`,
     },
     html: {
       fileName: 'index.html',
-      badge: 'HTML 101',
+      badge: 'HTML',
       badgeColor: '#E44D26',
       code: [
         '<!-- 🌐 Web Studio: Responsive Card -->',
@@ -124,10 +125,10 @@ export default function HomePage() {
     },
     javascript: {
       fileName: 'app.js',
-      badge: 'JavaScript 101',
+      badge: 'JavaScript',
       badgeColor: '#F7DF1E',
       code: [
-        '// ⚡ JavaScript 101: Interactive Logic',
+        '// ⚡ JavaScript: Interactive Logic',
         'const scholar = { name: "Explorer", hearts: 5 };',
         'let totalXp = 250;',
         '',
@@ -165,6 +166,7 @@ export default function HomePage() {
     setIsExecutingCode(true);
     setTimeout(() => {
       setIsExecutingCode(false);
+      setHasExecuted(true);
       setCodeOutput(CODE_SNIPPETS[activeCodeTab].defaultOutput);
       try {
         confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
@@ -285,28 +287,11 @@ export default function HomePage() {
   });
 
   return (
-    <div className="w-full flex flex-col items-center bg-[#F5F2EB] text-[#1E1E24] overflow-x-hidden">
+    <div className="w-full flex flex-col items-center text-[#1E1E24] overflow-x-hidden">
       {/* =========================================================================
           1. CODÉDEX HERO SECTION WITH AMBIENT ADVENTURE SCENERY
          ========================================================================= */}
       <section className="relative w-full overflow-hidden">
-        {/* Ambient Adventure Landscape Scenery (Ghibli / Retro 16-Bit Fantasy Mountains & Gurukul Peak, No Flowers) */}
-        <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-          <img
-            src="/adventure-hero-bg.jpg"
-            alt="Dronacharya Adventure Realm Scenery"
-            className="w-full h-full object-cover object-top opacity-35 sm:opacity-40 filter saturate-110"
-          />
-          {/* Smooth Multi-Stop Gradient Mask: Seamlessly transitions into #F5F2EB */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(to bottom, rgba(245, 242, 235, 0.15) 0%, rgba(245, 242, 235, 0.45) 45%, rgba(245, 242, 235, 0.85) 75%, #F5F2EB 100%)',
-            }}
-          />
-        </div>
-
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-12 sm:pb-16">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Authentic Codédex Copy & Dual CTAs */}
@@ -397,7 +382,8 @@ export default function HomePage() {
                         key={tab}
                         onClick={() => {
                           setActiveCodeTab(tab);
-                          setCodeOutput(CODE_SNIPPETS[tab].defaultOutput);
+                          setHasExecuted(false);
+                          setCodeOutput('');
                         }}
                         className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                           activeCodeTab === tab
@@ -452,17 +438,27 @@ export default function HomePage() {
                 </div>
 
                 {/* Output Terminal Area */}
-                <div className="p-3.5 bg-[#12131A] space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] text-gray-500 uppercase tracking-widest font-black">
-                    <span className="flex items-center gap-1.5">
+                <div className="p-3.5 bg-[#12131A] space-y-2">
+                  <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-black">
+                    <span className="flex items-center gap-1.5 text-gray-400">
                       <Terminal className="w-3.5 h-3.5 text-[#00B894]" />
                       Interactive Console
                     </span>
-                    <span className="text-[#00B894] font-bold">● Pyodide Ready</span>
+                    <span className={`font-bold flex items-center gap-1.5 ${hasExecuted ? 'text-[#00B894]' : 'text-amber-400'}`}>
+                      <span className="inline-block w-2 h-2 rounded-full bg-current"></span>
+                      {hasExecuted ? '● Output Executed' : '● Ready to Run'}
+                    </span>
                   </div>
-                  <pre className="text-xs font-mono text-[#55EFC4] whitespace-pre-wrap leading-relaxed">
-                    {codeOutput}
-                  </pre>
+                  {hasExecuted ? (
+                    <pre className="text-xs font-mono text-[#55EFC4] whitespace-pre-wrap leading-relaxed animate-in fade-in duration-200">
+                      {codeOutput}
+                    </pre>
+                  ) : (
+                    <div className="py-3 px-3 rounded-lg bg-[#0E0F14] border border-dashed border-gray-800 text-xs font-mono text-gray-400 flex items-center gap-2">
+                      <span className="text-[#00B894] font-bold text-sm">›</span>
+                      <span>Click <strong className="text-white bg-cyan-600/30 px-1.5 py-0.5 rounded border border-cyan-500/30 font-bold">&ldquo;Run Code ▶&rdquo;</strong> above to execute this script in the browser runtime...</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Bottom Simulator Bar */}
@@ -603,16 +599,24 @@ export default function HomePage() {
                       <div className="grid grid-cols-2 gap-2">
                         <Link
                           href={`/courses/${c.id}`}
-                          className="btn-arcade btn-arcade-white py-2.5 px-3 text-center text-xs font-bold"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/courses/${c.id}`);
+                          }}
+                          className="btn-arcade btn-arcade-white py-2.5 px-3 text-center text-xs font-bold cursor-pointer select-none"
                         >
-                          Syllabus
+                          <span className="pointer-events-none">Syllabus</span>
                         </Link>
                         <Link
                           href={`/learn/${firstLessonId}`}
-                          className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/learn/${firstLessonId}`);
+                          }}
+                          className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
-                          <span>Play</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <span className="pointer-events-none">Play</span>
+                          <ArrowRight className="w-3.5 h-3.5 pointer-events-none" />
                         </Link>
                       </div>
                     )}
@@ -639,14 +643,16 @@ export default function HomePage() {
          ========================================================================= */}
       <section className="w-full bg-white border-y-2 border-[#1E1E24] py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-wider text-[#FFD214] bg-[#1E1E24] px-3.5 py-1 rounded-full shadow-[2px_2px_0px_#6C5CE7]">
-              Gamification Engine
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24]">
+          <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
+            <div className="mb-4 select-none relative z-10">
+              <span className="inline-block text-xs font-black uppercase tracking-wider text-[#FFD214] bg-[#1E1E24] px-4 py-1.5 rounded-full border-2 border-[#1E1E24] shadow-[2px_2px_0px_#6C5CE7]">
+                Gamification Engine
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] leading-tight">
               Level Up Your Learning
             </h2>
-            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold">
+            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-3">
               Traditional computer science courses are dry and passive. Dronacharya transforms every milestone into an RPG adventure.
             </p>
           </div>

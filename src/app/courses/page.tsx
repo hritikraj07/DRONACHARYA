@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { COURSES_CATALOG, Course } from '@/lib/data/course-system';
 import { CourseCardBanner } from '@/components/course/CourseCardBanner';
 import {
@@ -32,6 +33,7 @@ import {
 type FilterTab = 'All' | 'Active' | 'HTML' | 'CSS' | 'JavaScript' | 'Python' | 'Coming Soon';
 
 export default function CoursesPage() {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterTab>('All');
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
 
@@ -143,15 +145,23 @@ export default function CoursesPage() {
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
                   href="/learn/html-less-1-1"
-                  className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push('/learn/html-less-1-1');
+                  }}
+                  className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5 cursor-pointer select-none"
                 >
-                  <span>Start HTML 101 Quest →</span>
+                  <span className="pointer-events-none">Start HTML Quest →</span>
                 </Link>
                 <Link
                   href="/learn/py-less-1-1"
-                  className="btn-arcade btn-arcade-white px-5 py-2.5 flex items-center gap-1.5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push('/learn/py-less-1-1');
+                  }}
+                  className="btn-arcade btn-arcade-white px-5 py-2.5 flex items-center gap-1.5 cursor-pointer select-none"
                 >
-                  <span>Play Python 101 →</span>
+                  <span className="pointer-events-none">Play Python Quest →</span>
                 </Link>
               </div>
             </div>
@@ -241,16 +251,24 @@ export default function CoursesPage() {
                       <div className="grid grid-cols-2 gap-2">
                         <Link
                           href={`/courses/${c.id}`}
-                          className="btn-arcade btn-arcade-white py-2.5 px-3 text-center text-xs font-bold"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/courses/${c.id}`);
+                          }}
+                          className="btn-arcade btn-arcade-white py-2.5 px-3 text-center text-xs font-bold cursor-pointer select-none"
                         >
-                          Syllabus
+                          <span className="pointer-events-none">Syllabus</span>
                         </Link>
                         <Link
                           href={`/learn/${firstLessonId}`}
-                          className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/learn/${firstLessonId}`);
+                          }}
+                          className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
-                          <span>Play</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <span className="pointer-events-none">Play</span>
+                          <ArrowRight className="w-3.5 h-3.5 pointer-events-none" />
                         </Link>
                       </div>
                     )}

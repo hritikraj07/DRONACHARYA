@@ -324,7 +324,7 @@ export const COURSES_CATALOG: Course[] = [
 `,
           solutionCode: `<h1>Scholar Arya</h1>
 <h2>Explorer Profile</h2>
-<p>Currently mastering <strong>HTML 101</strong> at Dronacharya.</p>
+<p>Currently mastering <strong>HTML</strong> at Dronacharya.</p>
 <ul>
   <li>Laser Radar</li>
   <li>Logic Core</li>
@@ -641,7 +641,7 @@ export const COURSES_CATALOG: Course[] = [
   <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" alt="Coding Workspace" />
   <h2>My Quests</h2>
   <ul>
-    <li>HTML 101 Mastery</li>
+    <li>HTML Mastery</li>
     <li>CSS Layout Design</li>
   </ul>
 </main>
@@ -670,7 +670,7 @@ export const COURSES_CATALOG: Course[] = [
                   codeSnippet: 'tag:ul',
                 },
               ],
-              explanation: 'Congratulations! You have completed HTML 101 and forged your first web portfolio.',
+              explanation: 'Congratulations! You have completed HTML and forged your first web portfolio.',
               hints: [
                 'Include <header>, <main>, and <footer>.',
                 'Add an <img> tag with both src and alt attributes.',
@@ -685,7 +685,7 @@ export const COURSES_CATALOG: Course[] = [
           id: 'boss-html-ch-3',
           title: 'Boss Challenge: The Grand Capstone Portal',
           description: 'Deploy a multi-section web portfolio ready for public showcase.',
-          objective: 'Complete the HTML 101 Capstone portfolio.',
+          objective: 'Complete the HTML Capstone portfolio.',
           starterCode: `<!-- Deploy your full portfolio: -->`,
           solutionCode: `<h1>Dronacharya Certified Web Developer</h1>`,
           testCases: [
@@ -695,7 +695,7 @@ export const COURSES_CATALOG: Course[] = [
               codeSnippet: 'text:certified',
             },
           ],
-          hints: ['Complete all chapters of HTML 101 to claim the HTML Mastery Seal.'],
+          hints: ['Complete all chapters of HTML to claim the HTML Mastery Seal.'],
           xpReward: 150,
         },
       },

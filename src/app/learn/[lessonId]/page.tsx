@@ -41,6 +41,7 @@ import {
   Globe,
   Award,
   ChevronRight,
+  ChevronLeft,
   Code2,
   Eye,
   Copy,
@@ -49,6 +50,10 @@ import {
   AlertCircle,
   Flame,
   Volume2,
+  Monitor,
+  Smartphone,
+  Lock,
+  RefreshCw,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -83,7 +88,12 @@ function QuestLearningLab() {
   const nextLesson = lessonData?.nextLesson;
 
   // Course language detection
-  const isPython = course?.language === 'python';
+  const courseLang = (course?.language || '').toLowerCase();
+  const courseId = (course?.id || '').toLowerCase();
+  const isPython = courseId === 'python' || courseLang === 'python' || rawId.startsWith('py-');
+  const isHtmlCourse = (courseId === 'html' || courseLang === 'html' || rawId.startsWith('html-')) && !isPython;
+  const isCssCourse = (courseId === 'css' || courseLang === 'css' || rawId.startsWith('css-')) && !isPython;
+  const isJsCourse = (courseId === 'javascript' || courseId === 'js' || courseLang === 'javascript' || rawId.startsWith('js-')) && !isPython;
   const isWeb = !isPython;
 
   // Language dialect preference
@@ -101,8 +111,8 @@ function QuestLearningLab() {
   const [jsCode, setJsCode] = useState<string>('');
   const [pythonCode, setPythonCode] = useState<string>('');
 
-  // Right Studio Bottom Pane: 'preview' or 'console'
-  const [studioPane, setStudioPane] = useState<'preview' | 'console'>('preview');
+  // Mobile Responsive Preview Toggle in Browser Sandbox
+  const [isMobilePreview, setIsMobilePreview] = useState<boolean>(false);
 
   // Execution & Validation State
   const [isRunning, setIsRunning] = useState<boolean>(false);
@@ -127,36 +137,55 @@ function QuestLearningLab() {
           lesson.interactiveTryStarter ||
           '# Write your Python quest solution:\n'
       );
-      setStudioPane('console');
-    } else {
-      // Set active tab to match course
-      if (course?.language === 'css') setActiveTab('css');
-      else if (course?.language === 'javascript') setActiveTab('js');
-      else setActiveTab('html');
-
-      // Set initial code buffers
+    } else if (isHtmlCourse) {
+      setActiveTab('html');
       const initialHtml =
         lesson.starterHtml ||
-        (course?.language === 'html' ? lesson.exercise?.initialCode : '') ||
+        lesson.exercise?.initialCode ||
         '<!-- HTML Playground -->\n<div class="quest-box">\n  <h2>Hello Adventurer!</h2>\n</div>';
-
-      const initialCss =
-        lesson.starterCss ||
-        (course?.language === 'css' ? lesson.exercise?.initialCode : '') ||
-        '/* CSS Realm */\nbody {\n  font-family: sans-serif;\n  padding: 1.5rem;\n}';
-
-      const initialJs =
-        lesson.starterJs ||
-        (course?.language === 'javascript' ? lesson.exercise?.initialCode : '') ||
-        '// JavaScript Arena\nconsole.log("Welcome to Dronacharya Studio!");';
-
+      const initialCss = lesson.starterCss || '';
+      const initialJs = lesson.starterJs || '';
       setHtmlCode(initialHtml);
       setCssCode(initialCss);
       setJsCode(initialJs);
-
-      // Build initial preview
       setPreviewDoc(buildWebPreviewDocument(initialHtml, initialCss, initialJs));
-      setStudioPane('preview');
+    } else if (isCssCourse) {
+      setActiveTab('css');
+      const initialHtml =
+        lesson.starterHtml ||
+        '<div class="quest-card">\n  <h2>CSS Realm</h2>\n  <p>Style this element.</p>\n</div>';
+      const initialCss =
+        lesson.starterCss ||
+        lesson.exercise?.initialCode ||
+        '/* CSS Realm */\nbody {\n  font-family: sans-serif;\n  padding: 1.5rem;\n}';
+      const initialJs = lesson.starterJs || '';
+      setHtmlCode(initialHtml);
+      setCssCode(initialCss);
+      setJsCode(initialJs);
+      setPreviewDoc(buildWebPreviewDocument(initialHtml, initialCss, initialJs));
+    } else if (isJsCourse) {
+      setActiveTab('js');
+      const initialHtml =
+        lesson.starterHtml ||
+        '<div id="app">\n  <h1 id="title">Interactive Quest</h1>\n  <button id="btn">Click Me</button>\n</div>';
+      const initialCss = lesson.starterCss || 'body { font-family: sans-serif; padding: 20px; }';
+      const initialJs =
+        lesson.starterJs ||
+        lesson.exercise?.initialCode ||
+        '// JavaScript Arena\nconsole.log("Welcome to Dronacharya Studio!");';
+      setHtmlCode(initialHtml);
+      setCssCode(initialCss);
+      setJsCode(initialJs);
+      setPreviewDoc(buildWebPreviewDocument(initialHtml, initialCss, initialJs));
+    } else {
+      setActiveTab('html');
+      const initialHtml = lesson.starterHtml || lesson.exercise?.initialCode || '';
+      const initialCss = lesson.starterCss || '';
+      const initialJs = lesson.starterJs || '';
+      setHtmlCode(initialHtml);
+      setCssCode(initialCss);
+      setJsCode(initialJs);
+      setPreviewDoc(buildWebPreviewDocument(initialHtml, initialCss, initialJs));
     }
 
     // Reset validation state
@@ -177,7 +206,7 @@ function QuestLearningLab() {
     } else {
       setTestResults([]);
     }
-  }, [lesson?.id, course?.language]);
+  }, [lesson?.id, course?.language, course?.id, rawId]);
 
   // Listen for iframe console events
   useEffect(() => {
@@ -211,11 +240,29 @@ function QuestLearningLab() {
   const handleResetCode = () => {
     if (!lesson) return;
     if (isPython) {
-      setPythonCode(lesson.exercise?.initialCode || '# Write your solution:\n');
+      setPythonCode(lesson.exercise?.initialCode || lesson.interactiveTryStarter || '# Write your solution:\n');
+    } else if (isHtmlCourse) {
+      const h = lesson.starterHtml || lesson.exercise?.initialCode || '';
+      setHtmlCode(h);
+      setCssCode(lesson.starterCss || '');
+      setJsCode(lesson.starterJs || '');
+      setPreviewDoc(buildWebPreviewDocument(h, lesson.starterCss || '', lesson.starterJs || ''));
+    } else if (isCssCourse) {
+      const c = lesson.starterCss || lesson.exercise?.initialCode || '';
+      setCssCode(c);
+      setHtmlCode(lesson.starterHtml || '');
+      setJsCode(lesson.starterJs || '');
+      setPreviewDoc(buildWebPreviewDocument(lesson.starterHtml || '', c, lesson.starterJs || ''));
+    } else if (isJsCourse) {
+      const j = lesson.starterJs || lesson.exercise?.initialCode || '';
+      setJsCode(j);
+      setHtmlCode(lesson.starterHtml || '');
+      setCssCode(lesson.starterCss || '');
+      setPreviewDoc(buildWebPreviewDocument(lesson.starterHtml || '', lesson.starterCss || '', j));
     } else {
-      setHtmlCode(lesson.starterHtml || (course?.language === 'html' ? lesson.exercise?.initialCode : '') || '');
-      setCssCode(lesson.starterCss || (course?.language === 'css' ? lesson.exercise?.initialCode : '') || '');
-      setJsCode(lesson.starterJs || (course?.language === 'javascript' ? lesson.exercise?.initialCode : '') || '');
+      setHtmlCode(lesson.starterHtml || lesson.exercise?.initialCode || '');
+      setCssCode(lesson.starterCss || '');
+      setJsCode(lesson.starterJs || '');
       setPreviewDoc(buildWebPreviewDocument(
         lesson.starterHtml || '',
         lesson.starterCss || '',
@@ -265,7 +312,6 @@ function QuestLearningLab() {
         msgs.push({ level: 'error', message: runRes.stderr, timestamp: Date.now() });
       }
       setConsoleLogs(msgs);
-      setStudioPane('console');
 
       const passed = validation.allPassed;
       setExercisePassed(passed);
@@ -285,10 +331,11 @@ function QuestLearningLab() {
     } else {
       // Web Validation (HTML, CSS, JS)
       const testCases = lesson.exercise?.testCases || [];
+      const webLang = (isCssCourse ? 'css' : isJsCourse ? 'javascript' : 'html') as any;
       const validation: WebValidationResult = await validateWebExercise(
         { html: htmlCode, css: cssCode, js: jsCode },
         testCases,
-        course?.language as any
+        webLang
       );
 
       // Force preview refresh
@@ -705,6 +752,30 @@ function QuestLearningLab() {
                   <span className="w-2 h-2 rounded-full bg-[#FFD214]" />
                   <span>main.py</span>
                 </button>
+              ) : isHtmlCourse ? (
+                <button
+                  onClick={() => setActiveTab('html')}
+                  className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 bg-[#25283B] text-[#FF7675] border border-[#FF7675]/50 shadow-sm"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#FF7675]" />
+                  <span>index.html</span>
+                </button>
+              ) : isCssCourse ? (
+                <button
+                  onClick={() => setActiveTab('css')}
+                  className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 bg-[#25283B] text-[#74B9FF] border border-[#74B9FF]/50 shadow-sm"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#74B9FF]" />
+                  <span>styles.css</span>
+                </button>
+              ) : isJsCourse ? (
+                <button
+                  onClick={() => setActiveTab('js')}
+                  className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 bg-[#25283B] text-[#FFEAA7] border border-[#FFEAA7]/50 shadow-sm"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#FFEAA7]" />
+                  <span>script.js</span>
+                </button>
               ) : (
                 <>
                   <button
@@ -807,15 +878,7 @@ function QuestLearningLab() {
                   placeholder="# Write your Python code here..."
                   className="w-full h-full bg-[#12131C] text-emerald-300 font-mono text-xs sm:text-sm p-3 outline-none resize-none leading-5 selection:bg-[#6C5CE7]/40"
                 />
-              ) : activeTab === 'html' ? (
-                <textarea
-                  value={htmlCode}
-                  onChange={(e) => setHtmlCode(e.target.value)}
-                  spellCheck={false}
-                  placeholder="<!-- Write HTML here -->"
-                  className="w-full h-full bg-[#12131C] text-orange-200 font-mono text-xs sm:text-sm p-3 outline-none resize-none leading-5 selection:bg-[#6C5CE7]/40"
-                />
-              ) : activeTab === 'css' ? (
+              ) : isCssCourse || activeTab === 'css' ? (
                 <textarea
                   value={cssCode}
                   onChange={(e) => setCssCode(e.target.value)}
@@ -823,7 +886,7 @@ function QuestLearningLab() {
                   placeholder="/* Write CSS styles here */"
                   className="w-full h-full bg-[#12131C] text-blue-200 font-mono text-xs sm:text-sm p-3 outline-none resize-none leading-5 selection:bg-[#6C5CE7]/40"
                 />
-              ) : (
+              ) : isJsCourse || activeTab === 'js' ? (
                 <textarea
                   value={jsCode}
                   onChange={(e) => setJsCode(e.target.value)}
@@ -831,96 +894,175 @@ function QuestLearningLab() {
                   placeholder="// Write JavaScript code here"
                   className="w-full h-full bg-[#12131C] text-yellow-200 font-mono text-xs sm:text-sm p-3 outline-none resize-none leading-5 selection:bg-[#6C5CE7]/40"
                 />
+              ) : (
+                <textarea
+                  value={htmlCode}
+                  onChange={(e) => setHtmlCode(e.target.value)}
+                  spellCheck={false}
+                  placeholder="<!-- Write HTML here -->"
+                  className="w-full h-full bg-[#12131C] text-orange-200 font-mono text-xs sm:text-sm p-3 outline-none resize-none leading-5 selection:bg-[#6C5CE7]/40"
+                />
               )}
             </div>
           </div>
 
-          {/* LOWER HALF: PREVIEW / CONSOLE TABS */}
-          <div className="h-1/2 flex flex-col bg-[#1A1C29]">
-            {/* Lower Pane Tabs */}
-            <div className="h-9 bg-[#161824] border-b border-[#2B2E42] px-3 flex items-center justify-between shrink-0 select-none">
-              <div className="flex items-center gap-2">
-                {isWeb && (
+          {/* LOWER HALF: REALISTIC LIVE BROWSER SANDBOX (WEB) OR INTERACTIVE OUTPUT (PYTHON) */}
+          {isWeb ? (
+            <div className="h-1/2 flex flex-col bg-[#161824] border-t-2 border-[#1E1E24]">
+              {/* Modern Browser Chrome Toolbar */}
+              <div className="h-10 bg-[#1A1C29] border-b border-[#2B2E42] px-3 flex items-center justify-between shrink-0 select-none gap-2">
+                {/* Left: Window Controls & Nav */}
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] border border-[#DC2626]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] border border-[#D97706]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] border border-[#059669]" />
+                  </div>
+
+                  <div className="flex items-center gap-1 ml-1 text-gray-500">
+                    <button
+                      disabled
+                      aria-label="Back"
+                      className="p-1 rounded text-gray-600 cursor-not-allowed opacity-50"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPreviewDoc(buildWebPreviewDocument(htmlCode, cssCode, jsCode));
+                      }}
+                      title="Reload Live Preview"
+                      className="p-1 rounded text-gray-400 hover:text-white hover:bg-[#25283B] transition-colors"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Center: URL Omnibar */}
+                <div className="flex-1 max-w-md flex items-center gap-1.5 bg-[#0E0F17] px-3 py-1 rounded-full border border-[#2B2E42] text-[11px] font-mono text-gray-300 shadow-inner">
+                  <Lock className="w-3 h-3 text-[#00B894] shrink-0" />
+                  <span className="text-gray-400">https://</span>
+                  <span className="text-emerald-400 font-semibold truncate">gurukul.preview</span>
+                  <span className="text-gray-500 truncate">/{course?.id || 'web'}/{lesson.id}.html</span>
+                </div>
+
+                {/* Right: Live Status & Responsive Device Toggle */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>LIVE PREVIEW</span>
+                  </div>
+
                   <button
-                    onClick={() => setStudioPane('preview')}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-bold transition-colors ${
-                      studioPane === 'preview'
-                        ? 'bg-[#25283B] text-white'
-                        : 'text-gray-400 hover:text-white'
+                    onClick={() => setIsMobilePreview(!isMobilePreview)}
+                    title={isMobilePreview ? 'Switch to Full Desktop View' : 'Switch to Mobile Responsive View'}
+                    className={`p-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1 transition-colors ${
+                      isMobilePreview
+                        ? 'bg-[#6C5CE7] text-white shadow-sm'
+                        : 'text-gray-400 hover:text-white hover:bg-[#25283B]'
                     }`}
                   >
-                    <Eye className="w-3.5 h-3.5 text-[#00B894]" />
-                    <span>Live Preview</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => setStudioPane('console')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-bold transition-colors ${
-                    studioPane === 'console'
-                      ? 'bg-[#25283B] text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <Terminal className="w-3.5 h-3.5 text-[#FFD214]" />
-                  <span>Terminal / Console</span>
-                  {consoleLogs.length > 0 && (
-                    <span className="w-4 h-4 rounded-full bg-[#6C5CE7] text-[10px] flex items-center justify-center font-bold text-white">
-                      {consoleLogs.length}
+                    {isMobilePreview ? (
+                      <Monitor className="w-3.5 h-3.5" />
+                    ) : (
+                      <Smartphone className="w-3.5 h-3.5" />
+                    )}
+                    <span className="hidden md:inline text-[10px]">
+                      {isMobilePreview ? '375px' : 'Desktop'}
                     </span>
-                  )}
-                </button>
+                  </button>
+                </div>
               </div>
 
-              {studioPane === 'console' && consoleLogs.length > 0 && (
-                <button
-                  onClick={() => setConsoleLogs([])}
-                  className="text-[11px] font-mono text-gray-400 hover:text-white"
-                >
-                  Clear Logs
-                </button>
-              )}
-            </div>
-
-            {/* Lower Pane Content */}
-            <div className="flex-1 overflow-hidden relative">
-              {isWeb && studioPane === 'preview' ? (
-                <iframe
-                  ref={iframeRef}
-                  srcDoc={previewDoc}
-                  title="Dronacharya Web Sandbox"
-                  sandbox="allow-scripts allow-modals"
-                  className="w-full h-full bg-white border-0"
-                />
-              ) : (
-                <div className="w-full h-full bg-[#0E0F17] p-3 overflow-y-auto font-mono text-xs space-y-1 text-gray-300">
-                  {consoleLogs.length === 0 ? (
-                    <div className="text-gray-500 italic p-2 select-none">
-                      {isPython
-                        ? 'Click "Run & Validate" to execute Python code via Pyodide...'
-                        : 'Captured console.log, warnings, and errors will appear here...'}
+              {/* Browser Canvas Body */}
+              <div className="flex-1 overflow-hidden relative flex items-center justify-center bg-[#0E0F17]">
+                {isMobilePreview ? (
+                  <div className="h-[96%] w-[375px] max-w-[95%] bg-white rounded-2xl border-4 border-[#2B2E42] shadow-2xl overflow-hidden flex flex-col transition-all">
+                    {/* Mobile speaker notch */}
+                    <div className="h-4 bg-[#1E2030] flex items-center justify-center shrink-0">
+                      <div className="w-12 h-1 rounded-full bg-gray-600" />
                     </div>
-                  ) : (
-                    consoleLogs.map((log, i) => (
-                      <div
-                        key={i}
-                        className={`flex items-start gap-2 py-0.5 ${
-                          log.level === 'error'
-                            ? 'text-rose-400 bg-rose-950/20 px-1 rounded'
-                            : log.level === 'warn'
-                            ? 'text-amber-300'
-                            : 'text-gray-200'
-                        }`}
-                      >
-                        <span className="text-gray-600 select-none">›</span>
-                        <span className="whitespace-pre-wrap">{log.message}</span>
-                      </div>
-                    ))
+                    <iframe
+                      ref={iframeRef}
+                      srcDoc={previewDoc}
+                      title="Dronacharya Mobile Web Sandbox"
+                      sandbox="allow-scripts allow-modals"
+                      className="w-full flex-1 bg-white border-0"
+                    />
+                  </div>
+                ) : (
+                  <iframe
+                    ref={iframeRef}
+                    srcDoc={previewDoc}
+                    title="Dronacharya Desktop Web Sandbox"
+                    sandbox="allow-scripts allow-modals"
+                    className="w-full h-full bg-white border-0"
+                  />
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="h-1/2 flex flex-col bg-[#0E0F17] border-t-2 border-[#1E1E24]">
+              {/* Python Output Bar */}
+              <div className="h-10 bg-[#161824] border-b border-[#2B2E42] px-3 flex items-center justify-between shrink-0 select-none">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-200">
+                    <span className="text-[#FFD214]">Pyodide 3.11</span>
+                    <span className="text-gray-500">·</span>
+                    <span className="text-gray-400">Standard Output</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
+                    <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
+                    <span>{isRunning ? 'EXECUTING...' : 'READY'}</span>
+                  </div>
+
+                  {consoleLogs.length > 0 && (
+                    <button
+                      onClick={() => setConsoleLogs([])}
+                      className="text-[11px] font-mono text-gray-400 hover:text-white px-2 py-0.5 rounded hover:bg-[#25283B] transition-colors"
+                    >
+                      Clear Output
+                    </button>
                   )}
                 </div>
-              )}
+              </div>
+
+              {/* Monospace Output Screen */}
+              <div className="flex-1 p-3 overflow-y-auto font-mono text-xs space-y-1 text-gray-300 select-text">
+                {consoleLogs.length === 0 ? (
+                  <div className="text-gray-500 italic p-3 select-none flex flex-col gap-1">
+                    <span># Output terminal ready.</span>
+                    <span># Press &quot;Run &amp; Validate&quot; (or Ctrl+Enter) to execute your Python script.</span>
+                  </div>
+                ) : (
+                  consoleLogs.map((log, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-start gap-2 py-0.5 ${
+                        log.level === 'error'
+                          ? 'text-rose-400 bg-rose-950/20 px-1 rounded'
+                          : log.level === 'warn'
+                          ? 'text-amber-300'
+                          : 'text-gray-200'
+                      }`}
+                    >
+                      <span className="text-[#FFD214] select-none">›</span>
+                      <span className="whitespace-pre-wrap">{log.message}</span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

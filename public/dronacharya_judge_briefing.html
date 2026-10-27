@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dronacharya — Judge Briefing & Executive Summary</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 12mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1E1E24;
+      background: #FFFFFF;
+      line-height: 1.45;
+      font-size: 11pt;
+    }
+    .header {
+      background: #FAF6EE;
+      border: 2px solid #1E1E24;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 4px 4px 0px #1E1E24;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title {
+      font-size: 20pt;
+      font-weight: 900;
+      color: #1E1E24;
+      letter-spacing: -0.5px;
+    }
+    .tagline {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #D97706;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 8.5pt;
+      font-weight: 800;
+      border: 1.5px solid #1E1E24;
+      background: #FFD214;
+      color: #1E1E24;
+    }
+    .section {
+      margin-bottom: 16px;
+      page-break-inside: avoid;
+    }
+    .section-title {
+      font-size: 13pt;
+      font-weight: 900;
+      color: #1E1E24;
+      border-bottom: 2px solid #1E1E24;
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .card {
+      background: #FAF6EE;
+      border: 1.5px solid #1E1E24;
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: 2px 2px 0px #1E1E24;
+    }
+    .card-purple {
+      background: #EDE9FE;
+      border-color: #6C5CE7;
+    }
+    .card-yellow {
+      background: #FEF3C7;
+      border-color: #D97706;
+    }
+    .card-green {
+      background: #D1FAE5;
+      border-color: #059669;
+    }
+    .card-title {
+      font-size: 10.5pt;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: #1E1E24;
+    }
+    p, li {
+      font-size: 9.5pt;
+      color: #374151;
+      line-height: 1.4;
+    }
+    ul {
+      margin-left: 16px;
+      margin-top: 4px;
+    }
+    li {
+      margin-bottom: 3px;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 8.5pt;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-weight: 700;
+      color: #6C5CE7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 9pt;
+    }
+    th, td {
+      border: 1px solid #1E1E24;
+      padding: 6px 10px;
+      text-align: left;
+    }
+    th {
+      background: #1E1E24;
+      color: #FFFFFF;
+      font-weight: 800;
+    }
+    tr:nth-child(even) {
+      background: #FAF6EE;
+    }
+    .highlight-box {
+      background: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 8px;
+      font-size: 9.5pt;
+    }
+    .page-break {
+      page-break-after: always;
+    }
+    .footer-note {
+      font-size: 8pt;
+      color: #6B7280;
+      text-align: center;
+      margin-top: 14px;
+      border-top: 1px solid #E5E7EB;
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: EXECUTIVE BRIEFING & KEY CONCEPTS -->
+  <div class="header">
+    <div>
+      <div class="badge">⚔️ HACKATHON JURY BRIEFING &amp; CHEAT SHEET</div>
+      <div class="title" style="margin-top: 6px;">DRONACHARYA ⋆˙⟡</div>
+      <div class="tagline">The Digital Gurukul — Coding Adventure</div>
+    </div>
+    <div style="text-align: right;">
+      <p style="font-weight: 800; color: #1E1E24; font-size: 9.5pt;">By Team NHK</p>
+      <p style="font-size: 8.5pt; color: #6B7280;">Target: Class 9–12 Scholars</p>
+      <p style="font-size: 8.5pt; font-family: monospace; color: #6C5CE7;">github.com/hritikraj07/DRONACHARYA</p>
+    </div>
+  </div>
+
+  <!-- 1. PROBLEM VS SOLUTION -->
+  <div class="section">
+    <div class="section-title"><span>🎯</span> 1. Problem Statement &amp; The Gurukul Innovation</div>
+    <div class="grid-2">
+      <div class="card card-yellow">
+        <div class="card-title" style="color: #B45309;">⚠️ The Critical Problem</div>
+        <ul>
+          <li><strong>70%+ Beginner Drop-Off:</strong> Traditional CS platforms rely on dry, intimidating syntax drills without narrative motivation.</li>
+          <li><strong>The False Dichotomy:</strong> Existing tools either use "toy blocks" (Scratch) that don't teach real code, or dry competitive matrices (LeetCode) that trigger cognitive burnout.</li>
+          <li><strong>Lack of Real Mentorship:</strong> Automated checkers output cryptic error messages rather than guiding thought processes.</li>
+        </ul>
+      </div>
+
+      <div class="card card-green">
+        <div class="card-title" style="color: #047857;">💡 The Dronacharya Solution</div>
+        <ul>
+          <li><strong>Digital Gurukul Apprenticeship:</strong> Connects ancient Indian personalized mentorship with modern gamification psychology.</li>
+          <li><strong>Hybrid Crawler + Minecraft Crafting:</strong> Learners write real Python/JS commands to mine resources, craft bridges, and conquer bosses.</li>
+          <li><strong>Socratic AI Mentor (Acharya AI):</strong> Rather than dumping answers, Acharya diagnoses failure states and asks thought-provoking questions.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. CORE FEATURES ARCHITECTURE -->
+  <div class="section">
+    <div class="section-title"><span>🏰</span> 2. Flagship Game Modes &amp; Feature Breakdown</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">⚔️⛏️ Code Dungeon &amp; Craft Realm (<code>/dungeon</code>)</div>
+        <p>10x10 top-down voxel grid sandbox combining Minecraft harvesting with Dungeon Crawling RPG mechanics:</p>
+        <ul>
+          <li><strong>Floor 1 (Variables):</strong> Mine 3 Wood, store in variables, craft Wooden Bridge, cross Lava River to Portal.</li>
+          <li><strong>Floor 2 (Loops):</strong> Automate mining rows of 5 Mana Crystals with <code>for i in range(5):</code>, craft Logic Key, unlock Gate.</li>
+          <li><strong>Floor 3 (Conditionals):</strong> Use <code>hero.scan()</code> to distinguish Mimics from Chests and bridge lava fissures.</li>
+          <li><strong>Floor 4 (Functions &amp; Lists):</strong> Write <code>cast_spell()</code> functions to iterate through Golem elemental weaknesses.</li>
+          <li><strong>Features:</strong> Web Audio 8-bit retro sound synthesis, frame-by-frame step debugger (<code>Step ⏭</code>), and Minecraft hotbar.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🤖 Socratic Mentor Console (<code>Acharya AI</code>)</div>
+        <p>Deep pedagogy engine available globally and docked inside every gameplay arena:</p>
+        <ul>
+          <li><strong>Zero Spoiler Guarantee:</strong> Never dumps raw copy-paste code. Prompts the learner to diagnose their own loop bounds and syntax.</li>
+          <li><strong>Multi-Lingual Gurukul Voice:</strong> Explains complex CS concepts in English, Hindi, and natural Hinglish.</li>
+          <li><strong>Contextual Telemetry:</strong> Automatically detects when the player takes lava damage or blocks on a stone wall.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top: 10px;">
+      <div class="card">
+        <div class="card-title">🎮 2D Simulator (<code>/simulator</code>)</div>
+        <p>Coordinated 3-panel arena: Rover Arya Rescue Mission (Loops &amp; Battery) and Bio-Cell Hazard Filter (Conditionals).</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🛡️ Verifiable Seals (<code>/achievements</code>)</div>
+        <p>Cryptographically verifiable seals (e.g. <code>Dungeon Architect Seal</code>) awarded only upon passing test harnesses.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚡ Hybrid Cloud (<code>Supabase</code>)</div>
+        <p>Zero-friction Guest Explorer mode (instant local play) with 1-click cloud sync to Supabase (<code>profiles</code>, <code>game_progress</code>).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- PAGE 2: TECH STACK, PITCH SCRIPT & JUDGES FAQ -->
+  <div class="section">
+    <div class="section-title"><span>⚙️</span> 3. Technical Stack &amp; Implementation Highlights</div>
+    <table>
+      <thead>
+        <tr>
+          <th>System Layer</th>
+          <th>Technologies Used</th>
+          <th>Key Engineering Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend Architecture</strong></td>
+          <td>Next.js 16 (App Router + Turbopack), React 19, TypeScript, Tailwind CSS v4</td>
+          <td>28 prerendered static routes, zero layout shift, tactile retro-arcade design system with custom 16-bit cursors.</td>
+        </tr>
+        <tr>
+          <td><strong>Game Engine &amp; Interpreter</strong></td>
+          <td>Deterministic Client-Side AST State Machine (TypeScript)</td>
+          <td>Parses Python/JS loops, conditionals, and functions into step-by-step animation frames. Zero server lag, zero compute cost.</td>
+        </tr>
+        <tr>
+          <td><strong>Retro Audio Synthesizer</strong></td>
+          <td>Native Browser Web Audio API (Square &amp; Triangle Waves)</td>
+          <td>Zero npm audio dependencies. Synthesizes 8-bit sound effects (move chirp, mine crunch, craft arpeggio, victory fanfare).</td>
+        </tr>
+        <tr>
+          <td><strong>Database &amp; Session Sync</strong></td>
+          <td>Supabase PostgreSQL Database + Synchronous LocalStorage Cache</td>
+          <td>Dual-tier data flow: Guest Explorers play instantly offline; authenticated users sync XP, levels, and seals directly to cloud.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. PITCH SCRIPT FOR JUDGES -->
+  <div class="section">
+    <div class="section-title"><span>🎙️</span> 4. 2-Minute Judge Pitch &amp; Presentation Script</div>
+    <div class="highlight-box">
+      <strong>⏱️ 0:00 - 0:30 | The Hook &amp; Problem:</strong><br>
+      <em>"Good morning respected judges! 70% of high school students who try learning programming quit within weeks because syntax drills feel sterile and disconnected. Dronacharya changes this fundamentally. We built 'The Digital Gurukul' — where learning computer science is an actual retro RPG adventure."</em>
+    </div>
+
+    <div class="highlight-box" style="border-left-color: #6C5CE7; background: #F5F3FF; margin-top: 6px;">
+      <strong>⏱️ 0:30 - 1:15 | The Live Gameplay Demo:</strong><br>
+      <em>"Let's look at the Code Dungeon at <code>/dungeon</code>. Instead of filling in a quiz, the student controls an Apprentice on a 10x10 voxel map. On Floor 1, they write Python to mine Wood blocks, store them in variables, craft a bridge, and cross molten lava. On Floor 4, they face the Syntax Golem Boss, writing reusable functions and weakness array loops to shatter its shield. Every command executes deterministically right in the browser with 8-bit sound and a step debugger."</em>
+    </div>
+
+    <div class="highlight-box" style="border-left-color: #10B981; background: #ECFDF5; margin-top: 6px;">
+      <strong>⏱️ 1:15 - 1:45 | Socratic AI &amp; Real Pedagogy:</strong><br>
+      <em>"When students fail, most AIs just hand them the answer. Our Acharya AI uses the Socratic method — diagnosing that their loop ran into lava and asking questions that prompt them to craft the bridge first. We also issue cryptographically verifiable Mastery Seals for their portfolio."</em>
+    </div>
+
+    <div class="highlight-box" style="border-left-color: #EF4444; background: #FEF2F2; margin-top: 6px;">
+      <strong>⏱️ 1:45 - 2:00 | Business &amp; Scalability:</strong><br>
+      <em>"Because our parser runs purely client-side, Dronacharya scales to millions of students with virtually zero cloud server inference cost. It's built for NEP 2020 Indian school curriculums with full English, Hindi, and Hinglish support. Thank you!"</em>
+    </div>
+  </div>
+
+  <!-- 5. ANTICIPATED JUDGE QUESTIONS -->
+  <div class="section">
+    <div class="section-title"><span>❓</span> 5. Anticipated Judge Q&amp;A (Battle-Tested Answers)</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Q1: How does this differ from Codédex or Codecademy?</div>
+        <p><strong>Answer:</strong> Most platforms are either passive reading or linear text boxes. Dronacharya introduces a <em>spatial sandbox</em> where code manipulates physical voxel tiles (mining, bridge crafting, boss mechanics) paired with Socratic AI mentoring in local Indian languages (Hinglish/Hindi).</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Q2: How do you handle code execution security?</div>
+        <p><strong>Answer:</strong> Rather than spinning up dangerous backend Docker containers for every beginner line, we engineered a deterministic client-side command interpreter that compiles AST frames directly in browser memory with zero security attack surface.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Dronacharya Platform — Developed for Ideathon 2026 • All Rights Reserved • Built with Next.js 16, React 19, TypeScript &amp; Supabase
+  </div>
+
+</body>
+</html>

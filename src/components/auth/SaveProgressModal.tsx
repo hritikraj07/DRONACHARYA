@@ -13,12 +13,31 @@ import {
   CheckCircle2,
   AlertCircle,
   Lock,
-  Eye,
-  EyeOff,
   Mail,
   User,
   GraduationCap,
 } from 'lucide-react';
+
+function EyeIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m15 18-.722-3.25" />
+      <path d="M2 8a10.645 10.645 0 0 0 20 0" />
+      <path d="m20 15-1.726-2.05" />
+      <path d="m4 15 1.726-2.05" />
+      <path d="m9 18 .722-3.25" />
+    </svg>
+  );
+}
 import confetti from 'canvas-confetti';
 import {
   getGuestSession,
@@ -190,13 +209,13 @@ export function SaveProgressModal({
         <div className="space-y-1.5 mb-5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE] border-2 border-[#1E1E24] text-xs font-black text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24]">
             <Sparkles className="w-3.5 h-3.5 text-[#6C5CE7]" />
-            <span>CLOUD SYNC • SUPABASE</span>
+            <span>SIGN IN TO SAVE PROGRESS</span>
           </div>
           <h2 className="font-serif font-black text-2xl sm:text-3xl text-[#1E1E24]">
             {mode === 'signup' ? 'Save Your Quest Progress' : 'Log In & Sync Progress'}
           </h2>
           <p className="text-xs sm:text-sm text-[#4A4A58] font-bold">
-            Create a free account to save your streak and sync your achievements to Supabase.
+            Sign in or create an account to save your streak and sync your achievements.
           </p>
         </div>
 
@@ -338,7 +357,7 @@ export function SaveProgressModal({
                 className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1E1E24] cursor-pointer"
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
               </button>
             </div>
           </div>

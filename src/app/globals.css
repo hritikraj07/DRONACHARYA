@@ -112,7 +112,7 @@ html.custom-cursor-active .cursor-not-allowed {
 html,
 body,
 body * {
-  cursor: url('/cursors/cursor-default.png') 1 1, auto;
+  cursor: url('/cursors/cursor-default.svg') 7 1, auto;
 }
 
 /* Interactive Elements: Buttons, Links, Clickable Cards */
@@ -138,7 +138,7 @@ a *,
 button *,
 [role="button"] *,
 .cursor-pointer * {
-  cursor: url('/cursors/cursor-pointer.png') 5 1, pointer !important;
+  cursor: url('/cursors/cursor-pointer.svg') 7 1, pointer !important;
 }
 
 /* Active Press on Clickable Elements */

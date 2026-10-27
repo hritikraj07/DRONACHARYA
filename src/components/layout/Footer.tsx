@@ -226,6 +226,10 @@ export function Footer() {
           <div className="flex flex-wrap items-center gap-4">
             <span>© {currentYear} DRONACHARYA ⋆˙⟡ (The Digital Gurukul)</span>
             <span>•</span>
+            <Link href="/about" className="hover:text-[#020617] hover:underline font-bold text-[#6C5CE7]">
+              About
+            </Link>
+            <span>•</span>
             <Link href="/terms" className="hover:text-[#020617] hover:underline">
               Terms
             </Link>

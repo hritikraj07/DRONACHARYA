@@ -14,7 +14,12 @@ import {
   AVAILABLE_CLASSES,
   updateUserLearningSelection,
 } from '@/lib/db/auth-db';
-import { SaveProgressModal } from '@/components/auth/SaveProgressModal';
+import dynamic from 'next/dynamic';
+
+const SaveProgressModal = dynamic(
+  () => import('@/components/auth/SaveProgressModal').then((m) => m.SaveProgressModal),
+  { ssr: false }
+);
 import {
   Compass,
   FolderGit2,
@@ -35,6 +40,8 @@ import {
   LogIn,
   UserPlus,
   Lock,
+  Pickaxe,
+  Settings,
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -148,14 +155,17 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
   // Secondary links housed in clean "More" dropdown
   const secondaryNavLinks = [
+    { name: 'Code Dungeon', href: '/dungeon', icon: Pickaxe },
     { name: 'World Map', href: '/paths', icon: Compass },
     { name: 'Quest Hub', href: '/dashboard', icon: Target },
     { name: 'Mastery Seals', href: '/achievements', icon: Award },
     { name: 'Squads', href: '/squads', icon: Users },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   const allNavLinks = [...primaryNavLinks, ...secondaryNavLinks];
   const isAuthPage = pathname === '/auth';
+  const isHomePage = pathname === '/';
 
   return (
     <>
@@ -166,14 +176,14 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             : 'bg-[#FAF6EE]/95 backdrop-blur-md border-b border-slate-200'
         }`}
       >
-        <div className="w-full px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between flex-nowrap gap-1.5 sm:gap-2.5 overflow-visible">
+        <div className="w-full px-3 sm:px-6 h-14 flex items-center justify-between flex-nowrap gap-2 overflow-visible">
           {/* LEFT: Brand Logo & Title */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-nowrap">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-nowrap">
             <Link href="/" className="flex items-center gap-2 shrink-0 group">
               <img
                 src="/logo.png"
                 alt="Dronacharya Logo"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 transition-transform shrink-0 bg-[#FAF6EE]"
+                className="w-8 h-8 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 transition-transform shrink-0 bg-[#FAF6EE]"
               />
               <div className="flex flex-col shrink-0">
                 <span
@@ -189,16 +199,18 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               </div>
             </Link>
 
-            {/* Current Course Selector Pill */}
-            <button
-              onClick={handleOpenSwitchModal}
-              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-xs font-bold border border-slate-200 text-slate-800 transition-colors cursor-pointer shrink-0"
-              title="Switch Learning Course"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
-              <span className="truncate max-w-[110px]">{mounted ? activeSubjectObj.name : ''}</span>
-              <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
-            </button>
+            {/* Current Course Selector Pill (Hidden on Home Page) */}
+            {!isHomePage && (
+              <button
+                onClick={handleOpenSwitchModal}
+                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-50 text-xs font-bold border border-slate-200 text-slate-800 transition-colors cursor-pointer shrink-0"
+                title="Switch Learning Course"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
+                <span className="truncate max-w-[110px]">{mounted ? activeSubjectObj.name : ''}</span>
+                <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
+              </button>
+            )}
           </div>
 
           {/* CENTER: Desktop Primary Navigation Links (Always visible to both guests and logged-in users) */}
@@ -336,17 +348,6 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               </>
             ) : (
               <>
-                {/* GUEST EXPLORER HUD: Pill badge (No green blinking light) + Log In + Sign Up */}
-                <Link
-                  href="/auth?mode=signup"
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100/80 border border-amber-200 text-xs font-bold text-amber-900 transition-colors cursor-pointer shrink-0"
-                  title="Guest Mode • Sign up to save progress"
-                >
-                  <span className="hidden 2xl:inline">Guest Mode • Sign up to save progress</span>
-                  <span className="hidden md:inline 2xl:hidden">Guest Mode</span>
-                  <span className="md:hidden">Guest</span>
-                </Link>
-
                 {/* Log In Button (Tactile Slate Pill Button) */}
                 <Link
                   href="/auth?mode=signin"
@@ -390,24 +391,26 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
         {/* Mobile / Tablet Navigation Drawer */}
         {mobileMenuOpen && (
           <div className="xl:hidden border-t border-slate-200 bg-[#FAF6EE] px-4 pt-3 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-150">
-            {/* Subject Switch Action */}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setSwitchModalOpen(true);
-              }}
-              className="w-full text-left p-3 rounded-xl bg-white border border-slate-200 text-xs font-bold flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-[#6C5CE7]" />
-                <span>
-                  Course: <strong>{activeSubjectObj.name}</strong>
+            {/* Subject Switch Action (Hidden on Home Page) */}
+            {!isHomePage && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setSwitchModalOpen(true);
+                }}
+                className="w-full text-left p-3 rounded-xl bg-white border border-slate-200 text-xs font-bold flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-[#6C5CE7]" />
+                  <span>
+                    Course: <strong>{activeSubjectObj.name}</strong>
+                  </span>
+                </div>
+                <span className="text-[10px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded">
+                  Switch
                 </span>
-              </div>
-              <span className="text-[10px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded">
-                Switch
-              </span>
-            </button>
+              </button>
+            )}
 
             {/* Quick Stats or Guest CTA on Mobile */}
             {currentUser ? (

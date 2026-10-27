@@ -23,6 +23,9 @@ import {
   Flame,
   Heart,
   ShieldCheck,
+  Pickaxe,
+  Shield,
+  Settings,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -84,7 +87,7 @@ export default function DashboardPage() {
             className="btn-game-yellow text-xs py-2.5 px-5 shrink-0 flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-[#1E1E24]" />
-            <span>Save Progress to Supabase</span>
+            <span>Sign In to Save Progress</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -101,8 +104,16 @@ export default function DashboardPage() {
             <h1 className="font-serif font-black text-3xl sm:text-4xl text-[#1E1E24]">
               {isGuest ? 'Welcome, Guest Explorer!' : `Welcome back, ${currentUser?.name || 'Apprentice'}!`}
             </h1>
-            <p className="text-xs sm:text-sm text-[#4A4A58] font-medium max-w-xl">
-              Current Curriculum: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong> • Level: <strong>{currentUser?.studentClass || 'Class 10'}</strong>
+            <p className="text-xs sm:text-sm text-[#4A4A58] font-medium max-w-xl flex items-center flex-wrap gap-2">
+              <span>Current Curriculum: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong> • Level: <strong>{currentUser?.studentClass || 'Class 10'}</strong></span>
+              <Link
+                href="/settings"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6C5CE7] hover:text-[#5b4bc4] bg-white px-2 py-0.5 rounded-lg border border-slate-300 shadow-xs hover:border-[#6C5CE7] transition-all"
+                title="Change active course in Profile Settings"
+              >
+                <Settings className="w-3 h-3 text-[#6C5CE7]" />
+                <span>Switch Course</span>
+              </Link>
             </p>
           </div>
 
@@ -142,6 +153,65 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Active Quests */}
         <div className="lg:col-span-7 space-y-6">
+          {/* Featured Game Mode: Gurukul Code Dungeon & Craft Realm */}
+          <div className="card-game p-6 bg-gradient-to-br from-[#FAF6EE] to-[#FEF3C7] border-2 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] relative overflow-hidden">
+            {/* Background decorative corner icon */}
+            <div className="absolute -right-4 -bottom-4 text-7xl opacity-10 select-none pointer-events-none">
+              ⚔️
+            </div>
+
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-black text-[#1E1E24] bg-[#FBBF24] px-3 py-1 rounded-full border border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>New Game Mode • Dungeon &amp; Craft</span>
+              </span>
+              <span className="text-xs font-black text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-0.5 rounded border border-[#1E1E24]">
+                Up to +350 XP / Floor
+              </span>
+            </div>
+
+            <h2 className="font-serif font-black text-2xl text-[#1E1E24] mb-1 flex items-center gap-2">
+              <span>Code Dungeon &amp; Craft Realm</span>
+              <span className="text-lg">⚔️⛏️</span>
+            </h2>
+            <p className="text-xs font-bold text-[#D97706] mb-2">
+              Voxel Mining, Bridge Crafting &amp; 4 Dungeon Boss Floors
+            </p>
+            <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
+              Mine resources, craft wooden &amp; stone bridges, disarm mimics with <code className="font-bold text-[#6C5CE7]">hero.scan()</code>, and defeat the Syntax Golem Boss with loop functions to earn the exclusive <strong>Dungeon Architect Seal</strong>.
+            </p>
+
+            {/* Floor badges preview */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-5">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-[#1E1E24]/20 text-[#1E1E24]">
+                F1: Voxel Quarry (Variables)
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-[#1E1E24]/20 text-[#1E1E24]">
+                F2: Loops Labyrinth (Loops)
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-[#1E1E24]/20 text-[#1E1E24]">
+                F3: Sentinel Gate (Conditionals)
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-[#1E1E24]/20 text-[#1E1E24]">
+                F4: Syntax Golem (Boss)
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t-2 border-[#1E1E24]/15">
+              <span className="text-xs font-bold text-[#7E7E8F]">
+                10x10 Voxel Grid • 8-Bit Audio • Socratic AI
+              </span>
+
+              <Link
+                href="/dungeon"
+                className="btn-arcade text-xs py-2 px-5 btn-arcade-yellow shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5"
+              >
+                <span>Enter Dungeon ⚔️</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
           {/* Active Featured Mission: Rescue the Robot */}
           <div className="card-game p-6 bg-white shadow-[4px_4px_0px_#6C5CE7] relative">
             <div className="flex items-center justify-between mb-3">

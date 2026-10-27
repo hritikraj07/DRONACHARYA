@@ -144,6 +144,16 @@ export const INITIAL_SEALS: MasterySeal[] = [
     verificationHash: 'rob02-navigator-verified',
     isUnlocked: false,
   },
+  {
+    id: 'seal-dungeon-architect',
+    title: 'Dungeon Architect Seal',
+    category: 'Game & Systems Engineering',
+    description: 'Conquered all 4 Code Dungeon & Craft Floors: Voxel Quarry, Labyrinth of Loops, Sentinel Gate, and Syntax Golem Boss.',
+    iconName: 'Shield',
+    requiredSkillId: 'dungeon.craft.mastery',
+    verificationHash: 'dng01-dungeon-architect-verified',
+    isUnlocked: false,
+  },
 ];
 
 export const INITIAL_CAPSTONES: CapstoneProject[] = [

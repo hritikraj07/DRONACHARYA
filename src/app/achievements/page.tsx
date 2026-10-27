@@ -84,7 +84,7 @@ export default function AchievementsPage() {
                 </div>
               ) : (
                 <Link
-                  href="/simulator?mission=mission-rescue-robot"
+                  href={seal.id === 'seal-dungeon-architect' ? '/dungeon' : '/simulator?mission=mission-rescue-robot'}
                   className="btn-game-purple text-xs py-1.5 px-3 flex items-center justify-center gap-1 shadow-[2px_2px_0px_#1E1E24]"
                 >
                   <span>Pass Mission to Unlock →</span>

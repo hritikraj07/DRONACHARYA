@@ -21,7 +21,7 @@ import {
 import { getRankFromXp, calculateAwardedXp } from './gamification';
 import { calculateUpdatedBKT } from './bkt';
 
-import { getActiveSession, getEffectiveUser } from './db/auth-db';
+import { getActiveSession, getEffectiveUser, recordGameProgress } from './db/auth-db';
 
 const STORAGE_KEY = 'dronacharya_gurukul_state_v2';
 
@@ -303,6 +303,50 @@ export function useDronacharya() {
     return { success: false, message: 'Invalid squad join code' };
   };
 
+  // Complete Code Dungeon Floor
+  const completeDungeonFloor = (floorNumber: number, earnedXp: number = 250) => {
+    let awardedSealId: string | null = null;
+    if (floorNumber === 4) {
+      awardedSealId = 'seal-dungeon-architect';
+    }
+
+    const updatedSeals = state.seals.map((seal) => {
+      if (seal.id === awardedSealId) {
+        return { ...seal, isUnlocked: true, awardedAt: new Date().toISOString() };
+      }
+      return seal;
+    });
+
+    const newTotalXp = state.user.totalXp + earnedXp;
+    const { rank } = getRankFromXp(newTotalXp);
+
+    const updatedUser = {
+      ...state.user,
+      totalXp: newTotalXp,
+      rank,
+    };
+
+    persistState({
+      ...state,
+      seals: updatedSeals,
+      user: updatedUser,
+    });
+
+    // Also sync to auth-db session & Supabase
+    recordGameProgress({
+      missionId: `dungeon-floor-${floorNumber}`,
+      earnedXp,
+      sealId: awardedSealId || undefined,
+      subject: 'python-basics',
+      levelId: String(floorNumber),
+    });
+
+    return {
+      earnedXp,
+      awardedSeal: updatedSeals.find((s) => s.id === awardedSealId && s.isUnlocked),
+    };
+  };
+
   // Reset demo state
   const resetDemoState = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -315,6 +359,7 @@ export function useDronacharya() {
     completeOnboarding,
     completeMission,
     submitProject,
+    completeDungeonFloor,
     joinSquad,
     resetDemoState,
   };

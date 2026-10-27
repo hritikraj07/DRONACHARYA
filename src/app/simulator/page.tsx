@@ -431,6 +431,12 @@ def boosted_rescue(cells: list) -> list:
           >
             Quest 2: Filter Cells
           </Link>
+          <Link
+            href="/dungeon"
+            className="btn-arcade text-xs px-3 py-1.5 btn-arcade-yellow flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24]"
+          >
+            <span>⚔️⛏️ Code Dungeon</span>
+          </Link>
         </div>
       </div>
 
@@ -831,14 +837,14 @@ for step in range(4):
             {!getActiveSession() && (
               <div className="mb-5 p-3 rounded-xl bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] text-center">
                 <p className="text-xs font-bold text-[#1E1E24] mb-2">
-                  Quest cleared in Guest Mode! Save your streak and sync your achievements to Supabase.
+                  Quest cleared in Guest Mode! Sign in to save your streak and sync your achievements.
                 </p>
                 <button
                   onClick={() => triggerSaveProgressModal('simulator_quest_complete')}
                   className="btn-arcade btn-arcade-gold py-2 px-4 text-xs w-full flex items-center justify-center gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#071426]" />
-                  <span>Save Progress to Supabase</span>
+                  <span>Sign In to Save Progress</span>
                 </button>
               </div>
             )}

@@ -42,6 +42,7 @@ export default function CourseDetailPage() {
 }
 
 function CourseDetailContent() {
+  const router = useRouter();
   const params = useParams();
   const rawId = (params?.courseId as string) || 'html';
   const course = findCourseBySlugOrId(rawId);
@@ -165,7 +166,7 @@ function CourseDetailContent() {
                 href="/learn/html-less-1-1"
                 className="px-6 py-3 bg-[#FFD214] text-[#1E1E24] font-black text-xs rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] transition-all hover:scale-105"
               >
-                Play HTML 101 Now →
+                Play HTML Now →
               </Link>
             </div>
           </div>
@@ -233,10 +234,14 @@ function CourseDetailContent() {
           <div className="shrink-0 flex flex-col gap-3 min-w-[200px]">
             <Link
               href={`/learn/${nextLessonId}`}
-              className="btn-arcade btn-arcade-purple py-3 px-6 flex items-center justify-center gap-2 text-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/learn/${nextLessonId}`);
+              }}
+              className="btn-arcade btn-arcade-purple py-3 px-6 flex items-center justify-center gap-2 text-center cursor-pointer select-none"
             >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>{completedCount > 0 ? 'Continue Quest' : 'Start Chapter 1'}</span>
+              <Play className="w-3.5 h-3.5 fill-current pointer-events-none" />
+              <span className="pointer-events-none">{completedCount > 0 ? 'Continue Quest' : 'Start Chapter 1'}</span>
             </Link>
 
             <Link
@@ -358,10 +363,14 @@ function CourseDetailContent() {
 
                               <Link
                                 href={`/learn/${less.id}`}
-                                className="px-3.5 py-1.5 bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-black text-xs rounded-lg border border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1 transition-transform hover:scale-105"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/learn/${less.id}`);
+                                }}
+                                className="px-3.5 py-1.5 bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-black text-xs rounded-lg border border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1 transition-transform hover:scale-105 cursor-pointer select-none"
                               >
-                                <span>{isDone ? 'Review' : 'Play'}</span>
-                                <ArrowRight className="w-3 h-3" />
+                                <span className="pointer-events-none">{isDone ? 'Review' : 'Play'}</span>
+                                <ArrowRight className="w-3 h-3 pointer-events-none" />
                               </Link>
                             </div>
                           </div>

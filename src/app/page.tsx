@@ -93,14 +93,17 @@ export default function HomePage() {
     setAuthError(null);
     setAuthSuccess(null);
 
+    const cleanEmail = authEmail.trim();
+    setAuthEmail(cleanEmail);
+
     const res = await authenticateUser({
-      email: authEmail,
+      email: cleanEmail,
       password: authPassword,
     });
 
     if (res.success && res.user) {
       setAuthSuccess(`Welcome back, ${res.user.name}! Entering your learning arena...`);
-      setActiveSession(res.user);
+      setActiveSession(res.user, res.session);
       window.dispatchEvent(new Event('dronacharya_session_change'));
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
@@ -121,7 +124,9 @@ export default function HomePage() {
       setAuthError('Please enter your full name.');
       return;
     }
-    if (!authEmail.trim() || !authEmail.includes('@')) {
+    const cleanEmail = authEmail.trim();
+    setAuthEmail(cleanEmail);
+    if (!cleanEmail || !cleanEmail.includes('@')) {
       setAuthError('Please enter a valid email address.');
       return;
     }
@@ -148,9 +153,12 @@ export default function HomePage() {
     setAuthError(null);
     setAuthSuccess(null);
 
+    const cleanEmail = authEmail.trim();
+    setAuthEmail(cleanEmail);
+
     const res = await registerUser({
-      name: authName,
-      email: authEmail,
+      name: authName.trim(),
+      email: cleanEmail,
       password: authPassword,
       studentClass: authClass,
       targetSubject: authSubject,
@@ -158,7 +166,7 @@ export default function HomePage() {
 
     if (res.success && res.user) {
       setAuthSuccess(`Welcome, ${res.user.name}! Your game arena is ready.`);
-      setActiveSession(res.user);
+      setActiveSession(res.user, res.session);
       window.dispatchEvent(new Event('dronacharya_session_change'));
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
@@ -308,6 +316,7 @@ export default function HomePage() {
                     required
                     value={authEmail}
                     onChange={(e) => setAuthEmail(e.target.value)}
+                    onBlur={() => setAuthEmail((prev) => prev.trim())}
                     placeholder="student@learning.edu"
                     className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
                   />
@@ -438,6 +447,7 @@ export default function HomePage() {
                         required
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
+                        onBlur={() => setAuthEmail((prev) => prev.trim())}
                         placeholder="your.email@example.com"
                         className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
                       />

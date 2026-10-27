@@ -58,12 +58,15 @@ export default function AuthPage() {
     setSuccessMsg(null);
     setIsSubmitting(true);
 
-    const result = await authenticateUser({ email, password });
+    const cleanEmail = email.trim();
+    setEmail(cleanEmail);
+
+    const result = await authenticateUser({ email: cleanEmail, password });
     setIsSubmitting(false);
 
     if (result.success && result.user) {
       setSuccessMsg(`Welcome back, ${result.user.name}! Entering your learning dashboard...`);
-      setActiveSession(result.user);
+      setActiveSession(result.user, result.session);
       window.dispatchEvent(new Event('dronacharya_session_change'));
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
@@ -81,7 +84,9 @@ export default function AuthPage() {
       setErrorMsg('Please enter your full name.');
       return;
     }
-    if (!email.trim() || !email.includes('@')) {
+    const cleanEmail = email.trim();
+    setEmail(cleanEmail);
+    if (!cleanEmail || !cleanEmail.includes('@')) {
       setErrorMsg('Please enter a valid email address.');
       return;
     }
@@ -107,9 +112,12 @@ export default function AuthPage() {
     setSuccessMsg(null);
     setIsSubmitting(true);
 
+    const cleanEmail = email.trim();
+    setEmail(cleanEmail);
+
     const result = await registerUser({
-      name: fullName,
-      email,
+      name: fullName.trim(),
+      email: cleanEmail,
       password,
       studentClass,
       targetSubject,
@@ -118,7 +126,7 @@ export default function AuthPage() {
 
     if (result.success && result.user) {
       setSuccessMsg(`Welcome, ${result.user.name}! Your game arena is ready.`);
-      setActiveSession(result.user);
+      setActiveSession(result.user, result.session);
       window.dispatchEvent(new Event('dronacharya_session_change'));
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
@@ -207,6 +215,7 @@ export default function AuthPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => setEmail((prev) => prev.trim())}
                   placeholder="student@learning.edu"
                   className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
                 />
@@ -327,6 +336,7 @@ export default function AuthPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => setEmail((prev) => prev.trim())}
                       placeholder="your.email@example.com"
                       className="w-full pl-9 pr-3 py-2 border border-[#D8CFC0] rounded bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#354B3A]"
                     />

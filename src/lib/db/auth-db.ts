@@ -102,25 +102,59 @@ function saveRegisteredUsers(users: RegisteredUser[]) {
   }
 }
 
-// Get active logged-in user from session cache
+// Get active logged-in user from session cache or cookie
 export function getActiveSession(): RegisteredUser | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(CURRENT_SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (raw) return JSON.parse(raw);
+
+    // Cookie fallback
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/(?:^|; )dronacharya_session=([^;]*)/);
+      if (match) {
+        return JSON.parse(decodeURIComponent(match[1]));
+      }
+    }
+    return null;
   } catch (e) {
     return null;
   }
 }
 
 // Set active session & broadcast immediately to TopNav and all components
-export function setActiveSession(user: RegisteredUser | null) {
+export function setActiveSession(user: RegisteredUser | null, session?: any) {
   if (typeof window === 'undefined') return;
   try {
     if (user) {
       localStorage.setItem(CURRENT_SESSION_KEY, JSON.stringify(user));
+      const maxAge = 60 * 60 * 24 * 7; // 7 days
+      if (typeof document !== 'undefined') {
+        document.cookie = `dronacharya_session=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      }
+
+      if (session?.access_token) {
+        localStorage.setItem('sb_access_token', session.access_token);
+        if (typeof document !== 'undefined') {
+          document.cookie = `sb_access_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        }
+      }
+      if (session?.refresh_token) {
+        localStorage.setItem('sb_refresh_token', session.refresh_token);
+        if (typeof document !== 'undefined') {
+          document.cookie = `sb_refresh_token=${session.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        }
+      }
     } else {
       localStorage.removeItem(CURRENT_SESSION_KEY);
+      localStorage.removeItem('sb_access_token');
+      localStorage.removeItem('sb_refresh_token');
+      if (typeof document !== 'undefined') {
+        document.cookie = 'dronacharya_session=; path=/; max-age=0; SameSite=Lax';
+        document.cookie = 'sb_access_token=; path=/; max-age=0; SameSite=Lax';
+        document.cookie = 'sb_refresh_token=; path=/; max-age=0; SameSite=Lax';
+      }
+      supabase.auth.signOut().catch(() => {});
     }
     // Broadcast event so TopNav and components update instantly
     window.dispatchEvent(new Event('dronacharya_session_change'));
@@ -140,8 +174,9 @@ export async function registerUser(params: {
   studentClass: string;
   targetSubject: string;
   preferredLanguage?: 'en' | 'hi' | 'hinglish';
-}): Promise<{ success: boolean; user?: RegisteredUser; error?: string }> {
-  const normalizedEmail = params.email.trim().toLowerCase();
+}): Promise<{ success: boolean; user?: RegisteredUser; session?: any; error?: string }> {
+  const email = (params.email || '').trim();
+  const normalizedEmail = email.toLowerCase();
 
   if (params.password.length < 6) {
     return {
@@ -215,13 +250,13 @@ export async function registerUser(params: {
       createdAt: authData.user.created_at || new Date().toISOString(),
     };
 
-    // 4. Update local session & backup cache
+    // 4. Update local session & backup cache with session tokens and cookies
     const users = getRegisteredUsers();
     users.push(newUser);
     saveRegisteredUsers(users);
-    setActiveSession(newUser);
+    setActiveSession(newUser, authData.session);
 
-    return { success: true, user: newUser };
+    return { success: true, user: newUser, session: authData.session };
   } catch (err: any) {
     console.error('Supabase registration error:', err);
     return {
@@ -237,27 +272,32 @@ export async function registerUser(params: {
 export async function authenticateUser(params: {
   email: string;
   password: string;
-}): Promise<{ success: boolean; user?: RegisteredUser; error?: string }> {
-  const normalizedEmail = params.email.trim().toLowerCase();
+}): Promise<{ success: boolean; user?: RegisteredUser; session?: any; error?: string }> {
+  // Ensure .trim() is used on the email address so trailing spaces don't cause an invalid credentials error
+  const email = (params.email || '').trim();
+  const password = params.password;
 
   try {
-    // 1. Sign in with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password: params.password,
+    // 1. Direct call to Supabase Auth signInWithPassword
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    if (authError) {
+    // 2. Log exact Supabase response in browser console
+    console.log("Auth attempt:", email, error);
+
+    if (error) {
       return {
         success: false,
-        error: authError.message || 'Invalid email or password entered.',
+        error: error.message || 'Invalid email or password entered.',
       };
     }
 
     if (!authData.user) {
       return {
         success: false,
-        error: 'User not found.',
+        error: 'User not found in database.',
       };
     }
 
@@ -292,7 +332,7 @@ export async function authenticateUser(params: {
     const authenticatedUser: RegisteredUser = {
       id: userId,
       name: profile?.full_name || authData.user.user_metadata?.full_name || 'Scholar',
-      email: authData.user.email || normalizedEmail,
+      email: authData.user.email || email,
       password: params.password,
       studentClass: profile?.selected_class || AVAILABLE_CLASSES[1],
       targetSubject:
@@ -312,16 +352,20 @@ export async function authenticateUser(params: {
 
     // 4. Update local session & backup cache
     const users = getRegisteredUsers();
-    const existingIdx = users.findIndex((u) => u.id === userId || u.email === normalizedEmail);
+    const existingIdx = users.findIndex(
+      (u) => u.id === userId || u.email.toLowerCase() === email.toLowerCase()
+    );
     if (existingIdx !== -1) {
       users[existingIdx] = authenticatedUser;
     } else {
       users.push(authenticatedUser);
     }
     saveRegisteredUsers(users);
-    setActiveSession(authenticatedUser);
 
-    return { success: true, user: authenticatedUser };
+    // Save user state and session tokens to app state & cookies
+    setActiveSession(authenticatedUser, authData.session);
+
+    return { success: true, user: authenticatedUser, session: authData.session };
   } catch (err: any) {
     console.error('Supabase authentication error:', err);
     return {

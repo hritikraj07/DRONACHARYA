@@ -21,7 +21,7 @@ import {
 import { getRankFromXp, calculateAwardedXp } from './gamification';
 import { calculateUpdatedBKT } from './bkt';
 
-import { getActiveSession } from './db/auth-db';
+import { getActiveSession, getEffectiveUser } from './db/auth-db';
 
 const STORAGE_KEY = 'dronacharya_gurukul_state_v2';
 
@@ -37,40 +37,22 @@ export interface AppState {
 }
 
 function getInitialUser(): UserProfile {
-  const session = getActiveSession();
-  if (session) {
-    return {
-      id: session.id,
-      email: session.email,
-      username: session.email.split('@')[0],
-      fullName: session.name,
-      avatarUrl: '',
-      bio: `Scholar enrolled in ${session.studentClass}. Currently mastering ${session.targetSubject}.`,
-      role: 'student',
-      preferredLanguage: session.preferredLanguage || 'hinglish',
-      totalXp: session.totalXp,
-      currentStreak: session.currentStreak,
-      graceFreezesAvailable: 1,
-      lastActiveDate: '2026-10-27',
-      rank: session.rank,
-      targetTrack: session.targetSubject,
-    };
-  }
+  const session = getEffectiveUser();
   return {
-    id: '',
-    email: '',
-    username: '',
-    fullName: '',
+    id: session.id,
+    email: session.email,
+    username: session.id === 'guest' ? 'guest_explorer' : session.email.split('@')[0],
+    fullName: session.name,
     avatarUrl: '',
-    bio: '',
+    bio: `Scholar enrolled in ${session.studentClass}. Currently mastering ${session.targetSubject}.`,
     role: 'student',
-    preferredLanguage: 'hinglish',
-    totalXp: 0,
-    currentStreak: 0,
+    preferredLanguage: session.preferredLanguage || 'hinglish',
+    totalXp: session.totalXp,
+    currentStreak: session.currentStreak,
     graceFreezesAvailable: 1,
     lastActiveDate: '2026-10-27',
-    rank: 'Sadhaka',
-    targetTrack: 'python-algorithms',
+    rank: session.rank,
+    targetTrack: session.targetSubject,
   };
 }
 

@@ -29,6 +29,7 @@ import {
   LearnerProgressState,
 } from '@/lib/curriculum/progression-engine';
 import { useDronacharya } from '@/lib/store';
+import { getActiveSession, triggerSaveProgressModal } from '@/lib/db/auth-db';
 import {
   BookOpen,
   ArrowRight,
@@ -696,41 +697,60 @@ function LessonContent() {
 
               {/* Next Step Navigation when passed */}
               {exercisePassed && (
-                <div className="pt-4 border-t border-[#1E1E24]/10 flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-xs font-bold text-[#10B981] flex items-center gap-1">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Topic #{topic.sequenceNumber} Completed & Verified</span>
+                <div className="pt-4 border-t border-[#1E1E24]/10 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="text-xs font-bold text-[#10B981] flex items-center gap-1">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Topic #{topic.sequenceNumber} Completed & Verified (+{awardedXp || 35} XP)</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {topic.missionId && (
+                        <Link
+                          href={`/simulator?mission=${topic.missionId}`}
+                          className="btn-game-yellow py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                        >
+                          <Gamepad2 className="w-3.5 h-3.5" />
+                          <span>Play Mission</span>
+                        </Link>
+                      )}
+
+                      {nextTopic ? (
+                        <Link
+                          href={`/learn/${nextTopic.id}`}
+                          className="btn-game-purple py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                        >
+                          <span>Next: Lesson #{nextTopic.sequenceNumber}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/paths"
+                          className="btn-game-purple py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                        >
+                          <span>Return to Roadmap</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {topic.missionId && (
-                      <Link
-                        href={`/simulator?mission=${topic.missionId}`}
-                        className="btn-game-yellow py-2 px-4 text-xs font-black flex items-center gap-1.5"
+                  {/* Guest Explorer Sync CTA */}
+                  {!getActiveSession() && (
+                    <div className="p-3 rounded-xl bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                      <div className="text-xs font-bold text-[#1E1E24]">
+                        <span>🕹️ Solved as Guest Explorer! </span>
+                        <span className="text-[#4A4A58]">Create a free account to save your streak and sync your achievements to Supabase.</span>
+                      </div>
+                      <button
+                        onClick={() => triggerSaveProgressModal('lesson_passed')}
+                        className="btn-game-yellow text-xs py-1.5 px-3.5 font-black shrink-0 flex items-center gap-1 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
                       >
-                        <Gamepad2 className="w-3.5 h-3.5" />
-                        <span>Play Mission</span>
-                      </Link>
-                    )}
-
-                    {nextTopic ? (
-                      <Link
-                        href={`/learn/${nextTopic.id}`}
-                        className="btn-game-purple py-2 px-4 text-xs font-black flex items-center gap-1.5"
-                      >
-                        <span>Next: Lesson #{nextTopic.sequenceNumber}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    ) : (
-                      <Link
-                        href="/paths"
-                        className="btn-game-purple py-2 px-4 text-xs font-black flex items-center gap-1.5"
-                      >
-                        <span>Return to Roadmap</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    )}
-                  </div>
+                        <Sparkles className="w-3.5 h-3.5 text-[#1E1E24]" />
+                        <span>Save Progress</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

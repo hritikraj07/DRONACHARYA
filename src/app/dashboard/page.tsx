@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDronacharya } from '@/lib/store';
-import { getActiveSession, RegisteredUser, AVAILABLE_SUBJECTS } from '@/lib/db/auth-db';
+import { getActiveSession, getGuestSession, triggerSaveProgressModal, RegisteredUser, AVAILABLE_SUBJECTS } from '@/lib/db/auth-db';
 import {
   ArrowRight,
   Target,
@@ -29,15 +29,28 @@ export default function DashboardPage() {
   const router = useRouter();
   const { state } = useDronacharya();
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    const session = getActiveSession();
-    if (!session) {
-      router.push('/');
-    } else {
-      setCurrentUser(session);
-    }
-  }, [router]);
+    const syncUser = () => {
+      const active = getActiveSession();
+      if (active) {
+        setCurrentUser(active);
+        setIsGuest(false);
+      } else {
+        const guest = getGuestSession();
+        setCurrentUser(guest);
+        setIsGuest(true);
+      }
+    };
+    syncUser();
+    window.addEventListener('dronacharya_session_change', syncUser);
+    window.addEventListener('storage', syncUser);
+    return () => {
+      window.removeEventListener('dronacharya_session_change', syncUser);
+      window.removeEventListener('storage', syncUser);
+    };
+  }, []);
 
   const activeSubjectObj =
     AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
@@ -49,6 +62,34 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-8">
+      {/* 0. Guest Mode Call-to-Action Banner */}
+      {isGuest && (
+        <div className="card-game p-4 sm:p-5 bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-[#F59E0B] text-white flex items-center justify-center text-xl font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] shrink-0">
+              🕹️
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#D97706] tracking-wider">
+                <span>Guest Explorer Mode</span>
+                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+              </div>
+              <p className="text-xs sm:text-sm text-[#1E1E24] font-bold">
+                You are playing as a Guest! Your streak, {totalXp} XP, and completed quests are saved locally in this browser.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => triggerSaveProgressModal('dashboard_guest_banner')}
+            className="btn-game-yellow text-xs py-2.5 px-5 shrink-0 flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-[#1E1E24]" />
+            <span>Save Progress to Supabase</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* 1. Player Status Hero Banner */}
       <div className="card-game p-6 sm:p-8 bg-[#FAF6EE] shadow-[6px_6px_0px_#1E1E24]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -58,7 +99,7 @@ export default function DashboardPage() {
               <span>Adventurer Headquarters</span>
             </div>
             <h1 className="font-serif font-black text-3xl sm:text-4xl text-[#1E1E24]">
-              Welcome back, {currentUser?.name || 'Apprentice'}!
+              {isGuest ? 'Welcome, Guest Explorer!' : `Welcome back, ${currentUser?.name || 'Apprentice'}!`}
             </h1>
             <p className="text-xs sm:text-sm text-[#4A4A58] font-medium max-w-xl">
               Current Curriculum: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong> • Level: <strong>{currentUser?.studentClass || 'Class 10'}</strong>

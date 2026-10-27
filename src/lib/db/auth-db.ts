@@ -102,6 +102,51 @@ function saveRegisteredUsers(users: RegisteredUser[]) {
   }
 }
 
+const GUEST_SESSION_KEY = 'dronacharya_guest_session_v1';
+
+// Default guest explorer profile
+const DEFAULT_GUEST: RegisteredUser = {
+  id: 'guest',
+  name: 'Guest Explorer',
+  email: 'guest@dronacharya.local',
+  studentClass: 'Class 10',
+  targetSubject: 'python-basics',
+  preferredLanguage: 'hinglish',
+  totalXp: 0,
+  currentStreak: 1,
+  rank: 'Sadhaka',
+  hearts: 5,
+  level: 1,
+  completedMissions: [],
+  unlockedSeals: [],
+  createdAt: '2026-10-27',
+};
+
+export function getGuestSession(): RegisteredUser {
+  if (typeof window === 'undefined') return DEFAULT_GUEST;
+  try {
+    const raw = localStorage.getItem(GUEST_SESSION_KEY);
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem(GUEST_SESSION_KEY, JSON.stringify(DEFAULT_GUEST));
+    return DEFAULT_GUEST;
+  } catch (e) {
+    return DEFAULT_GUEST;
+  }
+}
+
+export function saveGuestSession(guest: RegisteredUser): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(GUEST_SESSION_KEY, JSON.stringify(guest));
+    window.dispatchEvent(new Event('dronacharya_session_change'));
+    window.dispatchEvent(new Event('storage'));
+  } catch (e) {}
+}
+
+export function getEffectiveUser(): RegisteredUser {
+  return getActiveSession() || getGuestSession();
+}
+
 // Get active logged-in user from session cache or cookie
 export function getActiveSession(): RegisteredUser | null {
   if (typeof window === 'undefined') return null;
@@ -217,12 +262,19 @@ export async function registerUser(params: {
     const targetSub = params.targetSubject || AVAILABLE_SUBJECTS[0].id;
     const studentCls = params.studentClass || AVAILABLE_CLASSES[1];
 
-    // 2. Save selected_class / selected_subjects to public.profiles
+    // Read any existing guest explorer progress so we can seamlessly sync to Supabase
+    const guest = getGuestSession();
+    const guestXp = guest.totalXp || 0;
+    const guestMissions = guest.completedMissions || [];
+    const guestSeals = guest.unlockedSeals || [];
+
+    // 2. Save selected_class, selected_subjects, and synced guest XP to public.profiles
     const { error: profileError } = await supabase
       .from('profiles')
       .update({
         selected_class: studentCls,
         selected_subjects: [targetSub],
+        ...(guestXp > 0 ? { xp: guestXp } : {}),
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId);
@@ -231,7 +283,26 @@ export async function registerUser(params: {
       console.warn('Supabase profile initial update notice:', profileError.message);
     }
 
-    // 3. Construct clean RegisteredUser
+    // Sync guest completed missions to public.game_progress in Supabase
+    if (guestMissions.length > 0) {
+      for (const mId of guestMissions) {
+        supabase
+          .from('game_progress')
+          .upsert({
+            user_id: userId,
+            subject: targetSub,
+            level_id: String(mId),
+            score: 100,
+            completed: true,
+            updated_at: new Date().toISOString(),
+          })
+          .then(({ error }) => {
+            if (error) console.warn('Supabase guest game_progress sync notice:', error.message);
+          });
+      }
+    }
+
+    // 3. Construct clean RegisteredUser with synced progress
     const newUser: RegisteredUser = {
       id: userId,
       name: params.name.trim(),
@@ -240,15 +311,22 @@ export async function registerUser(params: {
       studentClass: studentCls,
       targetSubject: targetSub,
       preferredLanguage: params.preferredLanguage || 'hinglish',
-      totalXp: 0,
+      totalXp: guestXp,
       currentStreak: 1,
-      rank: 'Sadhaka',
-      level: 1,
-      hearts: 3,
-      completedMissions: [],
-      unlockedSeals: [],
+      rank: calculateRank(guestXp),
+      level: Math.floor(guestXp / 200) + 1,
+      hearts: 5,
+      completedMissions: guestMissions,
+      unlockedSeals: guestSeals,
       createdAt: authData.user.created_at || new Date().toISOString(),
     };
+
+    // Reset guest session in localStorage now that it is synced to Supabase
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(GUEST_SESSION_KEY);
+      } catch (e) {}
+    }
 
     // 4. Update local session & backup cache with session tokens and cookies
     const users = getRegisteredUsers();
@@ -385,7 +463,17 @@ export function updateUserLearningSelection(params: {
   preferredLanguage?: 'en' | 'hi' | 'hinglish';
 }): RegisteredUser | null {
   const currentUser = getActiveSession();
-  if (!currentUser) return null;
+  if (!currentUser) {
+    const guest = getGuestSession();
+    const updatedGuest: RegisteredUser = {
+      ...guest,
+      ...(params.studentClass ? { studentClass: params.studentClass } : {}),
+      ...(params.targetSubject ? { targetSubject: params.targetSubject } : {}),
+      ...(params.preferredLanguage ? { preferredLanguage: params.preferredLanguage } : {}),
+    };
+    saveGuestSession(updatedGuest);
+    return updatedGuest;
+  }
 
   const updatedUser: RegisteredUser = {
     ...currentUser,
@@ -423,8 +511,8 @@ export function updateUserLearningSelection(params: {
 
 /**
  * Record Game Progress & award XP:
- * Syncs directly to public.profiles (xp) and public.game_progress (level_id, score, completed)
- * while updating local session cache synchronously
+ * If authenticated: Syncs directly to public.profiles (xp) and public.game_progress
+ * If guest explorer: Syncs seamlessly to localStorage guest session
  */
 export function recordGameProgress(params: {
   missionId: string;
@@ -434,7 +522,28 @@ export function recordGameProgress(params: {
   sealId?: string;
 }): RegisteredUser | null {
   const currentUser = getActiveSession();
-  if (!currentUser) return null;
+  if (!currentUser) {
+    const guest = getGuestSession();
+    const newMissions = Array.from(new Set([...guest.completedMissions, params.missionId]));
+    const newSeals = params.sealId
+      ? Array.from(new Set([...guest.unlockedSeals, params.sealId]))
+      : guest.unlockedSeals;
+
+    const newTotalXp = guest.totalXp + params.earnedXp;
+    const newLevel = Math.floor(newTotalXp / 200) + 1;
+    const newRank = calculateRank(newTotalXp);
+
+    const updatedGuest: RegisteredUser = {
+      ...guest,
+      totalXp: newTotalXp,
+      level: newLevel,
+      rank: newRank,
+      completedMissions: newMissions,
+      unlockedSeals: newSeals,
+    };
+    saveGuestSession(updatedGuest);
+    return updatedGuest;
+  }
 
   const newMissions = Array.from(new Set([...currentUser.completedMissions, params.missionId]));
   const newSeals = params.sealId
@@ -500,11 +609,17 @@ export const awardGameProgress = recordGameProgress;
 
 /**
  * Deduct a heart upon game collision/failure:
- * Syncs directly to Supabase public.profiles while updating local session cache synchronously
+ * Syncs to Supabase profiles if logged in, or localStorage if guest explorer
  */
 export function deductHeart(): number {
   const currentUser = getActiveSession();
-  if (!currentUser) return 3;
+  if (!currentUser) {
+    const guest = getGuestSession();
+    const remaining = Math.max(0, guest.hearts - 1);
+    const updated = { ...guest, hearts: remaining };
+    saveGuestSession(updated);
+    return remaining;
+  }
 
   const remaining = Math.max(0, currentUser.hearts - 1);
   const updated = { ...currentUser, hearts: remaining };
@@ -527,20 +642,25 @@ export function deductHeart(): number {
 
 /**
  * Restore hearts:
- * Syncs directly to Supabase public.profiles while updating local session cache synchronously
+ * Syncs to Supabase profiles if logged in, or localStorage if guest explorer
  */
 export function restoreHearts(): number {
   const currentUser = getActiveSession();
-  if (!currentUser) return 3;
+  if (!currentUser) {
+    const guest = getGuestSession();
+    const updated = { ...guest, hearts: 5 };
+    saveGuestSession(updated);
+    return 5;
+  }
 
-  const updated = { ...currentUser, hearts: 3 };
+  const updated = { ...currentUser, hearts: 5 };
   setActiveSession(updated);
 
   // Sync to Supabase public.profiles
   supabase
     .from('profiles')
     .update({
-      hearts: 3,
+      hearts: 5,
       updated_at: new Date().toISOString(),
     })
     .eq('id', currentUser.id)
@@ -548,7 +668,16 @@ export function restoreHearts(): number {
       if (error) console.warn('Supabase restoreHearts notice:', error.message);
     });
 
-  return 3;
+  return 5;
+}
+
+/**
+ * Helper to dispatch event that prompts guests to save progress to Supabase
+ */
+export function triggerSaveProgressModal(reason: string = 'save_progress') {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('dronacharya_open_save_progress', { detail: { reason } }));
+  }
 }
 
 /**

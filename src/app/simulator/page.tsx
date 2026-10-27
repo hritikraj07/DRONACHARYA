@@ -10,7 +10,7 @@ import { executeRobotCode, RobotSimulationResult, RobotSimulationFrame } from '@
 import { executePythonChallenge, ExecutionResult } from '@/lib/simulator/python-runner';
 import { PlayableGridEngine } from '@/components/game/PlayableGridEngine';
 import { CellFilterEngine, BioCell } from '@/components/game/CellFilterEngine';
-import { recordGameProgress, deductHeart, getActiveSession } from '@/lib/db/auth-db';
+import { recordGameProgress, deductHeart, getActiveSession, triggerSaveProgressModal } from '@/lib/db/auth-db';
 import { AcharyaDrawer } from '@/components/mentor/AcharyaDrawer';
 import {
   Code2,
@@ -826,6 +826,22 @@ for step in range(4):
                 <span className="font-serif font-black text-base text-[#6C5CE7] truncate block">{currentMission.realmName}</span>
               </div>
             </div>
+
+            {/* Guest Progress Cloud Sync Prompt */}
+            {!getActiveSession() && (
+              <div className="mb-5 p-3 rounded-xl bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] text-center">
+                <p className="text-xs font-bold text-[#1E1E24] mb-2">
+                  Quest cleared in Guest Mode! Save your streak and sync your achievements to Supabase.
+                </p>
+                <button
+                  onClick={() => triggerSaveProgressModal('simulator_quest_complete')}
+                  className="btn-game-yellow py-2 px-4 text-xs font-black w-full flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#1E1E24]" />
+                  <span>Save Progress to Supabase</span>
+                </button>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

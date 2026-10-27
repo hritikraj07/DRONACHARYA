@@ -59,6 +59,13 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const modeParam = params.get('mode');
+      if (modeParam === 'signup' || modeParam === 'signin' || modeParam === 'guest') {
+        setAuthMode(modeParam);
+      }
+    }
     const session = typeof window !== 'undefined' ? localStorage.getItem('dronacharya_active_session_v2') : null;
     if (session) {
       window.location.href = '/';

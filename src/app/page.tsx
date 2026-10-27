@@ -271,18 +271,14 @@ export default function HomePage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               ) : (
-                <button
-                  onClick={() => {
-                    setAuthMode('signup');
-                    setSignupStep(1);
-                    setIsAuthModalOpen(true);
-                  }}
+                <Link
+                  href="/learn/py-topic-1"
                   className="btn-game-purple text-sm py-3.5 px-8 shadow-[4px_4px_0px_#1E1E24]"
                 >
                   <Sparkles className="w-5 h-5 text-[#FBBF24]" />
                   <span>Start Your Adventure</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </Link>
               )}
 
               <Link

@@ -77,7 +77,7 @@ export default function DashboardPage() {
   const currentLevelProgress = Math.min(100, Math.round(((totalXp % 200) / 200) * 100));
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-8 overflow-x-hidden">
       {/* 0. Guest Mode Call-to-Action Banner */}
       {isGuest && (
         <div className="card-game p-4 sm:p-5 bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex flex-col sm:flex-row items-center justify-between gap-4">

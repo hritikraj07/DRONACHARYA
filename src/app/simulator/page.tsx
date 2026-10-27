@@ -431,104 +431,111 @@ def boosted_rescue(cells: list) -> list:
   const currentFrame = robotSimResult?.frames[currentFrameIndex];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-1 flex flex-col gap-5">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-1 flex flex-col gap-5 overflow-x-hidden">
       {/* Top Mission Banner & Realm Switcher */}
-      <div className="bg-white border-2 border-[#1E1E24] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#1E1E24] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] text-[11px] font-black text-[#6C5CE7]">
+      <div className="bg-white border-2 border-[#1E1E24] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#1E1E24] flex flex-col xl:flex-row xl:items-center justify-between gap-4 overflow-hidden">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] text-[11px] font-black text-[#6C5CE7] shrink-0">
               Stage {currentMission.stageNumber}: {currentMission.realmName}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#1E1E24] text-[11px] font-black text-[#D97706] flex items-center gap-1">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#1E1E24] text-[11px] font-black text-[#D97706] flex items-center gap-1 shrink-0">
               <Star className="w-3 h-3 fill-[#F59E0B]" />
               <span>+{currentMission.xpReward} XP</span>
             </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#D1FAE5] border border-[#1E1E24] text-[11px] font-black text-[#059669]">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#D1FAE5] border border-[#1E1E24] text-[11px] font-black text-[#059669] shrink-0">
               Concept: {currentMission.concept}
             </span>
           </div>
 
-          <h1 className="font-serif font-black text-xl sm:text-2xl text-[#1E1E24]">
+          <h1 className="font-serif font-black text-xl sm:text-2xl text-[#1E1E24] break-words">
             {currentMission.title}
           </h1>
         </div>
 
-        {/* Mission Switcher Dropdown */}
-        <div className="flex items-center gap-2">
-          <Link
-            href="/simulator?mission=mission-rescue-robot"
-            className={`btn-arcade text-xs px-3 py-1.5 ${
-              currentMission.id === 'mission-rescue-robot'
-                ? 'btn-arcade-purple'
-                : 'btn-arcade-white'
-            }`}
-          >
-            Quest 1: Rescue Robot
-          </Link>
-          <Link
-            href="/simulator?mission=mission-hazard-filter"
-            className={`btn-arcade text-xs px-3 py-1.5 ${
-              currentMission.id === 'mission-hazard-filter'
-                ? 'btn-arcade-purple'
-                : 'btn-arcade-white'
-            }`}
-          >
-            Quest 2: Filter Cells
-          </Link>
-          <button
-            onClick={() => setIsMentorOpen(true)}
-            className="btn-arcade text-xs px-3 py-1.5 bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#6C5CE7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer"
-            title="Open Acharya Socratic AI Mentor"
-          >
-            <Sparkles className="w-3.5 h-3.5 fill-[#FFD214]" />
-            <span>Acharya AI</span>
-          </button>
-          <Link
-            href="/learn/py-less-1-1"
-            className="btn-arcade text-xs px-3 py-1.5 bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#D97706] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer"
-            title="Launch Rover Arya's Python Odyssey RPG Arena"
-          >
-            <span>🚀 Python Odyssey</span>
-          </Link>
-          <Link
-            href="/dungeon"
-            className="btn-arcade text-xs px-3 py-1.5 btn-arcade-yellow flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24]"
-          >
-            <span>⚔️⛏️ Code Dungeon</span>
-          </Link>
+        {/* Mission Switcher & Mode Launchers (Responsive with wrap) */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0 max-w-full">
+          {/* Active Quests Group */}
+          <div className="flex items-center gap-1.5 p-1 bg-[#FAF6EE] border border-[#1E1E24]/20 rounded-xl shrink-0">
+            <Link
+              href="/simulator?mission=mission-rescue-robot"
+              className={`btn-arcade text-xs px-3 py-1.5 whitespace-nowrap ${
+                currentMission.id === 'mission-rescue-robot'
+                  ? 'btn-arcade-purple'
+                  : 'btn-arcade-white'
+              }`}
+            >
+              Quest 1: Rescue Robot
+            </Link>
+            <Link
+              href="/simulator?mission=mission-hazard-filter"
+              className={`btn-arcade text-xs px-3 py-1.5 whitespace-nowrap ${
+                currentMission.id === 'mission-hazard-filter'
+                  ? 'btn-arcade-purple'
+                  : 'btn-arcade-white'
+              }`}
+            >
+              Quest 2: Filter Cells
+            </Link>
+          </div>
+
+          {/* Quick Action Tools */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              onClick={() => setIsMentorOpen(true)}
+              className="btn-arcade text-xs px-3 py-1.5 bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#6C5CE7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              title="Open Acharya Socratic AI Mentor"
+            >
+              <Sparkles className="w-3.5 h-3.5 fill-[#FFD214]" />
+              <span>Acharya AI</span>
+            </button>
+            <Link
+              href="/learn/py-less-1-1"
+              className="btn-arcade text-xs px-3 py-1.5 bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#D97706] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              title="Launch Rover Arya's Python Odyssey RPG Arena"
+            >
+              <span>🚀 Python Odyssey</span>
+            </Link>
+            <Link
+              href="/dungeon"
+              className="btn-arcade text-xs px-3 py-1.5 btn-arcade-yellow flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] whitespace-nowrap"
+            >
+              <span>⚔️ Code Dungeon</span>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Mobile Tab Switcher */}
-      <div className="flex lg:hidden border-2 border-[#1E1E24] rounded-xl bg-white p-1 gap-1 shadow-[2px_2px_0px_#1E1E24]">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:hidden border-2 border-[#1E1E24] rounded-xl bg-white p-1 gap-1 shadow-[2px_2px_0px_#1E1E24]">
         <button
           onClick={() => setActiveTab('arena')}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-            activeTab === 'arena' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          className={`py-2 px-2 text-xs font-bold rounded-lg transition-all text-center ${
+            activeTab === 'arena' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
           🎮 Game Arena
         </button>
         <button
           onClick={() => setActiveTab('code')}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-            activeTab === 'code' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          className={`py-2 px-2 text-xs font-bold rounded-lg transition-all text-center ${
+            activeTab === 'code' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
           💻 Code Editor
         </button>
         <button
           onClick={() => setActiveTab('guide')}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-            activeTab === 'guide' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          className={`py-2 px-2 text-xs font-bold rounded-lg transition-all text-center ${
+            activeTab === 'guide' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
           📜 Codex Guide
         </button>
         <button
           onClick={() => setActiveTab('terminal')}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-            activeTab === 'terminal' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58]'
+          className={`py-2 px-2 text-xs font-bold rounded-lg transition-all text-center ${
+            activeTab === 'terminal' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
           📟 Output

@@ -64,7 +64,7 @@ export default function CoursesPage() {
   const comingSoonCount = COURSES_CATALOG.filter((c) => c.isComingSoon).length;
 
   return (
-    <div className="min-h-screen bg-[#F5F2EB] py-10 px-4 sm:px-6 lg:px-8 text-[#1E1E24]">
+    <div className="min-h-screen bg-[#F5F2EB] py-10 px-4 sm:px-6 lg:px-8 text-[#1E1E24] overflow-x-hidden">
       <div className="max-w-6xl mx-auto space-y-10">
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#1E1E24] pb-8">
@@ -95,7 +95,7 @@ export default function CoursesPage() {
         </div>
 
         {/* FILTER PILLS */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-2 pb-2">
           {(
             [
               'All',

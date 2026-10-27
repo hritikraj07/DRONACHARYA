@@ -60,9 +60,9 @@ export function PlayableGridEngine({
   return (
     <div className="card-game p-4 sm:p-5 flex flex-col justify-between w-full h-full bg-[#FAF6EE]">
       {/* Top HUD: Battery Gauge & Coordinates */}
-      <div className="flex items-center justify-between gap-3 mb-4 bg-white border-2 border-[#1E1E24] rounded-xl p-3 shadow-[2px_2px_0px_#1E1E24]">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 mb-4 bg-white border-2 border-[#1E1E24] rounded-xl p-2.5 sm:p-3 shadow-[2px_2px_0px_#1E1E24]">
         {/* Battery Gauge */}
-        <div className="flex items-center gap-2 flex-1 max-w-[220px]">
+        <div className="flex items-center gap-2 min-w-[130px] flex-1">
           <BatteryCharging
             className={`w-5 h-5 shrink-0 ${
               batteryPct > 40 ? 'text-[#10B981]' : batteryPct > 15 ? 'text-[#F59E0B]' : 'text-[#EF4444]'

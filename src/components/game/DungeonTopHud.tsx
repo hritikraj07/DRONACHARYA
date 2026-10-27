@@ -118,7 +118,7 @@ export function DungeonTopHud({
               value={levelNumber}
               onChange={(e) => onSelectLevel(Number(e.target.value))}
               aria-label="Select Python Chronicles Level"
-              className="appearance-none bg-[#FAF6EE] border-2 border-[#1E1E24] font-serif font-black text-xs sm:text-sm text-[#1E1E24] pl-3 pr-8 py-2 rounded-xl shadow-[2px_2px_0px_#1E1E24] cursor-pointer hover:bg-white focus:outline-none"
+              className="appearance-none bg-[#FAF6EE] border-2 border-[#1E1E24] font-serif font-black text-xs sm:text-sm text-[#1E1E24] pl-3 pr-8 py-2 rounded-xl shadow-[2px_2px_0px_#1E1E24] cursor-pointer hover:bg-white focus:outline-none max-w-[280px] truncate"
             >
               {Object.values(DUNGEON_CAMPAIGN_LEVELS).map((lvl) => {
                 const stars = levelStars[lvl.levelNumber] || 0;

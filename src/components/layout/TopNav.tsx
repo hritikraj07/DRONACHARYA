@@ -293,7 +293,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
                 {/* 3. Daily Streak */}
                 <div
-                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200 text-xs font-black text-amber-700 shrink-0"
+                  className="hidden xl:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200 text-xs font-black text-amber-700 shrink-0"
                   title={`${currentUser.currentStreak} Day Quest Streak`}
                 >
                   <Flame className="w-3.5 h-3.5 fill-[#F59E0B] shrink-0" />
@@ -302,7 +302,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
                 {/* 4. Level Badge */}
                 <div
-                  className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-100 border border-amber-300 text-xs font-black text-amber-900 shrink-0"
+                  className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-100 border border-amber-300 text-xs font-black text-amber-900 shrink-0"
                   title={`Rank: ${currentUser.rank} • Lv.${currentUser.level || 1} • ${currentUser.totalXp} XP`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-900 shrink-0" />

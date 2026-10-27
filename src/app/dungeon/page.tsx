@@ -346,9 +346,9 @@ export default function DungeonPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#FAF6EE] text-[#1E1E24] px-3 sm:px-6 py-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full min-h-screen bg-[#FAF6EE] text-[#1E1E24] px-3 sm:px-6 py-6 max-w-7xl mx-auto space-y-6 overflow-x-hidden">
       {/* 0. Top Navigation & Breadcrumb */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/dashboard"
           className="btn-arcade text-xs py-2 px-3.5 btn-arcade-white flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24]"

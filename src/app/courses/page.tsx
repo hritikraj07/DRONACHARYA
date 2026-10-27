@@ -74,7 +74,7 @@ export default function CoursesPage() {
               <span>DRONACHARYA ⋆˙⟡ CURRICULUM</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-black text-[#1E1E24] tracking-tight">
-              Course Realms
+              Course Catalog
             </h1>
             <p className="text-sm sm:text-base font-bold text-[#4A4A58] max-w-2xl leading-relaxed">
               Step into interactive coding adventures. Write real typed code in your browser, complete hands-on missions, and build portfolio-worthy artifacts.
@@ -137,7 +137,7 @@ export default function CoursesPage() {
                 <span>Recommended Starter Path</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-                Python Programming Realm 🐍
+                Python Programming Course 🐍
               </h2>
               <p className="text-xs sm:text-sm font-bold text-purple-100 leading-relaxed">
                 Step into the live game-based Python universe! Control Rover Arya, master loops, conditionals, and functions in real sandboxed Python, or battle monsters in the Python Code Dungeon.
@@ -206,7 +206,7 @@ export default function CoursesPage() {
                         </span>
                       ) : (
                         <span className="text-[10px] font-pixel text-emerald-800 bg-[#DCFCE7] px-2.5 py-1 rounded-md border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
-                          ACTIVE REALM
+                          ACTIVE COURSE
                         </span>
                       )}
                     </div>

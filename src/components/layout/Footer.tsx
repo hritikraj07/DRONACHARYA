@@ -150,7 +150,7 @@ export function Footer() {
                 <li>
                   <button
                     onClick={() => setTeamModalType('github')}
-                    className="hover:text-[#6C5CE7] hover:underline transition-colors text-left font-bold cursor-pointer"
+                    className="hover:text-[#020617] hover:underline transition-colors text-left cursor-pointer"
                   >
                     Meet the Creators (4) ↗
                   </button>
@@ -175,7 +175,7 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dungeon" className="hover:text-[#020617] hover:underline transition-colors font-bold text-[#6C5CE7]">
+                  <Link href="/dungeon" className="hover:text-[#020617] hover:underline transition-colors">
                     ⚔️ Python Code Dungeon
                   </Link>
                 </li>
@@ -199,7 +199,7 @@ export function Footer() {
               </h4>
               <ul className="space-y-2.5 text-xs sm:text-sm font-medium text-[#64748B]">
                 <li>
-                  <Link href="/courses" className="text-[#6C5CE7] font-bold hover:underline">
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors">
                     All Courses →
                   </Link>
                 </li>
@@ -270,15 +270,25 @@ export function Footer() {
             <div className="flex flex-wrap items-center gap-4">
               <span>© {currentYear} DRONACHARYA ⋆˙⟡ (The Digital Gurukul)</span>
               <span>•</span>
-              <Link href="/about" className="hover:text-[#020617] hover:underline font-bold text-[#6C5CE7]">
+              <span className="flex items-center gap-1.5 text-slate-700 font-bold">
+                <span>Crafted with</span>
+                <svg className="w-3.5 h-3.5 inline-block shrink-0" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 5h2v-2h3v2h2v-2h3v2h2v4h-2v2h-2v2h-2v2h-2v-2h-2v-2h-2v-2h-2v-4z" fill="#FF4757" />
+                  <path d="M4 3h3v2H4V3zm5 0h3v2H9V3zM2 5h2v4H2V5zm12 0h2v4h-2V5zm-2 4h2v2h-2V9zm-2 2h2v2h-2v-2zm-2 2h2v2H8v-2zm-2-2h2v2H6v-2zm-2-2h2v2H4V9z" fill="#1E1E24" />
+                  <rect x="4" y="5" width="2" height="2" fill="#FFFFFF" />
+                </svg>
+                <span>by NHK</span>
+              </span>
+              <span>•</span>
+              <Link href="/about" className="hover:text-[#020617] hover:underline transition-colors">
                 About
               </Link>
               <span>•</span>
-              <Link href="/terms" className="hover:text-[#020617] hover:underline">
+              <Link href="/terms" className="hover:text-[#020617] hover:underline transition-colors">
                 Terms
               </Link>
               <span>•</span>
-              <Link href="/privacy" className="hover:text-[#020617] hover:underline">
+              <Link href="/privacy" className="hover:text-[#020617] hover:underline transition-colors">
                 Privacy Policy
               </Link>
             </div>
@@ -346,8 +356,8 @@ export function Footer() {
             <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#1E1E24]/20 mb-5">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-12 h-12 rounded-2xl border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24] shrink-0 ${
-                    teamModalType === 'github' ? 'bg-[#1E1E24] text-white' : 'bg-[#0A66C2] text-white'
+                  className={`w-12 h-12 rounded-2xl border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24] shrink-0 overflow-hidden ${
+                    teamModalType === 'github' ? 'bg-[#1E1E24] text-white' : 'bg-[#006699] p-0'
                   }`}
                 >
                   {teamModalType === 'github' ? (
@@ -355,9 +365,11 @@ export function Footer() {
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                   ) : (
-                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.79v8.37H6.46v-8.37M7.86 6.81a1.62 1.62 0 1 0 0 3.24 1.62 1.62 0 0 0 0-3.24z" />
-                    </svg>
+                    <img
+                      src="/linkedin-logo.png"
+                      alt="LinkedIn"
+                      className="w-full h-full object-cover"
+                    />
                   )}
                 </div>
                 <div>
@@ -388,14 +400,14 @@ export function Footer() {
               </button>
             </div>
 
-            {/* 4 Members Grid (Tactile Retro-Arcade Cards) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[65vh] overflow-y-auto pr-1">
+            {/* 4 Members Grid (Tactile Retro-Arcade Cards with top padding to prevent hover clipping) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto pt-3.5 pb-2 px-1.5">
               {TEAM_MEMBERS.map((member) => {
                 const targetUrl = teamModalType === 'github' ? member.github : member.linkedin;
                 return (
                   <div
                     key={member.name}
-                    className="p-4 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex flex-col justify-between gap-3 hover:-translate-y-0.5 transition-transform"
+                    className="p-4 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex flex-col justify-between gap-3 hover:-translate-y-1 hover:shadow-[3px_5px_0px_#1E1E24] transition-all"
                   >
                     <div className="flex items-start gap-3">
                       <div
@@ -426,10 +438,13 @@ export function Footer() {
                       className={`w-full py-2 px-3 text-xs font-black rounded-xl border-2 border-[#1E1E24] flex items-center justify-between transition-all cursor-pointer ${
                         teamModalType === 'github'
                           ? 'bg-[#1E1E24] text-white hover:bg-gray-800 shadow-[2px_2px_0px_#1E1E24]'
-                          : 'bg-[#0A66C2] text-white hover:bg-[#004182] shadow-[2px_2px_0px_#1E1E24]'
+                          : 'bg-[#006699] text-white hover:bg-[#004b70] shadow-[2px_2px_0px_#1E1E24]'
                       }`}
                     >
-                      <span className="truncate">
+                      <span className="truncate flex items-center gap-1.5">
+                        {teamModalType === 'linkedin' && (
+                          <img src="/linkedin-logo.png" alt="LinkedIn" className="w-3.5 h-3.5 rounded shrink-0 object-cover" />
+                        )}
                         {teamModalType === 'github'
                           ? `GitHub: ${member.handle}`
                           : `LinkedIn: ${member.name}`}
@@ -441,16 +456,9 @@ export function Footer() {
               })}
             </div>
 
-            {/* Bottom Tip Bar */}
-            <div className="mt-5 pt-3 border-t border-[#1E1E24]/10 flex items-center justify-between text-[11px] font-bold text-[#64748B]">
+            {/* Bottom Tip Bar (Close Window button removed) */}
+            <div className="mt-5 pt-3 border-t border-[#1E1E24]/10 flex items-center justify-center text-[11px] font-bold text-[#64748B]">
               <span>💡 Links open the official profile in a secure tab</span>
-              <button
-                type="button"
-                onClick={() => setTeamModalType(null)}
-                className="text-[#6C5CE7] hover:underline font-black cursor-pointer"
-              >
-                Close Window
-              </button>
             </div>
           </div>
         </div>

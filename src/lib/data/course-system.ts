@@ -102,6 +102,371 @@ export interface Course {
 
 export const COURSES_CATALOG: Course[] = [
   // =========================================================================
+  // 1. PYTHON: Interactive Game-Based Learning (ACTIVE)
+  // =========================================================================
+  {
+    id: 'python',
+    slug: 'python',
+    title: 'Python: The Python Course',
+    language: 'Python',
+    level: 'Beginner',
+    tagline: 'Learn real Python programming through code-driven adventure missions.',
+    description: 'Master core programming fundamentals from your first print statement to variables, branching conditions, loops, lists, and reusable functions. Control autonomous rover Arya in interactive 2D simulations.',
+    totalChapters: 8,
+    totalLessons: 18,
+    xpReward: 1200,
+    iconName: 'Terminal',
+    badgeText: 'Fully Playable',
+    badgeColor: 'bg-[#10B981] text-white',
+    isAvailable: true,
+    isComingSoon: false,
+    chapters: [
+      {
+        id: 'py-ch-1',
+        courseId: 'python',
+        chapterNumber: 1,
+        title: 'Chapter 1: Hello World & Syntax',
+        conceptName: 'Text Output & Syntax Fundamentals',
+        description: 'Wake the stranded field rover Arya with your very first code incantation. Learn print(), strings, and case-sensitive syntax.',
+        realmName: 'Starter Village',
+        iconName: 'Sparkles',
+        color: '#6C5CE7',
+        lessons: [
+          {
+            id: 'py-less-1-1',
+            chapterId: 'py-ch-1',
+            sequenceOrder: 1,
+            title: 'Lesson 1.1: The First Incantation',
+            subtitle: 'Awaken the Rover with print()',
+            storyIntro: 'Deep inside the ancient Digital Gurukul, an autonomous exploration rover named Arya sits powered down. A flashing green terminal awaits your transmission. In Python, programmers use the `print()` command to speak to computers and output text to the console screen.',
+            storyIntroHinglish: 'Digital Gurukul ke andar Arya naam ka autonomous exploration rover band pada hai. Python me computer se baat karne ke liye aur console pe message bhejne ke liye hum `print()` command use karte hain.',
+            conceptExplanation: 'The `print()` function displays text on the screen. Any words enclosed in quotes (like `"Hello"`) are called **Strings**. The parentheses `()` instruct Python to execute the function.',
+            conceptExplanationHinglish: '`print()` function screen par text dikhata hai. Quotes ke andar likhi cheezein `"Hello"` Strings kahlati hain. Parentheses `()` Python ko command execute karne ke liye bolti hain.',
+            codeExample: `print("Hello, World!")
+print("Rover Arya online.")`,
+            codeExampleExplanation: 'Line 1 sends "Hello, World!" to the screen. Line 2 prints a status message on a new line.',
+            interactiveTryStarter: `print("Hello, Gurukul!")
+print("System diagnostic initialized.")`,
+            tryExplanation: 'Click "Run Example" to see how Python executes each line from top to bottom.',
+            xpReward: 30,
+            exercise: {
+              id: 'ex-1-1',
+              type: 'code',
+              title: 'Exercise: Transmit the Beacon Signal',
+              instructions: 'Write a Python program that prints the message: `Beacon Activated`',
+              prompt: 'Use the `print()` function with double quotes around the message.',
+              initialCode: `# Write your print statement below:
+`,
+              solutionCode: `print("Beacon Activated")`,
+              testCases: [
+                {
+                  inputDescription: 'Console outputs "Beacon Activated"',
+                  expectedOutput: 'Beacon Activated',
+                  codeSnippet: 'stdout:Beacon Activated',
+                },
+              ],
+              explanation: 'The `print("Beacon Activated")` statement transmits the string directly to the stdout console.',
+              hints: [
+                'In Python, displaying text requires the print() command.',
+                'Enclose the text in double quotes inside the parentheses: print("...")',
+                'Make sure the spelling and capitalization match: "Beacon Activated"',
+                'Write: print("Beacon Activated")',
+              ],
+              xpReward: 40,
+            },
+          },
+          {
+            id: 'py-less-1-2',
+            chapterId: 'py-ch-1',
+            sequenceOrder: 2,
+            title: 'Lesson 1.2: Numbers vs. Text Strings',
+            subtitle: 'Quotes make strings; raw numbers calculate',
+            storyIntro: 'Rover Arya needs to report both its name and its current radar coordinates. Notice that when you print a number without quotes, Python treats it as a numerical value ready for math!',
+            storyIntroHinglish: 'Rover Arya ko apna naam aur radar coordinates batane hain. Jab aap bina quotes ke number likhte hain, toh Python usko mathematical number manta hai!',
+            conceptExplanation: 'Text inside quotes like `"100"` is a string (characters). A number without quotes like `100` is an integer. You can print multiple items by separating them with commas: `print("Battery:", 100)`.',
+            conceptExplanationHinglish: 'Quotes ke andar `"100"` ek text string hai, jabki bina quotes ke `100` ek integer number hai. Comma laga ke aap ek sath print kar sakte hain.',
+            codeExample: `print("Battery Level:", 100)
+print("Sensors Active:", 4)`,
+            codeExampleExplanation: 'Commas inside print() automatically insert a single space between the arguments.',
+            interactiveTryStarter: `print("Coordinates:", 12, 45)
+print("Status:", "Nominal")`,
+            tryExplanation: 'Run this to see how commas join strings and numbers seamlessly.',
+            xpReward: 30,
+            exercise: {
+              id: 'ex-1-2',
+              type: 'code',
+              title: 'Exercise: Report Rover Telemetry',
+              instructions: 'Print the exact text: `Power: 95` using `print("Power:", 95)` or a combined string.',
+              prompt: 'Transmit the power level to the base station.',
+              initialCode: `# Print the power reading:
+`,
+              solutionCode: `print("Power:", 95)`,
+              testCases: [
+                {
+                  inputDescription: 'Console outputs "Power: 95"',
+                  expectedOutput: 'Power: 95',
+                  codeSnippet: 'stdout:Power: 95',
+                },
+              ],
+              explanation: 'Separating the string "Power:" and the integer 95 with a comma outputs "Power: 95".',
+              hints: [
+                'You can pass multiple items to print() separated by commas.',
+                'The first argument should be "Power:" and the second 95.',
+                'Write: print("Power:", 95)',
+                'Code: print("Power:", 95)',
+              ],
+              xpReward: 40,
+            },
+          },
+        ],
+        bossChallenge: {
+          id: 'boss-ch-1',
+          title: 'Boss Challenge: Rover Initialization Sequence',
+          description: 'Deploy the complete 3-line diagnostic awakening sequence for rover Arya.',
+          objective: 'Print system check, battery, and ready beacon.',
+          starterCode: `# Transmit the 3 diagnostic lines:
+print("SYSTEM: ONLINE")
+`,
+          solutionCode: `print("SYSTEM: ONLINE")
+print("BATTERY: 100")
+print("MISSION: RESCUE")`,
+          testCases: [
+            {
+              inputDescription: 'Outputs SYSTEM: ONLINE',
+              expectedOutput: 'SYSTEM: ONLINE',
+              codeSnippet: 'stdout:SYSTEM: ONLINE',
+            },
+            {
+              inputDescription: 'Outputs BATTERY: 100',
+              expectedOutput: 'BATTERY: 100',
+              codeSnippet: 'stdout:BATTERY: 100',
+            },
+          ],
+          hints: ['Print all 3 status messages matching capitalization.'],
+          xpReward: 100,
+        },
+      },
+      {
+        id: 'py-ch-2',
+        courseId: 'python',
+        chapterNumber: 2,
+        title: 'Chapter 2: Variables & State',
+        conceptName: 'State Memory & Dynamic Values',
+        description: 'Equip rover Arya with persistent variable registers: battery levels, coordinates, and energy storage.',
+        realmName: 'Variable Valley',
+        iconName: 'Cpu',
+        color: '#6C5CE7',
+        lessons: [
+          {
+            id: 'py-less-2-1',
+            chapterId: 'py-ch-2',
+            sequenceOrder: 1,
+            title: 'Lesson 2.1: Declaring Variable Registers',
+            subtitle: 'Assigning values with =',
+            storyIntro: 'An autonomous rover cannot just shout messages; it must remember its battery, coordinates, and health.',
+            storyIntroHinglish: 'Rover ko data yaad rakhne ke liye variables ki zaroorat hoti hai.',
+            conceptExplanation: 'Variables hold values in memory. Create one using `variable_name = value`. Example: `energy = 100`.',
+            conceptExplanationHinglish: 'Variable me value store karne ke liye `name = value` likhte hain.',
+            codeExample: `energy = 100
+rover_name = "Arya"
+print(rover_name, "Energy:", energy)`,
+            codeExampleExplanation: 'Stores 100 in energy and Arya in rover_name.',
+            interactiveTryStarter: `gold = 50
+print("Current Gold:", gold)`,
+            tryExplanation: 'Run to see variable substitution.',
+            xpReward: 30,
+            exercise: {
+              id: 'ex-2-1',
+              type: 'code',
+              title: 'Exercise: Store Rover Battery',
+              instructions: 'Create a variable `battery = 85` and print it using `print("Battery:", battery)`.',
+              prompt: 'Assign 85 to battery and print.',
+              initialCode: `# Declare battery and print:
+`,
+              solutionCode: `battery = 85
+print("Battery:", battery)`,
+              testCases: [
+                {
+                  inputDescription: 'Outputs Battery: 85',
+                  expectedOutput: 'Battery: 85',
+                  codeSnippet: 'stdout:Battery: 85',
+                },
+              ],
+              explanation: 'Variable memory stores integers seamlessly.',
+              hints: ['Write battery = 85', 'Then print("Battery:", battery)'],
+              xpReward: 40,
+            },
+          },
+        ],
+        bossChallenge: {
+          id: 'boss-ch-2',
+          title: 'Boss Challenge: State Register Protocol',
+          description: 'Store multi-state telemetry and output formatted status report.',
+          objective: 'Declare coordinates x and y and output total.',
+          starterCode: `x = 10\ny = 20\n`,
+          solutionCode: `x = 10\ny = 20\nprint("Target:", x + y)`,
+          testCases: [
+            {
+              inputDescription: 'Outputs Target: 30',
+              expectedOutput: 'Target: 30',
+              codeSnippet: 'stdout:Target: 30',
+            },
+          ],
+          hints: ['Add x and y inside print.'],
+          xpReward: 100,
+        },
+      },
+      {
+        id: 'py-ch-3',
+        courseId: 'python',
+        chapterNumber: 3,
+        title: 'Chapter 3: Conditionals & Decisions',
+        conceptName: 'Branching if, elif, else Logic',
+        description: 'Give Arya autonomous decision-making power: detect barriers, check energy thresholds, and avoid hazards.',
+        realmName: 'Conditional Castle',
+        iconName: 'Shield',
+        color: '#6C5CE7',
+        lessons: [
+          {
+            id: 'py-less-3-1',
+            chapterId: 'py-ch-3',
+            sequenceOrder: 1,
+            title: 'Lesson 3.1: The If Statement',
+            subtitle: 'Branching on True or False',
+            storyIntro: 'When rover Arya approaches a deep crater, it must decide: Is it safe to move forward?',
+            storyIntroHinglish: 'Rover ko decision lena hota hai ki rasta safe hai ya nahi.',
+            conceptExplanation: '`if condition:` executes indented code when the condition is True.',
+            conceptExplanationHinglish: '`if condition:` ke andar ka indented code tab chalta hai jab condition True ho.',
+            codeExample: `battery = 45
+if battery > 20:
+    print("Sufficient energy for quest.")`,
+            codeExampleExplanation: 'Since 45 > 20 is True, the indented statement executes.',
+            interactiveTryStarter: `power = 80
+if power >= 50:
+    print("Full thrusters enabled.")`,
+            tryExplanation: 'Test if conditions in Python.',
+            xpReward: 30,
+            exercise: {
+              id: 'ex-3-1',
+              type: 'code',
+              title: 'Exercise: Verify Safety Sensor',
+              instructions: 'Given `distance = 15`, write an `if distance > 10:` check that prints `Clear Path`.',
+              prompt: 'Write an if check with 4-space indentation.',
+              initialCode: `distance = 15
+# Write if statement:
+`,
+              solutionCode: `distance = 15
+if distance > 10:
+    print("Clear Path")`,
+              testCases: [
+                {
+                  inputDescription: 'Outputs Clear Path',
+                  expectedOutput: 'Clear Path',
+                  codeSnippet: 'stdout:Clear Path',
+                },
+              ],
+              explanation: 'Indented code blocks are fundamental to Python syntax.',
+              hints: ['Use if distance > 10:', 'Indent print("Clear Path") with 4 spaces.'],
+              xpReward: 40,
+            },
+          },
+        ],
+        bossChallenge: {
+          id: 'boss-ch-3',
+          title: 'Boss Challenge: Autonomous Obstacle Evasion',
+          description: 'Branch between Safe, Caution, and Danger states.',
+          objective: 'Write complete if/elif/else block.',
+          starterCode: `obstacle_distance = 8\n`,
+          solutionCode: `obstacle_distance = 8
+if obstacle_distance > 10:
+    print("Full Speed")
+else:
+    print("Brakes Engaged")`,
+          testCases: [
+            {
+              inputDescription: 'Outputs Brakes Engaged',
+              expectedOutput: 'Brakes Engaged',
+              codeSnippet: 'stdout:Brakes Engaged',
+            },
+          ],
+          hints: ['Use if and else blocks.'],
+          xpReward: 100,
+        },
+      },
+      {
+        id: 'py-ch-4',
+        courseId: 'python',
+        chapterNumber: 4,
+        title: 'Chapter 4: Loops & Repetition',
+        conceptName: 'For Loops & Range Iteration',
+        description: 'Automate rover wheel revolutions using Python for loops and range(). Navigate long hallways without repeating code.',
+        realmName: 'Loop Lab',
+        iconName: 'RotateCcw',
+        color: '#6C5CE7',
+        lessons: [
+          {
+            id: 'py-less-4-1',
+            chapterId: 'py-ch-4',
+            sequenceOrder: 1,
+            title: 'Lesson 4.1: Counting with for and range()',
+            subtitle: 'Looping through iterations',
+            storyIntro: 'Why write 5 move commands when you can tell Arya to repeat the action 5 times with a single loop?',
+            storyIntroHinglish: '5 baar alag alag command likhne ki jagah for loop se repeat karein.',
+            conceptExplanation: '`for i in range(5):` executes the indented block 5 times, where `i` takes values 0, 1, 2, 3, 4.',
+            conceptExplanationHinglish: '`for i in range(5):` 5 baar loop chalata hai.',
+            codeExample: `for step in range(3):
+    print("Rover moving step:", step)`,
+            codeExampleExplanation: 'Loops 3 times, printing 0, 1, 2.',
+            interactiveTryStarter: `for count in range(4):
+    print("Pulse:", count)`,
+            tryExplanation: 'Run to see loop iteration.',
+            xpReward: 30,
+            exercise: {
+              id: 'ex-4-1',
+              type: 'code',
+              title: 'Exercise: Execute 4 Propulsion Bursts',
+              instructions: 'Write a loop `for step in range(4):` that prints `Burst Active`.',
+              prompt: 'Use for step in range(4): with print.',
+              initialCode: `# Write for loop below:
+`,
+              solutionCode: `for step in range(4):
+    print("Burst Active")`,
+              testCases: [
+                {
+                  inputDescription: 'Outputs Burst Active 4 times',
+                  expectedOutput: 'Burst Active',
+                  codeSnippet: 'stdout:Burst Active',
+                },
+              ],
+              explanation: 'Loops automate repetitive logic seamlessly.',
+              hints: ['Write for step in range(4):', 'Indent print("Burst Active") with 4 spaces.'],
+              xpReward: 40,
+            },
+          },
+        ],
+        bossChallenge: {
+          id: 'boss-ch-4',
+          title: 'Boss Challenge: Rescue the Stranded Rover in Simulator',
+          description: 'Deploy the complete rescue loop in the 2D grid simulator.',
+          objective: 'Test loop in simulator.',
+          starterCode: `print("Rescue loop active")\n`,
+          solutionCode: `for i in range(5):
+    print("Navigating sector")`,
+          testCases: [
+            {
+              inputDescription: 'Loop output verified',
+              expectedOutput: 'Navigating sector',
+              codeSnippet: 'stdout:Navigating sector',
+            },
+          ],
+          hints: ['Use for i in range(5):'],
+          xpReward: 150,
+        },
+      },
+    ],
+  },
+
+  // =========================================================================
   // 1. HTML 101: The Blueprint of the Web (ACTIVE)
   // =========================================================================
   {
@@ -1857,371 +2222,6 @@ btn.addEventListener("click", () => {
             },
           ],
           hints: ['Increment count and assign to display.textContent inside addEventListener.'],
-          xpReward: 150,
-        },
-      },
-    ],
-  },
-
-  // =========================================================================
-  // 4. PYTHON 101: The Python Realm (ACTIVE)
-  // =========================================================================
-  {
-    id: 'python',
-    slug: 'python',
-    title: 'Python: The Python Realm',
-    language: 'Python',
-    level: 'Beginner',
-    tagline: 'Learn real Python programming through code-driven adventure missions.',
-    description: 'Master core programming fundamentals from your first print statement to variables, branching conditions, loops, lists, and reusable functions. Control autonomous rover Arya in interactive 2D simulations.',
-    totalChapters: 8,
-    totalLessons: 18,
-    xpReward: 1200,
-    iconName: 'Terminal',
-    badgeText: 'Fully Playable',
-    badgeColor: 'bg-[#10B981] text-white',
-    isAvailable: true,
-    isComingSoon: false,
-    chapters: [
-      {
-        id: 'py-ch-1',
-        courseId: 'python',
-        chapterNumber: 1,
-        title: 'Chapter 1: Hello World & Syntax',
-        conceptName: 'Text Output & Syntax Fundamentals',
-        description: 'Wake the stranded field rover Arya with your very first code incantation. Learn print(), strings, and case-sensitive syntax.',
-        realmName: 'Starter Village',
-        iconName: 'Sparkles',
-        color: '#6C5CE7',
-        lessons: [
-          {
-            id: 'py-less-1-1',
-            chapterId: 'py-ch-1',
-            sequenceOrder: 1,
-            title: 'Lesson 1.1: The First Incantation',
-            subtitle: 'Awaken the Rover with print()',
-            storyIntro: 'Deep inside the ancient Digital Gurukul, an autonomous exploration rover named Arya sits powered down. A flashing green terminal awaits your transmission. In Python, programmers use the `print()` command to speak to computers and output text to the console screen.',
-            storyIntroHinglish: 'Digital Gurukul ke andar Arya naam ka autonomous exploration rover band pada hai. Python me computer se baat karne ke liye aur console pe message bhejne ke liye hum `print()` command use karte hain.',
-            conceptExplanation: 'The `print()` function displays text on the screen. Any words enclosed in quotes (like `"Hello"`) are called **Strings**. The parentheses `()` instruct Python to execute the function.',
-            conceptExplanationHinglish: '`print()` function screen par text dikhata hai. Quotes ke andar likhi cheezein `"Hello"` Strings kahlati hain. Parentheses `()` Python ko command execute karne ke liye bolti hain.',
-            codeExample: `print("Hello, World!")
-print("Rover Arya online.")`,
-            codeExampleExplanation: 'Line 1 sends "Hello, World!" to the screen. Line 2 prints a status message on a new line.',
-            interactiveTryStarter: `print("Hello, Gurukul!")
-print("System diagnostic initialized.")`,
-            tryExplanation: 'Click "Run Example" to see how Python executes each line from top to bottom.',
-            xpReward: 30,
-            exercise: {
-              id: 'ex-1-1',
-              type: 'code',
-              title: 'Exercise: Transmit the Beacon Signal',
-              instructions: 'Write a Python program that prints the message: `Beacon Activated`',
-              prompt: 'Use the `print()` function with double quotes around the message.',
-              initialCode: `# Write your print statement below:
-`,
-              solutionCode: `print("Beacon Activated")`,
-              testCases: [
-                {
-                  inputDescription: 'Console outputs "Beacon Activated"',
-                  expectedOutput: 'Beacon Activated',
-                  codeSnippet: 'stdout:Beacon Activated',
-                },
-              ],
-              explanation: 'The `print("Beacon Activated")` statement transmits the string directly to the stdout console.',
-              hints: [
-                'In Python, displaying text requires the print() command.',
-                'Enclose the text in double quotes inside the parentheses: print("...")',
-                'Make sure the spelling and capitalization match: "Beacon Activated"',
-                'Write: print("Beacon Activated")',
-              ],
-              xpReward: 40,
-            },
-          },
-          {
-            id: 'py-less-1-2',
-            chapterId: 'py-ch-1',
-            sequenceOrder: 2,
-            title: 'Lesson 1.2: Numbers vs. Text Strings',
-            subtitle: 'Quotes make strings; raw numbers calculate',
-            storyIntro: 'Rover Arya needs to report both its name and its current radar coordinates. Notice that when you print a number without quotes, Python treats it as a numerical value ready for math!',
-            storyIntroHinglish: 'Rover Arya ko apna naam aur radar coordinates batane hain. Jab aap bina quotes ke number likhte hain, toh Python usko mathematical number manta hai!',
-            conceptExplanation: 'Text inside quotes like `"100"` is a string (characters). A number without quotes like `100` is an integer. You can print multiple items by separating them with commas: `print("Battery:", 100)`.',
-            conceptExplanationHinglish: 'Quotes ke andar `"100"` ek text string hai, jabki bina quotes ke `100` ek integer number hai. Comma laga ke aap ek sath print kar sakte hain.',
-            codeExample: `print("Battery Level:", 100)
-print("Sensors Active:", 4)`,
-            codeExampleExplanation: 'Commas inside print() automatically insert a single space between the arguments.',
-            interactiveTryStarter: `print("Coordinates:", 12, 45)
-print("Status:", "Nominal")`,
-            tryExplanation: 'Run this to see how commas join strings and numbers seamlessly.',
-            xpReward: 30,
-            exercise: {
-              id: 'ex-1-2',
-              type: 'code',
-              title: 'Exercise: Report Rover Telemetry',
-              instructions: 'Print the exact text: `Power: 95` using `print("Power:", 95)` or a combined string.',
-              prompt: 'Transmit the power level to the base station.',
-              initialCode: `# Print the power reading:
-`,
-              solutionCode: `print("Power:", 95)`,
-              testCases: [
-                {
-                  inputDescription: 'Console outputs "Power: 95"',
-                  expectedOutput: 'Power: 95',
-                  codeSnippet: 'stdout:Power: 95',
-                },
-              ],
-              explanation: 'Separating the string "Power:" and the integer 95 with a comma outputs "Power: 95".',
-              hints: [
-                'You can pass multiple items to print() separated by commas.',
-                'The first argument should be "Power:" and the second 95.',
-                'Write: print("Power:", 95)',
-                'Code: print("Power:", 95)',
-              ],
-              xpReward: 40,
-            },
-          },
-        ],
-        bossChallenge: {
-          id: 'boss-ch-1',
-          title: 'Boss Challenge: Rover Initialization Sequence',
-          description: 'Deploy the complete 3-line diagnostic awakening sequence for rover Arya.',
-          objective: 'Print system check, battery, and ready beacon.',
-          starterCode: `# Transmit the 3 diagnostic lines:
-print("SYSTEM: ONLINE")
-`,
-          solutionCode: `print("SYSTEM: ONLINE")
-print("BATTERY: 100")
-print("MISSION: RESCUE")`,
-          testCases: [
-            {
-              inputDescription: 'Outputs SYSTEM: ONLINE',
-              expectedOutput: 'SYSTEM: ONLINE',
-              codeSnippet: 'stdout:SYSTEM: ONLINE',
-            },
-            {
-              inputDescription: 'Outputs BATTERY: 100',
-              expectedOutput: 'BATTERY: 100',
-              codeSnippet: 'stdout:BATTERY: 100',
-            },
-          ],
-          hints: ['Print all 3 status messages matching capitalization.'],
-          xpReward: 100,
-        },
-      },
-      {
-        id: 'py-ch-2',
-        courseId: 'python',
-        chapterNumber: 2,
-        title: 'Chapter 2: Variables & State',
-        conceptName: 'State Memory & Dynamic Values',
-        description: 'Equip rover Arya with persistent variable registers: battery levels, coordinates, and energy storage.',
-        realmName: 'Variable Valley',
-        iconName: 'Cpu',
-        color: '#6C5CE7',
-        lessons: [
-          {
-            id: 'py-less-2-1',
-            chapterId: 'py-ch-2',
-            sequenceOrder: 1,
-            title: 'Lesson 2.1: Declaring Variable Registers',
-            subtitle: 'Assigning values with =',
-            storyIntro: 'An autonomous rover cannot just shout messages; it must remember its battery, coordinates, and health.',
-            storyIntroHinglish: 'Rover ko data yaad rakhne ke liye variables ki zaroorat hoti hai.',
-            conceptExplanation: 'Variables hold values in memory. Create one using `variable_name = value`. Example: `energy = 100`.',
-            conceptExplanationHinglish: 'Variable me value store karne ke liye `name = value` likhte hain.',
-            codeExample: `energy = 100
-rover_name = "Arya"
-print(rover_name, "Energy:", energy)`,
-            codeExampleExplanation: 'Stores 100 in energy and Arya in rover_name.',
-            interactiveTryStarter: `gold = 50
-print("Current Gold:", gold)`,
-            tryExplanation: 'Run to see variable substitution.',
-            xpReward: 30,
-            exercise: {
-              id: 'ex-2-1',
-              type: 'code',
-              title: 'Exercise: Store Rover Battery',
-              instructions: 'Create a variable `battery = 85` and print it using `print("Battery:", battery)`.',
-              prompt: 'Assign 85 to battery and print.',
-              initialCode: `# Declare battery and print:
-`,
-              solutionCode: `battery = 85
-print("Battery:", battery)`,
-              testCases: [
-                {
-                  inputDescription: 'Outputs Battery: 85',
-                  expectedOutput: 'Battery: 85',
-                  codeSnippet: 'stdout:Battery: 85',
-                },
-              ],
-              explanation: 'Variable memory stores integers seamlessly.',
-              hints: ['Write battery = 85', 'Then print("Battery:", battery)'],
-              xpReward: 40,
-            },
-          },
-        ],
-        bossChallenge: {
-          id: 'boss-ch-2',
-          title: 'Boss Challenge: State Register Protocol',
-          description: 'Store multi-state telemetry and output formatted status report.',
-          objective: 'Declare coordinates x and y and output total.',
-          starterCode: `x = 10\ny = 20\n`,
-          solutionCode: `x = 10\ny = 20\nprint("Target:", x + y)`,
-          testCases: [
-            {
-              inputDescription: 'Outputs Target: 30',
-              expectedOutput: 'Target: 30',
-              codeSnippet: 'stdout:Target: 30',
-            },
-          ],
-          hints: ['Add x and y inside print.'],
-          xpReward: 100,
-        },
-      },
-      {
-        id: 'py-ch-3',
-        courseId: 'python',
-        chapterNumber: 3,
-        title: 'Chapter 3: Conditionals & Decisions',
-        conceptName: 'Branching if, elif, else Logic',
-        description: 'Give Arya autonomous decision-making power: detect barriers, check energy thresholds, and avoid hazards.',
-        realmName: 'Conditional Castle',
-        iconName: 'Shield',
-        color: '#6C5CE7',
-        lessons: [
-          {
-            id: 'py-less-3-1',
-            chapterId: 'py-ch-3',
-            sequenceOrder: 1,
-            title: 'Lesson 3.1: The If Statement',
-            subtitle: 'Branching on True or False',
-            storyIntro: 'When rover Arya approaches a deep crater, it must decide: Is it safe to move forward?',
-            storyIntroHinglish: 'Rover ko decision lena hota hai ki rasta safe hai ya nahi.',
-            conceptExplanation: '`if condition:` executes indented code when the condition is True.',
-            conceptExplanationHinglish: '`if condition:` ke andar ka indented code tab chalta hai jab condition True ho.',
-            codeExample: `battery = 45
-if battery > 20:
-    print("Sufficient energy for quest.")`,
-            codeExampleExplanation: 'Since 45 > 20 is True, the indented statement executes.',
-            interactiveTryStarter: `power = 80
-if power >= 50:
-    print("Full thrusters enabled.")`,
-            tryExplanation: 'Test if conditions in Python.',
-            xpReward: 30,
-            exercise: {
-              id: 'ex-3-1',
-              type: 'code',
-              title: 'Exercise: Verify Safety Sensor',
-              instructions: 'Given `distance = 15`, write an `if distance > 10:` check that prints `Clear Path`.',
-              prompt: 'Write an if check with 4-space indentation.',
-              initialCode: `distance = 15
-# Write if statement:
-`,
-              solutionCode: `distance = 15
-if distance > 10:
-    print("Clear Path")`,
-              testCases: [
-                {
-                  inputDescription: 'Outputs Clear Path',
-                  expectedOutput: 'Clear Path',
-                  codeSnippet: 'stdout:Clear Path',
-                },
-              ],
-              explanation: 'Indented code blocks are fundamental to Python syntax.',
-              hints: ['Use if distance > 10:', 'Indent print("Clear Path") with 4 spaces.'],
-              xpReward: 40,
-            },
-          },
-        ],
-        bossChallenge: {
-          id: 'boss-ch-3',
-          title: 'Boss Challenge: Autonomous Obstacle Evasion',
-          description: 'Branch between Safe, Caution, and Danger states.',
-          objective: 'Write complete if/elif/else block.',
-          starterCode: `obstacle_distance = 8\n`,
-          solutionCode: `obstacle_distance = 8
-if obstacle_distance > 10:
-    print("Full Speed")
-else:
-    print("Brakes Engaged")`,
-          testCases: [
-            {
-              inputDescription: 'Outputs Brakes Engaged',
-              expectedOutput: 'Brakes Engaged',
-              codeSnippet: 'stdout:Brakes Engaged',
-            },
-          ],
-          hints: ['Use if and else blocks.'],
-          xpReward: 100,
-        },
-      },
-      {
-        id: 'py-ch-4',
-        courseId: 'python',
-        chapterNumber: 4,
-        title: 'Chapter 4: Loops & Repetition',
-        conceptName: 'For Loops & Range Iteration',
-        description: 'Automate rover wheel revolutions using Python for loops and range(). Navigate long hallways without repeating code.',
-        realmName: 'Loop Lab',
-        iconName: 'RotateCcw',
-        color: '#6C5CE7',
-        lessons: [
-          {
-            id: 'py-less-4-1',
-            chapterId: 'py-ch-4',
-            sequenceOrder: 1,
-            title: 'Lesson 4.1: Counting with for and range()',
-            subtitle: 'Looping through iterations',
-            storyIntro: 'Why write 5 move commands when you can tell Arya to repeat the action 5 times with a single loop?',
-            storyIntroHinglish: '5 baar alag alag command likhne ki jagah for loop se repeat karein.',
-            conceptExplanation: '`for i in range(5):` executes the indented block 5 times, where `i` takes values 0, 1, 2, 3, 4.',
-            conceptExplanationHinglish: '`for i in range(5):` 5 baar loop chalata hai.',
-            codeExample: `for step in range(3):
-    print("Rover moving step:", step)`,
-            codeExampleExplanation: 'Loops 3 times, printing 0, 1, 2.',
-            interactiveTryStarter: `for count in range(4):
-    print("Pulse:", count)`,
-            tryExplanation: 'Run to see loop iteration.',
-            xpReward: 30,
-            exercise: {
-              id: 'ex-4-1',
-              type: 'code',
-              title: 'Exercise: Execute 4 Propulsion Bursts',
-              instructions: 'Write a loop `for step in range(4):` that prints `Burst Active`.',
-              prompt: 'Use for step in range(4): with print.',
-              initialCode: `# Write for loop below:
-`,
-              solutionCode: `for step in range(4):
-    print("Burst Active")`,
-              testCases: [
-                {
-                  inputDescription: 'Outputs Burst Active 4 times',
-                  expectedOutput: 'Burst Active',
-                  codeSnippet: 'stdout:Burst Active',
-                },
-              ],
-              explanation: 'Loops automate repetitive logic seamlessly.',
-              hints: ['Write for step in range(4):', 'Indent print("Burst Active") with 4 spaces.'],
-              xpReward: 40,
-            },
-          },
-        ],
-        bossChallenge: {
-          id: 'boss-ch-4',
-          title: 'Boss Challenge: Rescue the Stranded Rover in Simulator',
-          description: 'Deploy the complete rescue loop in the 2D grid simulator.',
-          objective: 'Test loop in simulator.',
-          starterCode: `print("Rescue loop active")\n`,
-          solutionCode: `for i in range(5):
-    print("Navigating sector")`,
-          testCases: [
-            {
-              inputDescription: 'Loop output verified',
-              expectedOutput: 'Navigating sector',
-              codeSnippet: 'stdout:Navigating sector',
-            },
-          ],
-          hints: ['Use for i in range(5):'],
           xpReward: 150,
         },
       },

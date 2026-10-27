@@ -52,7 +52,7 @@ export const AVAILABLE_SUBJECTS: SubjectMetadata[] = [
   {
     id: 'python',
     name: 'Python',
-    title: 'Python: The Python Realm',
+    title: 'Python: The Python Course',
     slug: 'python',
     category: 'Programming',
     icon: 'Terminal',

@@ -189,7 +189,7 @@ export default function HomePage() {
     });
 
     if (res.success && res.user) {
-      setAuthSuccess(`Welcome back, ${res.user.name}! Entering your learning realm...`);
+      setAuthSuccess(`Welcome back, ${res.user.name}! Entering your learning adventure...`);
       setActiveSession(res.user, res.session);
       window.dispatchEvent(new Event('dronacharya_session_change'));
       window.dispatchEvent(new Event('storage'));
@@ -279,12 +279,14 @@ export default function HomePage() {
   const activeFirstLessonId =
     activeSubjectCourse.chapters[0]?.lessons[0]?.id || `${activeSubjectCourse.id}-less-1-1`;
 
-  // Filtered courses for Journey section
-  const displayedCourses = COURSES_CATALOG.filter((c) => {
-    if (journeyFilter === 'active') return !c.isComingSoon;
-    if (journeyFilter === 'coming') return c.isComingSoon;
-    return true;
-  });
+  // Filtered courses for Journey section (Python prioritized at the top)
+  const displayedCourses = [...COURSES_CATALOG]
+    .sort((a, b) => (a.id === 'python' ? -1 : b.id === 'python' ? 1 : 0))
+    .filter((c) => {
+      if (journeyFilter === 'active') return !c.isComingSoon;
+      if (journeyFilter === 'coming') return c.isComingSoon;
+      return true;
+    });
 
   return (
     <div className="w-full flex flex-col items-center text-[#1E1E24] overflow-x-hidden">
@@ -471,7 +473,7 @@ export default function HomePage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <span className="text-xs font-black uppercase tracking-wider text-[#6C5CE7] bg-[#EDE9FE] px-3 py-1 rounded-full border border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24]">
-              Curriculum Realms
+              Curriculum Courses
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2">
               Explore 250+ hours of free interactive coding lessons.
@@ -491,7 +493,7 @@ export default function HomePage() {
                   : 'text-[#4A4A58] hover:text-[#1E1E24]'
               }`}
             >
-              All Realms
+              All Courses
             </button>
             <button
               onClick={() => setJourneyFilter('active')}
@@ -548,7 +550,7 @@ export default function HomePage() {
                         </span>
                       ) : (
                         <span className="text-[10px] font-pixel text-emerald-800 bg-[#DCFCE7] px-2.5 py-1 rounded-md border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
-                          ACTIVE REALM
+                          ACTIVE COURSE
                         </span>
                       )}
                     </div>

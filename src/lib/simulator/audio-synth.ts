@@ -222,4 +222,99 @@ export const DungeonSound = {
       });
     } catch {}
   },
+
+  // 8. Gem / Item Pickup (high-pitched twinkling chime)
+  playCollect: () => {
+    if (isAudioMuted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const notes = [987.77, 1318.51, 1567.98]; // B5, E6, G6
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const startTime = ctx.currentTime + i * 0.05;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0.12, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + 0.13);
+      });
+    } catch {}
+  },
+
+  // 9. Spell Fizzle / Traceback Error (downturned comic error buzzer)
+  playSpellFizzle: () => {
+    if (isAudioMuted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(320, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.28);
+
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch {}
+  },
+
+  // 10. Switch / Lever Click (mechanical ratchet sound)
+  playSwitch: () => {
+    if (isAudioMuted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.setValueAtTime(900, ctx.currentTime + 0.03);
+
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.09);
+    } catch {}
+  },
+
+  // 11. Heal / Mana Crystal (soothing ascending sine wave)
+  playHeal: () => {
+    if (isAudioMuted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.25);
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.26);
+    } catch {}
+  },
 };

@@ -1,4 +1,5 @@
-// Dronacharya Code Dungeon & Craft Realm: Main Split-Screen Interactive Game Page
+// Dronacharya Code Dungeon: The Python Chronicles
+// Interactive 2D/2.5D RPG Game-Based Learning Environment
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,79 +10,121 @@ import {
   getActiveSession,
   getGuestSession,
   deductHeart,
-  restoreHearts,
   RegisteredUser,
 } from '@/lib/db/auth-db';
 import {
-  DUNGEON_FLOORS,
-  DungeonFloorSpec,
+  DUNGEON_CAMPAIGN_LEVELS,
+  DungeonCampaignLevel,
   TileData,
   Direction,
-  DungeonInventory,
-  DungeonSimulationFrame,
-  DungeonSimulationResult,
-  executeDungeonCode,
-  CraftingRecipe,
+  GameFrame,
+  EnemyEntity,
+  GemEntity,
+  SwitchEntity,
+  GateEntity,
+  CrystalEntity,
 } from '@/lib/simulator/dungeon-engine';
+import {
+  executeDungeonPythonCode,
+  initPyodide,
+  isPyodideLoaded,
+} from '@/lib/simulator/dungeon-python-bridge';
 import { DungeonSound } from '@/lib/simulator/audio-synth';
 import { DungeonCanvas } from '@/components/game/DungeonCanvas';
 import { DungeonTopHud } from '@/components/game/DungeonTopHud';
 import { DungeonCodeEditor } from '@/components/game/DungeonCodeEditor';
-import { CraftingModal } from '@/components/game/CraftingModal';
 import { DungeonVictoryModal } from '@/components/game/DungeonVictoryModal';
-import { ArrowLeft, Gamepad2, Sparkles, HelpCircle } from 'lucide-react';
+import { AcharyaDrawer } from '@/components/mentor/AcharyaDrawer';
+import {
+  ArrowLeft,
+  Gamepad2,
+  Sparkles,
+  BookOpen,
+  Award,
+  Zap,
+} from 'lucide-react';
 
 export default function DungeonPage() {
   const router = useRouter();
-  const { state, completeDungeonFloor } = useDronacharya();
+  const { state } = useDronacharya();
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
 
-  // Active Floor & Spec
-  const [currentFloor, setCurrentFloor] = useState<number>(1);
-  const floorSpec: DungeonFloorSpec = DUNGEON_FLOORS[currentFloor] || DUNGEON_FLOORS[1];
+  // Active Level (1 to 5)
+  const [currentLevelNumber, setCurrentLevelNumber] = useState<number>(1);
+  const currentLevel: DungeonCampaignLevel =
+    DUNGEON_CAMPAIGN_LEVELS[currentLevelNumber] || DUNGEON_CAMPAIGN_LEVELS[1];
 
-  // Game Grid & Avatar State
-  const [tiles, setTiles] = useState<TileData[]>(floorSpec.initialTiles);
-  const [heroX, setHeroX] = useState<number>(floorSpec.startX);
-  const [heroY, setHeroY] = useState<number>(floorSpec.startY);
-  const [facing, setFacing] = useState<Direction>(floorSpec.startFacing);
-  const [heroHp, setHeroHp] = useState<number>(3);
-  const [inventory, setInventory] = useState<DungeonInventory>({ ...floorSpec.initialInventory });
+  // World & Grid State
+  const [tiles, setTiles] = useState<TileData[]>([]);
+  const [heroX, setHeroX] = useState<number>(currentLevel.startX);
+  const [heroY, setHeroY] = useState<number>(currentLevel.startY);
+  const [facing, setFacing] = useState<Direction>(currentLevel.startFacing);
+  const [heroHp, setHeroHp] = useState<number>(100);
+  const [gemsCount, setGemsCount] = useState<number>(0);
   const [completedGoals, setCompletedGoals] = useState<Record<string, boolean>>({});
-  const [bossHp, setBossHp] = useState<number>(floorSpec.bossData ? floorSpec.bossData.hp : 100);
+
+  const [enemies, setEnemies] = useState<EnemyEntity[]>([]);
+  const [gems, setGems] = useState<GemEntity[]>([]);
+  const [switches, setSwitches] = useState<SwitchEntity[]>([]);
+  const [gates, setGates] = useState<GateEntity[]>([]);
+  const [crystals, setCrystals] = useState<CrystalEntity[]>([]);
 
   // Code & Execution State
-  const [code, setCode] = useState<string>(floorSpec.initialCode);
+  const [code, setCode] = useState<string>(currentLevel.initialCode);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [speed, setSpeed] = useState<1 | 2>(1);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [speed, setSpeed] = useState<1 | 2 | 4>(1);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [activeFrame, setActiveFrame] = useState<DungeonSimulationFrame | null>(null);
+  const [activeFrame, setActiveFrame] = useState<GameFrame | null>(null);
   const [pathTrail, setPathTrail] = useState<{ x: number; y: number }[]>([]);
   const [logs, setConsoleLogs] = useState<string[]>([
-    `⚔️ Entered ${floorSpec.title}.`,
-    '💡 Spellbook initialized. Write code and press "Run Code ▶".',
+    `⚔️ Welcome to Level ${currentLevel.levelNumber}: ${currentLevel.title}`,
+    `💡 ${currentLevel.concept}`,
+    '🐍 Python 3 Spellbook initialized. Write code and press "Run Code ▶".',
   ]);
-  const [diagnostic, setDiagnostic] = useState<DungeonSimulationResult['diagnostic'] | undefined>(undefined);
+  const [diagnostic, setDiagnostic] = useState<any>(undefined);
+  const [isPyodideActive, setIsPyodideActive] = useState<boolean>(false);
 
-  // Step-by-step Frame Queue Debugger
-  const simulationFramesRef = useRef<DungeonSimulationFrame[]>([]);
+  // Star ratings per level (persisted in localStorage)
+  const [levelStars, setLevelStars] = useState<Record<number, number>>({});
+
+  // Simulation Frame Buffer & Animation Timers
+  const simulationFramesRef = useRef<GameFrame[]>([]);
   const currentFrameIdxRef = useRef<number>(0);
   const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Modals
-  const [craftModalOpen, setCraftModalOpen] = useState(false);
+  // Victory Modal State
   const [victoryModalOpen, setVictoryModalOpen] = useState(false);
   const [awardedXp, setAwardedXp] = useState(0);
+  const [earnedStars, setEarnedStars] = useState<1 | 2 | 3>(3);
+  const [lastCodeLines, setLastCodeLines] = useState<number>(0);
 
-  // Initialize and sync user
+  // Acharya AI Mentor Drawer State
+  const [mentorDrawerOpen, setMentorDrawerOpen] = useState(false);
+  const [mentorErrorContext, setMentorErrorContext] = useState<string>('');
+
+  // 1. Initialize user, audio, and load Pyodide on mount
   useEffect(() => {
     setIsMuted(DungeonSound.isMuted());
+
     const syncUser = () => {
       const active = getActiveSession();
       if (active) setCurrentUser(active);
       else setCurrentUser(getGuestSession());
     };
     syncUser();
+
+    // Load saved stars
+    try {
+      const saved = localStorage.getItem('dronacharya_dungeon_stars');
+      if (saved) setLevelStars(JSON.parse(saved));
+    } catch {}
+
+    // Preload Pyodide in background
+    initPyodide().then((instance) => {
+      if (instance) setIsPyodideActive(true);
+    });
+
     window.addEventListener('dronacharya_session_change', syncUser);
     return () => {
       window.removeEventListener('dronacharya_session_change', syncUser);
@@ -89,58 +132,130 @@ export default function DungeonPage() {
     };
   }, []);
 
-  // Floor reset handler
-  const loadFloor = (floorNum: number) => {
+  // 2. Load and reset level
+  const loadLevel = (lvlNum: number) => {
     if (animationTimerRef.current) clearInterval(animationTimerRef.current);
-    const spec = DUNGEON_FLOORS[floorNum] || DUNGEON_FLOORS[1];
-    setCurrentFloor(floorNum);
+    const spec = DUNGEON_CAMPAIGN_LEVELS[lvlNum] || DUNGEON_CAMPAIGN_LEVELS[1];
+
+    setCurrentLevelNumber(lvlNum);
     setTiles(spec.initialTiles.map((t) => ({ ...t })));
     setHeroX(spec.startX);
     setHeroY(spec.startY);
     setFacing(spec.startFacing);
-    setHeroHp(3);
-    setInventory({ ...spec.initialInventory });
+    setHeroHp(100);
+    setGemsCount(0);
+    setCompletedGoals({});
+
+    setEnemies(spec.enemies.map((e) => ({ ...e })));
+    setGems(spec.gems.map((g) => ({ ...g })));
+    setSwitches(spec.switches.map((s) => ({ ...s })));
+    setGates(spec.gates.map((g) => ({ ...g })));
+    setCrystals(spec.crystals.map((c) => ({ ...c })));
+
     setCode(spec.initialCode);
     setIsRunning(false);
+    setIsPaused(false);
     setActiveFrame(null);
     setPathTrail([{ x: spec.startX, y: spec.startY }]);
     setConsoleLogs([
-      `⚔️ Loaded ${spec.title} (${spec.realmName}).`,
-      '💡 Ready for Python/JS command execution.',
+      `⚔️ Level ${spec.levelNumber}: ${spec.title} loaded.`,
+      `💡 Concept: ${spec.concept}`,
+      `🎯 3-Star Goal: Complete in under ${spec.parLines} lines of Python code!`,
     ]);
     setDiagnostic(undefined);
     setVictoryModalOpen(false);
-    setCompletedGoals({});
-    setBossHp(spec.bossData ? spec.bossData.hp : 100);
     simulationFramesRef.current = [];
     currentFrameIdxRef.current = 0;
   };
 
-  // Run full simulation
-  const handleRunCode = () => {
+  // Initial level setup
+  useEffect(() => {
+    loadLevel(currentLevelNumber);
+  }, [currentLevelNumber]);
+
+  // 3. Frame playback stepper
+  const applyFrame = (frame: GameFrame) => {
+    setActiveFrame(frame);
+    setHeroX(frame.toPos.x);
+    setHeroY(frame.toPos.y);
+    setFacing(frame.facing);
+    setHeroHp(frame.heroHp);
+    if (frame.gemsCount !== undefined) setGemsCount(frame.gemsCount);
+    setPathTrail((prev) => [...prev, { x: frame.toPos.x, y: frame.toPos.y }]);
+
+    // Mutate tiles
+    if (frame.tileMutations) {
+      setTiles((prev) => {
+        const next = [...prev];
+        frame.tileMutations?.forEach((mut) => {
+          const found = next.find((t) => t.x === mut.x && t.y === mut.y);
+          if (found) found.type = mut.newType;
+        });
+        return next;
+      });
+    }
+
+    // Play sound FX
+    if (frame.soundToPlay) {
+      switch (frame.soundToPlay) {
+        case 'move':
+          DungeonSound.playMove();
+          break;
+        case 'attack':
+          DungeonSound.playAttack();
+          break;
+        case 'collect':
+          DungeonSound.playCollect();
+          break;
+        case 'switch':
+          DungeonSound.playSwitch();
+          break;
+        case 'heal':
+          DungeonSound.playHeal();
+          break;
+        case 'damage':
+          DungeonSound.playDamage();
+          break;
+        case 'fizzle':
+          DungeonSound.playSpellFizzle();
+          break;
+        case 'victory':
+          DungeonSound.playVictory();
+          break;
+      }
+    }
+  };
+
+  // 4. Run Code Simulation
+  const handleRunCode = async () => {
     if (isRunning) return;
 
-    // Reset board before re-executing
-    const spec = DUNGEON_FLOORS[currentFloor];
-    const initialClone = spec.initialTiles.map((t) => ({ ...t }));
-    setTiles(initialClone);
+    // Reset world entities before run
+    const spec = DUNGEON_CAMPAIGN_LEVELS[currentLevelNumber];
+    setTiles(spec.initialTiles.map((t) => ({ ...t })));
     setHeroX(spec.startX);
     setHeroY(spec.startY);
     setFacing(spec.startFacing);
-    setHeroHp(3);
-    setInventory({ ...spec.initialInventory });
+    setHeroHp(100);
+    setGemsCount(0);
     setPathTrail([{ x: spec.startX, y: spec.startY }]);
+    setEnemies(spec.enemies.map((e) => ({ ...e })));
+    setGems(spec.gems.map((g) => ({ ...g })));
+    setSwitches(spec.switches.map((s) => ({ ...s })));
+    setGates(spec.gates.map((g) => ({ ...g })));
+    setCrystals(spec.crystals.map((c) => ({ ...c })));
 
-    // Execute code through deterministic state machine
-    const result = executeDungeonCode(currentFloor, code, initialClone);
+    // Execute Python script
+    const result = await executeDungeonPythonCode(spec, code);
     simulationFramesRef.current = result.frames;
     currentFrameIdxRef.current = 0;
     setConsoleLogs(result.logs);
     setDiagnostic(result.diagnostic);
     setIsRunning(true);
+    setIsPaused(false);
+    setLastCodeLines(result.codeLines);
 
-    const tickDelay = speed === 1 ? 250 : 125;
-
+    const delayMs = speed === 1 ? 240 : speed === 2 ? 120 : 60;
     if (animationTimerRef.current) clearInterval(animationTimerRef.current);
 
     animationTimerRef.current = setInterval(() => {
@@ -148,14 +263,27 @@ export default function DungeonPage() {
         if (animationTimerRef.current) clearInterval(animationTimerRef.current);
         setIsRunning(false);
 
-        // Apply final goals & check victory
+        // Apply completed goals
         setCompletedGoals(result.completedGoals);
 
         if (result.success) {
           DungeonSound.playVictory();
           const xp = spec.xpReward;
           setAwardedXp(xp);
-          completeDungeonFloor(currentFloor, xp);
+          setEarnedStars(result.starsEarned);
+
+          // Save star rating
+          setLevelStars((prev) => {
+            const next = {
+              ...prev,
+              [currentLevelNumber]: Math.max(prev[currentLevelNumber] || 0, result.starsEarned),
+            };
+            try {
+              localStorage.setItem('dronacharya_dungeon_stars', JSON.stringify(next));
+            } catch {}
+            return next;
+          });
+
           setVictoryModalOpen(true);
         } else if (result.finalHp <= 0) {
           deductHeart();
@@ -165,115 +293,42 @@ export default function DungeonPage() {
 
       const frame = simulationFramesRef.current[currentFrameIdxRef.current];
       currentFrameIdxRef.current += 1;
-
-      // Apply frame state
-      setActiveFrame(frame);
-      setHeroX(frame.x);
-      setHeroY(frame.y);
-      setFacing(frame.facing);
-      setHeroHp(frame.hp);
-      setInventory(frame.inventory);
-      setPathTrail((prev) => [...prev, { x: frame.x, y: frame.y }]);
-
-      // Mutate tiles if frame specifies
-      if (frame.tileMutations) {
-        setTiles((prev) => {
-          const next = [...prev];
-          frame.tileMutations?.forEach((mut) => {
-            const found = next.find((t) => t.x === mut.x && t.y === mut.y);
-            if (found) found.type = mut.newType;
-          });
-          return next;
-        });
-      }
-
-      // Play matching Web Audio sound
-      if (frame.soundToPlay) {
-        switch (frame.soundToPlay) {
-          case 'move':
-            DungeonSound.playMove();
-            break;
-          case 'mine':
-            DungeonSound.playMine();
-            break;
-          case 'craft':
-            DungeonSound.playCraft();
-            break;
-          case 'place':
-            DungeonSound.playPlace();
-            break;
-          case 'attack':
-            DungeonSound.playAttack();
-            break;
-          case 'damage':
-            DungeonSound.playDamage();
-            break;
-          case 'victory':
-            DungeonSound.playVictory();
-            break;
-        }
-      }
-    }, tickDelay);
+      applyFrame(frame);
+    }, delayMs);
   };
 
-  // Step Forward debugger
-  const handleStepForward = () => {
+  // 5. Step Forward (1 Tick)
+  const handleStepForward = async () => {
     if (simulationFramesRef.current.length === 0) {
-      // Calculate frames first
-      const spec = DUNGEON_FLOORS[currentFloor];
-      const initialClone = spec.initialTiles.map((t) => ({ ...t }));
-      const result = executeDungeonCode(currentFloor, code, initialClone);
+      const spec = DUNGEON_CAMPAIGN_LEVELS[currentLevelNumber];
+      const result = await executeDungeonPythonCode(spec, code);
       simulationFramesRef.current = result.frames;
       currentFrameIdxRef.current = 0;
       setConsoleLogs(result.logs);
       setDiagnostic(result.diagnostic);
+      setLastCodeLines(result.codeLines);
     }
 
     if (currentFrameIdxRef.current < simulationFramesRef.current.length) {
       const frame = simulationFramesRef.current[currentFrameIdxRef.current];
       currentFrameIdxRef.current += 1;
-
-      setActiveFrame(frame);
-      setHeroX(frame.x);
-      setHeroY(frame.y);
-      setFacing(frame.facing);
-      setHeroHp(frame.hp);
-      setInventory(frame.inventory);
-      setPathTrail((prev) => [...prev, { x: frame.x, y: frame.y }]);
-
-      if (frame.tileMutations) {
-        setTiles((prev) => {
-          const next = [...prev];
-          frame.tileMutations?.forEach((mut) => {
-            const found = next.find((t) => t.x === mut.x && t.y === mut.y);
-            if (found) found.type = mut.newType;
-          });
-          return next;
-        });
-      }
-
-      if (frame.soundToPlay) {
-        DungeonSound.playMove();
-      }
+      applyFrame(frame);
     }
   };
 
-  // Craft item from manual recipe book
-  const handleCraftItem = (recipe: CraftingRecipe) => {
-    setInventory((prev) => {
-      const next = { ...prev };
-      Object.entries(recipe.requirements).forEach(([item, reqCount]) => {
-        const k = item as keyof DungeonInventory;
-        next[k] = Math.max(0, next[k] - (reqCount || 0));
-      });
-      next[recipe.id] += recipe.resultCount;
-      return next;
-    });
+  // 6. Pause / Resume
+  const handlePause = () => {
+    if (animationTimerRef.current) {
+      clearInterval(animationTimerRef.current);
+      animationTimerRef.current = null;
+      setIsPaused(true);
+      setIsRunning(false);
+    }
+  };
 
-    setConsoleLogs((prev) => [
-      ...prev,
-      `🔨 Manually crafted ${recipe.name}! (+${recipe.resultCount})`,
-    ]);
+  // Speed Toggle
+  const handleToggleSpeed = () => {
+    setSpeed((prev) => (prev === 1 ? 2 : prev === 2 ? 4 : 1));
   };
 
   const handleToggleMute = () => {
@@ -281,9 +336,18 @@ export default function DungeonPage() {
     setIsMuted(next);
   };
 
+  // Deep Context Sync with Acharya AI Mentor
+  const handleAskMentorHelp = (studentCode: string, errorSummary?: string) => {
+    setMentorErrorContext(
+      errorSummary ||
+        `Level ${currentLevelNumber}: "${currentLevel.title}" failure. Code line count: ${lastCodeLines}. Objectives incomplete.`
+    );
+    setMentorDrawerOpen(true);
+  };
+
   return (
     <div className="w-full min-h-screen bg-[#FAF6EE] text-[#1E1E24] px-3 sm:px-6 py-6 max-w-7xl mx-auto space-y-6">
-      {/* 0. Breadcrumb & Back Navigation */}
+      {/* 0. Top Navigation & Breadcrumb */}
       <div className="flex items-center justify-between">
         <Link
           href="/dashboard"
@@ -294,9 +358,17 @@ export default function DungeonPage() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleAskMentorHelp(code, diagnostic?.summary)}
+            className="btn-arcade text-xs py-2 px-3.5 btn-arcade-yellow flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] font-black"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#6C5CE7] fill-current" />
+            <span>Ask Acharya Mentor</span>
+          </button>
+
           <Link
             href="/simulator"
-            className="text-xs font-bold text-[#6C5CE7] hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[#6C5CE7] hover:underline flex items-center gap-1 hidden sm:flex"
           >
             <Gamepad2 className="w-3.5 h-3.5" />
             <span>Practice Simulator</span>
@@ -306,82 +378,97 @@ export default function DungeonPage() {
 
       {/* 1. Top HUD Ribbon */}
       <DungeonTopHud
-        floorSpec={floorSpec}
-        currentFloor={currentFloor}
-        onSelectFloor={loadFloor}
+        currentLevel={currentLevel}
+        levelNumber={currentLevelNumber}
+        onSelectLevel={loadLevel}
         hp={heroHp}
+        maxHp={100}
         xp={currentUser?.totalXp || state.user.totalXp}
-        level={currentUser?.level || 1}
-        inventory={inventory}
+        playerLevel={currentUser?.level || 1}
+        gemsCount={gemsCount}
         completedGoals={completedGoals}
-        onOpenCraftingModal={() => setCraftModalOpen(true)}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
+        levelStars={levelStars}
       />
 
-      {/* 2. Main Split-Screen Gameplay Arena (Desktop: Left 55%, Right 45%) */}
+      {/* 2. Main Split-Screen Gameplay Arena (Desktop: Left 55% Stage, Right 45% Code Editor) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Pane (55% width): 2D Grid / Voxel Canvas */}
+        {/* Left Pane (55% width): 2D/2.5D Dungeon Canvas Stage */}
         <div className="lg:col-span-7 flex flex-col items-center">
           <DungeonCanvas
+            gridWidth={currentLevel.gridWidth}
+            gridHeight={currentLevel.gridHeight}
             tiles={tiles}
             heroX={heroX}
             heroY={heroY}
             facing={facing}
             heroHp={heroHp}
+            maxHp={100}
             activeFrame={activeFrame}
             pathTrail={pathTrail}
             isAnimating={isRunning}
-            bossHp={bossHp}
+            enemies={enemies}
+            gems={gems}
+            switches={switches}
+            gates={gates}
+            crystals={crystals}
             onQuickInsertCode={(snippet) => {
               setCode((prev) => prev + (prev.endsWith('\n') ? '' : '\n') + snippet + '\n');
             }}
           />
         </div>
 
-        {/* Right Pane (45% width): Spellbook Code Editor & Socratic Acharya AI */}
+        {/* Right Pane (45% width): Real Python 3 Spellbook Editor & Combat Console */}
         <div className="lg:col-span-5 flex flex-col">
           <DungeonCodeEditor
             code={code}
             onChangeCode={setCode}
             isRunning={isRunning}
+            isPaused={isPaused}
             onRunCode={handleRunCode}
             onStepForward={handleStepForward}
-            onResetFloor={() => loadFloor(currentFloor)}
+            onPause={handlePause}
+            onResetLevel={() => loadLevel(currentLevelNumber)}
             speed={speed}
-            onToggleSpeed={() => setSpeed(speed === 1 ? 2 : 1)}
+            onToggleSpeed={handleToggleSpeed}
             logs={logs}
             diagnostic={diagnostic}
-            floorNumber={currentFloor}
-            inventory={inventory}
-            onCraftItem={handleCraftItem}
+            levelNumber={currentLevelNumber}
+            parLines={currentLevel.parLines}
+            isPyodideActive={isPyodideActive}
+            onAskMentorHelp={handleAskMentorHelp}
           />
         </div>
       </div>
 
-      {/* 3. Crafting & Blueprints Modal */}
-      <CraftingModal
-        isOpen={craftModalOpen}
-        onClose={() => setCraftModalOpen(false)}
-        inventory={inventory}
-        onCraftItem={handleCraftItem}
-        onInsertCodeSnippet={(snippet) => {
-          setCode((prev) => prev + (prev.endsWith('\n') ? '' : '\n') + snippet + '\n');
-        }}
-      />
-
-      {/* 4. Victory & Seal Modal */}
+      {/* 3. Victory & Star Rating Modal */}
       <DungeonVictoryModal
         isOpen={victoryModalOpen}
-        floorSpec={floorSpec}
-        floorNumber={currentFloor}
+        level={currentLevel}
+        levelNumber={currentLevelNumber}
         xpEarned={awardedXp}
         totalXp={currentUser?.totalXp || state.user.totalXp}
-        onNextFloor={() => {
-          if (currentFloor < 4) loadFloor(currentFloor + 1);
+        starsEarned={earnedStars}
+        codeLines={lastCodeLines}
+        parLines={currentLevel.parLines}
+        onNextLevel={() => {
+          if (currentLevelNumber < 5) loadLevel(currentLevelNumber + 1);
         }}
-        onReplayFloor={() => loadFloor(currentFloor)}
-        isArchitectSealUnlocked={currentFloor === 4}
+        onReplayLevel={() => loadLevel(currentLevelNumber)}
+      />
+
+      {/* 4. Deep Context Synced Acharya AI Mentor Drawer */}
+      <AcharyaDrawer
+        isOpen={mentorDrawerOpen}
+        onClose={() => setMentorDrawerOpen(false)}
+        contextCode={code}
+        contextError={mentorErrorContext}
+        activeMissionTitle={`The Python Chronicles — Level ${currentLevelNumber}: ${currentLevel.title}`}
+        missionGoal={`${currentLevel.concept}. Sub-goals: ${currentLevel.objectives
+          .map((o) => o.label)
+          .join('; ')}. Par lines: ${currentLevel.parLines}.`}
+        language="python"
       />
     </div>
   );

@@ -9,6 +9,7 @@ import {
   setActiveSession,
   authenticateUser,
   registerUser,
+  createGuestSession,
   updateUserLearningSelection,
   RegisteredUser,
   AVAILABLE_CLASSES,
@@ -220,6 +221,14 @@ export default function HomePage() {
     } else {
       setAuthError(res.error || 'Registration failed.');
     }
+  };
+
+  const handleInstantGuestLaunch = () => {
+    const guestUser = createGuestSession(authSubject, authClass);
+    setCurrentUser(guestUser);
+    setIsAuthModalOpen(false);
+    window.dispatchEvent(new Event('dronacharya_session_change'));
+    window.dispatchEvent(new Event('storage'));
   };
 
   return (
@@ -604,6 +613,25 @@ export default function HomePage() {
                   ? 'Enter credentials to load your saved progress & character state.'
                   : 'Complete 3 quick steps to tailor your interactive gaming curriculum.'}
               </p>
+            </div>
+
+            {/* Quick Guest Demo Option */}
+            <div className="mb-4 p-3 rounded-xl bg-[#FBBF24]/20 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-between gap-2">
+              <div>
+                <div className="font-black text-xs text-[#1E1E24] flex items-center gap-1">
+                  <span>No login required?</span>
+                  <span className="text-[10px] bg-[#10B981] text-white px-1.5 py-0.2 rounded font-black">Free</span>
+                </div>
+                <div className="text-[11px] text-[#4A4A58] font-medium">Play as Guest Demo directly.</div>
+              </div>
+              <button
+                type="button"
+                onClick={handleInstantGuestLaunch}
+                className="btn-game-yellow py-1.5 px-3.5 text-xs font-black shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1 shrink-0"
+              >
+                <Gamepad2 className="w-3.5 h-3.5" />
+                <span>Play as Guest</span>
+              </button>
             </div>
 
             {/* Tabs */}

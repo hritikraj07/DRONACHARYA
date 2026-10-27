@@ -19,7 +19,7 @@ export function AppShell({ children }: AppShellProps) {
         <TopNav onOpenMentor={() => setIsMentorOpen(true)} />
       </Suspense>
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col relative">
         {children}
       </main>
 

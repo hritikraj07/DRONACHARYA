@@ -99,9 +99,15 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     { name: 'Projects', href: '/projects', icon: FolderGit2 },
   ];
 
+  const isAuthPage = pathname === '/auth';
+
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#FAF6EE]/95 backdrop-blur-md border-b-2 border-[#1E1E24] shadow-xs">
+      <header className={`sticky top-0 z-40 w-full transition-colors ${
+        isAuthPage
+          ? 'bg-[#090A0F]/85 backdrop-blur-md border-b-2 border-white/10 text-white'
+          : 'bg-[#FAF6EE]/95 backdrop-blur-md border-b-2 border-[#1E1E24] shadow-xs'
+      }`}>
         <div className="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Brand Mark & Title */}
           <div className="flex items-center gap-4 sm:gap-6 min-w-0">
@@ -110,11 +116,13 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 द्रो
               </div>
               <div className="flex flex-col">
-                <span className="font-serif font-black text-base sm:text-lg text-[#1E1E24] tracking-tight leading-none flex items-center gap-1.5">
+                <span className={`font-serif font-black text-base sm:text-lg tracking-tight leading-none flex items-center gap-1.5 ${
+                  isAuthPage ? 'text-white' : 'text-[#1E1E24]'
+                }`}>
                   DRONACHARYA
                   <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
                 </span>
-                <span className="text-[9px] tracking-widest uppercase text-[#6C5CE7] font-black mt-0.5">
+                <span className="text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
                   Coding Adventure
                 </span>
               </div>

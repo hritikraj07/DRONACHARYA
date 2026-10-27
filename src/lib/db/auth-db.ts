@@ -550,3 +550,29 @@ export function restoreHearts(): number {
 
   return 3;
 }
+
+/**
+ * Create an immediate guest demo session without requiring credentials.
+ * Directly routes to learning the respective selected course.
+ */
+export function createGuestSession(targetSubject: string = 'python-basics', studentClass: string = 'Class 10'): RegisteredUser {
+  const guestUser: RegisteredUser = {
+    id: `guest_${Date.now()}`,
+    name: 'Guest Explorer',
+    email: 'guest@dronacharya.local',
+    studentClass: studentClass,
+    targetSubject: targetSubject,
+    preferredLanguage: 'en',
+    totalXp: 150,
+    currentStreak: 1,
+    rank: 'Sadhaka',
+    hearts: 5,
+    level: 1,
+    completedMissions: [],
+    unlockedSeals: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  setActiveSession(guestUser, null);
+  return guestUser;
+}

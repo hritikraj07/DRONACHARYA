@@ -1,11 +1,12 @@
 // Dronacharya Database & Authentication Engine
-// Supports real credential verification, user persistence, and dynamic course/class switching
+// Connected directly to Supabase Database (profiles & game_progress) with synchronous local cache
+import { supabase } from '@/lib/supabase';
 
 export interface RegisteredUser {
   id: string;
   name: string;
   email: string;
-  password: string; // Stored securely in database records
+  password?: string;
   studentClass: string;
   targetSubject: string;
   preferredLanguage: 'en' | 'hi' | 'hinglish';
@@ -72,29 +73,36 @@ export const AVAILABLE_SUBJECTS = [
   },
 ];
 
-// Read all registered users from database
+export function calculateRank(xp: number): 'Sadhaka' | 'Abhyasi' | 'Vidvan' | 'Acharya' {
+  if (xp >= 9000) return 'Acharya';
+  if (xp >= 3500) return 'Vidvan';
+  if (xp >= 1000) return 'Abhyasi';
+  return 'Sadhaka';
+}
+
+// Read all registered users from local cache
 export function getRegisteredUsers(): RegisteredUser[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(USERS_DB_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
-    console.warn('Error reading database:', e);
+    console.warn('Error reading database cache:', e);
     return [];
   }
 }
 
-// Save users to database
+// Save users to local cache
 function saveRegisteredUsers(users: RegisteredUser[]) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
   } catch (e) {
-    console.warn('Error writing database:', e);
+    console.warn('Error writing database cache:', e);
   }
 }
 
-// Get active logged-in user
+// Get active logged-in user from session cache
 export function getActiveSession(): RegisteredUser | null {
   if (typeof window === 'undefined') return null;
   try {
@@ -114,34 +122,26 @@ export function setActiveSession(user: RegisteredUser | null) {
     } else {
       localStorage.removeItem(CURRENT_SESSION_KEY);
     }
-    // Broadcast event so TopNav updates instantly without needing a full reload
+    // Broadcast event so TopNav and components update instantly
     window.dispatchEvent(new Event('dronacharya_session_change'));
     window.dispatchEvent(new Event('storage'));
   } catch (e) {
-    console.warn('Error setting session:', e);
+    console.warn('Error setting session cache:', e);
   }
 }
 
-// Register a new student into database
-export function registerUser(params: {
+/**
+ * Register a new student into Supabase Auth & public.profiles
+ */
+export async function registerUser(params: {
   name: string;
   email: string;
   password: string;
   studentClass: string;
   targetSubject: string;
   preferredLanguage?: 'en' | 'hi' | 'hinglish';
-}): { success: boolean; user?: RegisteredUser; error?: string } {
-  const users = getRegisteredUsers();
+}): Promise<{ success: boolean; user?: RegisteredUser; error?: string }> {
   const normalizedEmail = params.email.trim().toLowerCase();
-
-  // Validate email uniqueness
-  const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
-  if (existing) {
-    return {
-      success: false,
-      error: 'An account with this email is already registered in the database. Please Sign In.',
-    };
-  }
 
   if (params.password.length < 6) {
     return {
@@ -150,63 +150,191 @@ export function registerUser(params: {
     };
   }
 
-  // Create fresh student profile with ZERO fake data
-  const newUser: RegisteredUser = {
-    id: `usr_${Date.now()}`,
-    name: params.name.trim(),
-    email: normalizedEmail,
-    password: params.password,
-    studentClass: params.studentClass || AVAILABLE_CLASSES[1],
-    targetSubject: params.targetSubject || AVAILABLE_SUBJECTS[0].id,
-    preferredLanguage: params.preferredLanguage || 'hinglish',
-    totalXp: 0,
-    currentStreak: 1,
-    rank: 'Sadhaka',
-    level: 1,
-    hearts: 3,
-    completedMissions: [],
-    unlockedSeals: [],
-    createdAt: new Date().toISOString(),
-  };
+  try {
+    // 1. Sign up user with Supabase Auth (passing full_name in metadata for auth trigger)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: normalizedEmail,
+      password: params.password,
+      options: {
+        data: {
+          full_name: params.name.trim(),
+          selected_class: params.studentClass || AVAILABLE_CLASSES[1],
+          selected_subjects: [params.targetSubject || AVAILABLE_SUBJECTS[0].id],
+        },
+      },
+    });
 
-  users.push(newUser);
-  saveRegisteredUsers(users);
-  setActiveSession(newUser);
+    if (authError) {
+      return {
+        success: false,
+        error: authError.message,
+      };
+    }
 
-  return { success: true, user: newUser };
+    if (!authData.user) {
+      return {
+        success: false,
+        error: 'Unable to create user account. Please check credentials.',
+      };
+    }
+
+    const userId = authData.user.id;
+    const targetSub = params.targetSubject || AVAILABLE_SUBJECTS[0].id;
+    const studentCls = params.studentClass || AVAILABLE_CLASSES[1];
+
+    // 2. Save selected_class / selected_subjects to public.profiles
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        selected_class: studentCls,
+        selected_subjects: [targetSub],
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    if (profileError) {
+      console.warn('Supabase profile initial update notice:', profileError.message);
+    }
+
+    // 3. Construct clean RegisteredUser
+    const newUser: RegisteredUser = {
+      id: userId,
+      name: params.name.trim(),
+      email: normalizedEmail,
+      password: params.password,
+      studentClass: studentCls,
+      targetSubject: targetSub,
+      preferredLanguage: params.preferredLanguage || 'hinglish',
+      totalXp: 0,
+      currentStreak: 1,
+      rank: 'Sadhaka',
+      level: 1,
+      hearts: 3,
+      completedMissions: [],
+      unlockedSeals: [],
+      createdAt: authData.user.created_at || new Date().toISOString(),
+    };
+
+    // 4. Update local session & backup cache
+    const users = getRegisteredUsers();
+    users.push(newUser);
+    saveRegisteredUsers(users);
+    setActiveSession(newUser);
+
+    return { success: true, user: newUser };
+  } catch (err: any) {
+    console.error('Supabase registration error:', err);
+    return {
+      success: false,
+      error: err.message || 'An unexpected registration error occurred.',
+    };
+  }
 }
 
-// Authenticate user against database credentials
-export function authenticateUser(params: {
+/**
+ * Authenticate user with Supabase Auth & fetch from public.profiles + public.game_progress
+ */
+export async function authenticateUser(params: {
   email: string;
   password: string;
-}): { success: boolean; user?: RegisteredUser; error?: string } {
-  const users = getRegisteredUsers();
+}): Promise<{ success: boolean; user?: RegisteredUser; error?: string }> {
   const normalizedEmail = params.email.trim().toLowerCase();
 
-  // Search database for email
-  const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  try {
+    // 1. Sign in with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: params.password,
+    });
 
-  if (!user) {
+    if (authError) {
+      return {
+        success: false,
+        error: authError.message || 'Invalid email or password entered.',
+      };
+    }
+
+    if (!authData.user) {
+      return {
+        success: false,
+        error: 'User not found.',
+      };
+    }
+
+    const userId = authData.user.id;
+
+    // 2. Fetch user's row from public.profiles
+    const { data: profile, error: profileErr } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileErr) {
+      console.warn('Supabase profile fetch error:', profileErr.message);
+    }
+
+    // 3. Fetch user's progress from public.game_progress
+    const { data: progressRows, error: progressErr } = await supabase
+      .from('game_progress')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (progressErr) {
+      console.warn('Supabase game_progress fetch error:', progressErr.message);
+    }
+
+    const userXp = profile?.xp ?? 0;
+    const completedMissions = progressRows
+      ? progressRows.filter((r) => r.completed).map((r) => String(r.level_id || r.id))
+      : [];
+
+    const authenticatedUser: RegisteredUser = {
+      id: userId,
+      name: profile?.full_name || authData.user.user_metadata?.full_name || 'Scholar',
+      email: authData.user.email || normalizedEmail,
+      password: params.password,
+      studentClass: profile?.selected_class || AVAILABLE_CLASSES[1],
+      targetSubject:
+        profile?.selected_subjects && profile.selected_subjects.length > 0
+          ? profile.selected_subjects[0]
+          : AVAILABLE_SUBJECTS[0].id,
+      preferredLanguage: 'hinglish',
+      totalXp: userXp,
+      currentStreak: profile?.streak || 1,
+      rank: calculateRank(userXp),
+      level: Math.floor(userXp / 200) + 1,
+      hearts: profile?.hearts ?? 3,
+      completedMissions,
+      unlockedSeals: [],
+      createdAt: profile?.created_at || authData.user.created_at || new Date().toISOString(),
+    };
+
+    // 4. Update local session & backup cache
+    const users = getRegisteredUsers();
+    const existingIdx = users.findIndex((u) => u.id === userId || u.email === normalizedEmail);
+    if (existingIdx !== -1) {
+      users[existingIdx] = authenticatedUser;
+    } else {
+      users.push(authenticatedUser);
+    }
+    saveRegisteredUsers(users);
+    setActiveSession(authenticatedUser);
+
+    return { success: true, user: authenticatedUser };
+  } catch (err: any) {
+    console.error('Supabase authentication error:', err);
     return {
       success: false,
-      error: 'No scholar account found with this email in database. Please click Register to create your account.',
+      error: err.message || 'Authentication failed. Please verify credentials.',
     };
   }
-
-  // Verify password match
-  if (user.password !== params.password) {
-    return {
-      success: false,
-      error: 'Incorrect password entered. Credentials do not match our database records.',
-    };
-  }
-
-  setActiveSession(user);
-  return { success: true, user };
 }
 
-// Update student's selected class or subject anytime
+/**
+ * Update student's selected class or subject anytime:
+ * Syncs directly to Supabase public.profiles while updating local session cache synchronously
+ */
 export function updateUserLearningSelection(params: {
   studentClass?: string;
   targetSubject?: string;
@@ -215,35 +343,55 @@ export function updateUserLearningSelection(params: {
   const currentUser = getActiveSession();
   if (!currentUser) return null;
 
-  const users = getRegisteredUsers();
-  const updatedUser = {
+  const updatedUser: RegisteredUser = {
     ...currentUser,
     ...(params.studentClass ? { studentClass: params.studentClass } : {}),
     ...(params.targetSubject ? { targetSubject: params.targetSubject } : {}),
     ...(params.preferredLanguage ? { preferredLanguage: params.preferredLanguage } : {}),
   };
 
-  // Update in database list
+  // Immediate synchronous session update for smooth UI
+  setActiveSession(updatedUser);
+
+  // Sync to local backup array
+  const users = getRegisteredUsers();
   const idx = users.findIndex((u) => u.id === currentUser.id);
   if (idx !== -1) {
     users[idx] = updatedUser;
     saveRegisteredUsers(users);
   }
 
-  setActiveSession(updatedUser);
+  // Direct asynchronous sync to Supabase public.profiles
+  supabase
+    .from('profiles')
+    .update({
+      ...(params.studentClass ? { selected_class: params.studentClass } : {}),
+      ...(params.targetSubject ? { selected_subjects: [params.targetSubject] } : {}),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', currentUser.id)
+    .then(({ error }) => {
+      if (error) console.warn('Supabase profile sync notice:', error.message);
+    });
+
   return updatedUser;
 }
 
-// Award game XP and mission completion to user in database
-export function awardGameProgress(params: {
+/**
+ * Record Game Progress & award XP:
+ * Syncs directly to public.profiles (xp) and public.game_progress (level_id, score, completed)
+ * while updating local session cache synchronously
+ */
+export function recordGameProgress(params: {
   missionId: string;
   earnedXp: number;
+  levelId?: string;
+  subject?: string;
   sealId?: string;
 }): RegisteredUser | null {
   const currentUser = getActiveSession();
   if (!currentUser) return null;
 
-  const users = getRegisteredUsers();
   const newMissions = Array.from(new Set([...currentUser.completedMissions, params.missionId]));
   const newSeals = params.sealId
     ? Array.from(new Set([...currentUser.unlockedSeals, params.sealId]))
@@ -251,14 +399,7 @@ export function awardGameProgress(params: {
 
   const newTotalXp = currentUser.totalXp + params.earnedXp;
   const newLevel = Math.floor(newTotalXp / 200) + 1;
-  const newRank =
-    newTotalXp >= 9000
-      ? 'Acharya'
-      : newTotalXp >= 3500
-      ? 'Vidvan'
-      : newTotalXp >= 1000
-      ? 'Abhyasi'
-      : 'Sadhaka';
+  const newRank = calculateRank(newTotalXp);
 
   const updatedUser: RegisteredUser = {
     ...currentUser,
@@ -269,17 +410,54 @@ export function awardGameProgress(params: {
     unlockedSeals: newSeals,
   };
 
+  // Immediate synchronous session update
+  setActiveSession(updatedUser);
+
+  // Sync to local backup array
+  const users = getRegisteredUsers();
   const idx = users.findIndex((u) => u.id === currentUser.id);
   if (idx !== -1) {
     users[idx] = updatedUser;
     saveRegisteredUsers(users);
   }
 
-  setActiveSession(updatedUser);
+  // Direct asynchronous sync to Supabase public.profiles
+  supabase
+    .from('profiles')
+    .update({
+      xp: newTotalXp,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', currentUser.id)
+    .then(({ error }) => {
+      if (error) console.warn('Supabase xp sync notice:', error.message);
+    });
+
+  // Direct asynchronous sync to Supabase public.game_progress
+  supabase
+    .from('game_progress')
+    .upsert({
+      user_id: currentUser.id,
+      subject: params.subject || currentUser.targetSubject || 'python-basics',
+      level_id: String(params.levelId || params.missionId || '1'),
+      score: newTotalXp,
+      completed: true,
+      updated_at: new Date().toISOString(),
+    })
+    .then(({ error }) => {
+      if (error) console.warn('Supabase game_progress upsert notice:', error.message);
+    });
+
   return updatedUser;
 }
 
-// Deduct heart when user fails in game
+// Backward-compatible alias for existing call sites
+export const awardGameProgress = recordGameProgress;
+
+/**
+ * Deduct a heart upon game collision/failure:
+ * Syncs directly to Supabase public.profiles while updating local session cache synchronously
+ */
 export function deductHeart(): number {
   const currentUser = getActiveSession();
   if (!currentUser) return 3;
@@ -287,15 +465,44 @@ export function deductHeart(): number {
   const remaining = Math.max(0, currentUser.hearts - 1);
   const updated = { ...currentUser, hearts: remaining };
   setActiveSession(updated);
+
+  // Sync to Supabase public.profiles
+  supabase
+    .from('profiles')
+    .update({
+      hearts: remaining,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', currentUser.id)
+    .then(({ error }) => {
+      if (error) console.warn('Supabase deductHeart notice:', error.message);
+    });
+
   return remaining;
 }
 
-// Restore hearts
+/**
+ * Restore hearts:
+ * Syncs directly to Supabase public.profiles while updating local session cache synchronously
+ */
 export function restoreHearts(): number {
   const currentUser = getActiveSession();
   if (!currentUser) return 3;
 
   const updated = { ...currentUser, hearts: 3 };
   setActiveSession(updated);
+
+  // Sync to Supabase public.profiles
+  supabase
+    .from('profiles')
+    .update({
+      hearts: 3,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', currentUser.id)
+    .then(({ error }) => {
+      if (error) console.warn('Supabase restoreHearts notice:', error.message);
+    });
+
   return 3;
 }

@@ -52,13 +52,13 @@ export default function AuthPage() {
     }
   }, []);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsSubmitting(true);
 
-    const result = authenticateUser({ email, password });
+    const result = await authenticateUser({ email, password });
     setIsSubmitting(false);
 
     if (result.success && result.user) {
@@ -101,13 +101,13 @@ export default function AuthPage() {
     setSignupStep(3);
   };
 
-  const handleFinalSignUp = (e: React.FormEvent) => {
+  const handleFinalSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsSubmitting(true);
 
-    const result = registerUser({
+    const result = await registerUser({
       name: fullName,
       email,
       password,

@@ -87,13 +87,13 @@ export default function HomePage() {
     };
   }, []);
 
-  // Handle Sign In (Strict database credential matching)
-  const handleSignIn = (e: React.FormEvent) => {
+  // Handle Sign In (Strict database credential matching with Supabase)
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
     setAuthSuccess(null);
 
-    const res = authenticateUser({
+    const res = await authenticateUser({
       email: authEmail,
       password: authPassword,
     });
@@ -142,13 +142,13 @@ export default function HomePage() {
     setSignupStep(3);
   };
 
-  // Step 3 Completion -> Register in Database
-  const handleFinalSignUp = (e: React.FormEvent) => {
+  // Step 3 Completion -> Register in Supabase Database
+  const handleFinalSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
     setAuthSuccess(null);
 
-    const res = registerUser({
+    const res = await registerUser({
       name: authName,
       email: authEmail,
       password: authPassword,

@@ -473,35 +473,36 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
         )}
       </header>
 
-      {/* Switch Class / Subject Modal (Pixel-faithful to Image 4) */}
+      {/* Switch Class / Subject Modal (Pixel-faithful to Website Theme) */}
       {switchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-[#1E1E24]/60 backdrop-blur-xs transition-opacity"
             onClick={() => setSwitchModalOpen(false)}
           />
-          <div className="relative w-full max-w-md bg-[#0F1424] border border-[#1E293B] rounded-2xl p-6 z-10 shadow-2xl animate-in zoom-in-95 duration-150 text-white">
+          <div className="relative w-full max-w-md bg-[#FAF6EE] border-3 border-[#1E1E24] rounded-2xl p-6 z-10 shadow-[8px_8px_0px_#1E1E24] animate-in zoom-in-95 duration-150 text-[#1E1E24]">
             <div className="flex items-start justify-between mb-5">
               <div>
-                <span className="text-[10px] text-[#38BDF8] uppercase tracking-wider font-pixel block mb-1">
+                <span className="text-[10px] text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full border border-[#6C5CE7]/30 uppercase tracking-wider font-pixel inline-block mb-1">
                   PERSONALIZED LEARNING PATH
                 </span>
-                <h3 className="font-pixel text-base sm:text-lg text-white">
+                <h3 className="font-pixel text-base sm:text-lg text-[#1E1E24]">
                   Choose Realm & Grade
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSwitchModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-xl border-2 border-[#1E1E24] bg-white text-[#1E1E24] hover:bg-[#FEE2E2] shadow-[2px_2px_0px_#1E1E24] transition-all cursor-pointer"
+                aria-label="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleSaveSwitch} className="space-y-5 text-xs">
               <div>
-                <label className="block font-bold text-slate-400 text-xs mb-2">
+                <label className="block font-black text-[#1E1E24] text-xs mb-2">
                   Class Standard (Aligned with NEP 2020):
                 </label>
                 <div className="space-y-2">
@@ -512,15 +513,15 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                         type="button"
                         key={c}
                         onClick={() => setSelectedClass(c)}
-                        className={`w-full p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                        className={`w-full p-3 rounded-xl border-2 text-left cursor-pointer transition-all flex items-center justify-between ${
                           isActive
-                            ? 'bg-[#131A2E] border-2 border-[#FFD214] text-[#FFD214]'
-                            : 'bg-[#131A2E]/60 border-[#1E293B] hover:border-slate-600 text-slate-200'
+                            ? 'bg-[#FEF9C3] border-[#1E1E24] text-[#854D0E] shadow-[3px_3px_0px_#1E1E24] font-black'
+                            : 'bg-white border-[#1E1E24] hover:bg-slate-50 text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] font-bold'
                         }`}
                       >
-                        <span className="font-bold text-xs">{c}</span>
+                        <span className="text-xs">{c}</span>
                         {isActive && (
-                          <span className="font-pixel text-[10px] text-[#FFD214] flex items-center gap-1">
+                          <span className="font-pixel text-[10px] text-[#854D0E] flex items-center gap-1">
                             ✓ Active
                           </span>
                         )}
@@ -531,36 +532,36 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-400 text-xs mb-2">
+                <label className="block font-black text-[#1E1E24] text-xs mb-2">
                   Target Course Realm:
                 </label>
                 <div className="relative">
                   <select
                     value={selectedSubject}
                     onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="w-full bg-[#131A2E] border border-[#1E293B] rounded-xl px-4 py-3 text-xs font-bold text-white appearance-none pr-10 focus:outline-none focus:border-[#FFD214] cursor-pointer"
+                    className="w-full bg-white border-2 border-[#1E1E24] rounded-xl px-4 py-3 text-xs font-bold text-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] appearance-none pr-10 focus:outline-none focus:border-[#6C5CE7] cursor-pointer"
                   >
                     {AVAILABLE_SUBJECTS.filter((s) => !s.isComingSoon).map((s) => (
-                      <option key={s.id} value={s.id} className="bg-[#0F1424] text-white py-2">
+                      <option key={s.id} value={s.id} className="bg-white text-[#1E1E24] py-2 font-bold">
                         {s.name} — {s.tagline}
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-[#1E1E24] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[#1E293B] flex items-center justify-between">
+              <div className="pt-4 border-t-2 border-[#1E1E24]/15 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setSwitchModalOpen(false)}
-                  className="px-5 py-2.5 rounded-lg bg-[#1E293B] hover:bg-slate-700 text-white font-bold text-xs border border-slate-600 transition-colors cursor-pointer"
+                  className="btn-arcade btn-arcade-white py-2.5 px-5 text-xs font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-lg bg-[#FFD214] hover:bg-[#FACC15] text-[#0F172A] font-black text-xs border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] transition-all active:translate-y-[1px] cursor-pointer"
+                  className="btn-arcade btn-arcade-gold py-2.5 px-6 text-xs font-black"
                 >
                   Save & Update
                 </button>

@@ -68,16 +68,43 @@ export default function ProjectsPage() {
         )}
       </div>
 
+      {/* Prerequisite & Mission Connection Banner */}
+      <div className="mb-6 p-3.5 rounded-xl bg-[#FAF8F5] border border-[#B49A65] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-[#354B3A] font-bold">Connected Mission:</span>
+          <span className="text-[#252820]">Rescue the Robot (Python Loops & Conditions)</span>
+          {state.learningPaths[0]?.missions[0]?.isCompleted ? (
+            <span className="text-[#354B3A] font-semibold flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Prerequisite Mastered</span>
+            </span>
+          ) : (
+            <span className="text-[#A65F43] font-semibold">
+              (Recommended: Complete Mission 1 first)
+            </span>
+          )}
+        </div>
+        <Link
+          href="/simulator?mission=mission-rescue-robot"
+          className="text-[#354B3A] font-bold underline hover:text-[#2B3D2F]"
+        >
+          Open Rescue the Robot Simulator →
+        </Link>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Project Brief, Milestones & Rubric */}
         <div className="lg:col-span-5 space-y-6">
           <div className="card-ivory">
             <span className="text-[11px] font-semibold text-[#A65F43] uppercase tracking-wider">
-              System Specification
+              System Specification & Why It Matters
             </span>
             <p className="text-xs text-[#575A51] mt-2 leading-relaxed">
               {project.description}
             </p>
+            <div className="mt-3 p-2.5 rounded bg-[#FAF8F5] border border-[#D8CFC0] text-[11px] text-[#575A51]">
+              <strong className="text-[#252820]">Why this matters:</strong> Autonomous warehouse rovers and planetary landers process movement command sequences with finite battery constraints. If coordinates or battery checks fail, the robot can crash into perimeter walls.
+            </div>
 
             <div className="mt-4 pt-3 border-t border-[#D8CFC0]">
               <div className="text-xs font-semibold text-[#252820] mb-2">Learning Objectives:</div>

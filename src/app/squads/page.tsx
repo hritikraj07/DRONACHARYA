@@ -79,9 +79,14 @@ export default function SquadsPage() {
           <div className="card-parchment">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[11px] font-semibold text-[#A65F43] uppercase tracking-wider">
-                  Active Guild (Join Code: {squad.joinCode})
-                </span>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[11px] font-semibold text-[#A65F43] uppercase tracking-wider">
+                    Active Guild (Join Code: {squad.joinCode})
+                  </span>
+                  <span className="text-[10px] bg-[#D8CFC0] text-[#575A51] px-2 py-0.5 rounded font-medium">
+                    Demonstration Guild Data
+                  </span>
+                </div>
                 <h2 className="font-serif font-bold text-2xl text-[#252820] mt-0.5">
                   {squad.name}
                 </h2>

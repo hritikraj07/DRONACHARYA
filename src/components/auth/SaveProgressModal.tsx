@@ -335,7 +335,7 @@ export function SaveProgressModal({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-game-yellow py-3 text-xs font-black flex items-center justify-center gap-2 shadow-[4px_4px_0px_#1E1E24] cursor-pointer disabled:opacity-50"
+              className="w-full btn-arcade btn-arcade-gold py-3 px-6 text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span>Syncing with Supabase...</span>

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Lora, Inter, JetBrains_Mono } from 'next/font/google';
+import { Lora, Inter, JetBrains_Mono, Press_Start_2P } from 'next/font/google';
 import './globals.css';
 import { AppShell } from '@/components/layout/AppShell';
 
@@ -22,10 +22,25 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
+const pressStart2P = Press_Start_2P({
+  variable: '--font-pixel',
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
-  title: 'Dronacharya AI — Gamified Coding Adventure',
+  title: 'Dronacharya ⋆˙⟡',
   description:
-    'Explore interactive programming worlds, write real code to control characters, defeat challenges, and level up your coding skills with your AI mentor.',
+    'Start your coding adventure with Dronacharya. The most fun and beginner-friendly way to learn Python, HTML, CSS, and JavaScript.',
+  icons: {
+    icon: [
+      { url: '/logo.png', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
@@ -36,7 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${lora.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${lora.variable} ${inter.variable} ${jetbrainsMono.variable} ${pressStart2P.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#FAF6EE] text-[#1E1E24]">
         <AppShell>{children}</AppShell>

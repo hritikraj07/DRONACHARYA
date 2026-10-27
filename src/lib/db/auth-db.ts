@@ -30,48 +30,192 @@ export const AVAILABLE_CLASSES = [
   'Class 12 / 12th Pass',
 ];
 
-export const AVAILABLE_SUBJECTS = [
+export interface SubjectMetadata {
+  id: string;
+  name: string;
+  title: string;
+  slug: string;
+  category: string;
+  icon: string;
+  badge: string;
+  tagline: string;
+  description: string;
+  isAvailable: boolean;
+  isComingSoon: boolean;
+  totalChapters?: number;
+  totalLessons?: number;
+  color?: string;
+}
+
+export const AVAILABLE_SUBJECTS: SubjectMetadata[] = [
+  // 4 ACTIVE PLAYABLE TRACKS
   {
-    id: 'python-basics',
-    name: 'Python Programming',
-    category: 'Programming',
-    icon: 'Terminal',
-    tagline: 'Interactive 2D Robot Rescue Game with Loops & Logic',
+    id: 'html',
+    name: 'HTML',
+    title: 'HTML: The Blueprint',
+    slug: 'html',
+    category: 'Web Development',
+    icon: 'FileCode',
+    badge: 'Active Quest',
+    tagline: 'Structure of the Web: Elements, Semantic Tags & Mini-Portfolio',
+    description: 'Learn the foundational markup language that powers every website on the internet. Write tags, embed media, and architect responsive pages.',
     isAvailable: true,
+    isComingSoon: false,
+    totalChapters: 3,
+    totalLessons: 7,
+    color: '#E44D26',
   },
   {
-    id: 'c-programming',
-    name: 'C Programming',
+    id: 'css',
+    name: 'CSS',
+    title: 'CSS: Colors & Layouts',
+    slug: 'css',
+    category: 'Web Development',
+    icon: 'Palette',
+    badge: 'Active Quest',
+    tagline: 'Styling & Design: Selectors, Box Model, Flexbox & Grid Systems',
+    description: 'Bring websites to life with colors, typography, modern Box Model mechanics, Flexbox layouts, and CSS Grid responsive galleries.',
+    isAvailable: true,
+    isComingSoon: false,
+    totalChapters: 3,
+    totalLessons: 7,
+    color: '#264DE4',
+  },
+  {
+    id: 'javascript',
+    name: 'JavaScript',
+    title: 'JavaScript: Interactive Web',
+    slug: 'javascript',
     category: 'Programming',
     icon: 'Code2',
-    tagline: 'Pointer Maze & Memory Game',
-    isAvailable: false,
+    badge: 'Active Quest',
+    tagline: 'Interactivity & Logic: Variables, Conditionals, DOM & Events',
+    description: 'Master the programming language of the browser. Create dynamic user interactions, manipulate the DOM, and control game logic.',
+    isAvailable: true,
+    isComingSoon: false,
+    totalChapters: 3,
+    totalLessons: 7,
+    color: '#F7DF1E',
   },
   {
-    id: 'java-programming',
-    name: 'Java Programming',
+    id: 'python',
+    name: 'Python',
+    title: 'Python: The Python Realm',
+    slug: 'python',
     category: 'Programming',
-    icon: 'Coffee',
-    tagline: 'Object-Oriented Dungeon Quest',
+    icon: 'Terminal',
+    badge: 'Active Quest',
+    tagline: 'Game-Based Python: Loops, Logic & Autonomous Rover Arya',
+    description: 'Master core programming fundamentals from your first print statement to variables, branching conditions, loops, lists, and reusable functions.',
+    isAvailable: true,
+    isComingSoon: false,
+    totalChapters: 8,
+    totalLessons: 24,
+    color: '#3776AB',
+  },
+
+  // 6 LOCKED COMING SOON TRACKS
+  {
+    id: 'react',
+    name: 'React',
+    title: 'React: Components & Hooks',
+    slug: 'react',
+    category: 'Frontend Framework',
+    icon: 'Atom',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Component Architecture, State, Hooks & Modern Single-Page Apps',
+    description: 'Build reactive user interfaces with reusable components, state hooks, and modern frontend design systems.',
     isAvailable: false,
+    isComingSoon: true,
+    color: '#61DAFB',
   },
   {
-    id: 'cpp-programming',
-    name: 'C++ Programming',
-    category: 'Programming',
+    id: 'nodejs',
+    name: 'Node.js',
+    title: 'Node.js: Server-Side JS',
+    slug: 'nodejs',
+    category: 'Backend Engine',
+    icon: 'Server',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Server-Side JavaScript, REST APIs, JSON & Express Engine',
+    description: 'Build scalable backend services, HTTP servers, RESTful endpoints, and backend application logic.',
+    isAvailable: false,
+    isComingSoon: true,
+    color: '#339933',
+  },
+  {
+    id: 'sql',
+    name: 'SQL',
+    title: 'SQL: Databases & Queries',
+    slug: 'sql',
+    category: 'Databases',
+    icon: 'Database',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Relational Databases, Queries, Joins, Aggregations & Schemas',
+    description: 'Query relational databases, structure table relationships, extract insights with SELECT, and perform complex JOIN operations.',
+    isAvailable: false,
+    isComingSoon: true,
+    color: '#00758F',
+  },
+  {
+    id: 'cpp',
+    name: 'C++',
+    title: 'C++: High Performance',
+    slug: 'cpp',
+    category: 'Systems Programming',
     icon: 'Cpu',
-    tagline: 'Game Engine Math & Memory Trials',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Pointers, Memory Allocation, Structures & Game Engine Math',
+    description: 'Master hardware-level control, pointers, reference semantics, and high-performance algorithms.',
     isAvailable: false,
+    isComingSoon: true,
+    color: '#00599C',
   },
   {
-    id: 'web-development',
-    name: 'JavaScript & Web Dev',
-    category: 'Web',
-    icon: 'Globe',
-    tagline: 'Interactive DOM Canvas & Web Puzzles',
+    id: 'ml',
+    name: 'Machine Learning',
+    title: 'Machine Learning: AI Foundations',
+    slug: 'ml',
+    category: 'AI & Data Science',
+    icon: 'Brain',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Neural Networks, Data Cleaning, Regression & Predictive Models',
+    description: 'Explore statistical learning, machine learning pipelines, classification, regression, and practical model training.',
     isAvailable: false,
+    isComingSoon: true,
+    color: '#FF6F00',
+  },
+  {
+    id: 'git',
+    name: 'Git & GitHub',
+    title: 'Git & GitHub: Version Control',
+    slug: 'git',
+    category: 'Developer Tools',
+    icon: 'GitBranch',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Version Control, Branching, Pull Requests & Open-Source Collaboration',
+    description: 'Collaborate with developers worldwide. Master git init, commits, branching workflows, pull requests, and merge conflict resolution.',
+    isAvailable: false,
+    isComingSoon: true,
+    color: '#F05032',
   },
 ];
+
+/**
+ * Normalize subject identifiers and aliases to primary active IDs
+ */
+export function normalizeSubjectId(id?: string): string {
+  if (!id) return 'html';
+  const clean = id.toLowerCase().trim();
+  if (clean === 'py' || clean === 'python-basics' || clean === 'python-101' || clean === 'python-realm') return 'python';
+  if (clean === 'js' || clean === 'javascript-101' || clean === 'web-development') return 'javascript';
+  if (clean === 'html-101' || clean === 'html-basics') return 'html';
+  if (clean === 'css-101' || clean === 'css-basics') return 'css';
+  if (clean === 'c-programming' || clean === 'cpp-programming' || clean === 'c++') return 'cpp';
+  if (clean === 'machine-learning' || clean === 'ai') return 'ml';
+  if (clean === 'github') return 'git';
+  return clean;
+}
 
 export function calculateRank(xp: number): 'Sadhaka' | 'Abhyasi' | 'Vidvan' | 'Acharya' {
   if (xp >= 9000) return 'Acharya';
@@ -110,7 +254,7 @@ const DEFAULT_GUEST: RegisteredUser = {
   name: 'Guest Explorer',
   email: 'guest@dronacharya.local',
   studentClass: 'Class 10',
-  targetSubject: 'python-basics',
+  targetSubject: 'html',
   preferredLanguage: 'hinglish',
   totalXp: 0,
   currentStreak: 1,
@@ -462,13 +606,23 @@ export function updateUserLearningSelection(params: {
   targetSubject?: string;
   preferredLanguage?: 'en' | 'hi' | 'hinglish';
 }): RegisteredUser | null {
+  const normSubject = params.targetSubject ? normalizeSubjectId(params.targetSubject) : undefined;
+  let resolvedSubject = normSubject;
+  if (normSubject) {
+    const found = AVAILABLE_SUBJECTS.find((s) => s.id === normSubject);
+    if (found?.isComingSoon) {
+      console.warn(`Subject ${normSubject} is Coming Soon and cannot be selected as an active quest.`);
+      resolvedSubject = undefined;
+    }
+  }
+
   const currentUser = getActiveSession();
   if (!currentUser) {
     const guest = getGuestSession();
     const updatedGuest: RegisteredUser = {
       ...guest,
       ...(params.studentClass ? { studentClass: params.studentClass } : {}),
-      ...(params.targetSubject ? { targetSubject: params.targetSubject } : {}),
+      ...(resolvedSubject ? { targetSubject: resolvedSubject } : {}),
       ...(params.preferredLanguage ? { preferredLanguage: params.preferredLanguage } : {}),
     };
     saveGuestSession(updatedGuest);
@@ -478,7 +632,7 @@ export function updateUserLearningSelection(params: {
   const updatedUser: RegisteredUser = {
     ...currentUser,
     ...(params.studentClass ? { studentClass: params.studentClass } : {}),
-    ...(params.targetSubject ? { targetSubject: params.targetSubject } : {}),
+    ...(resolvedSubject ? { targetSubject: resolvedSubject } : {}),
     ...(params.preferredLanguage ? { preferredLanguage: params.preferredLanguage } : {}),
   };
 
@@ -684,13 +838,17 @@ export function triggerSaveProgressModal(reason: string = 'save_progress') {
  * Create an immediate guest demo session without requiring credentials.
  * Directly routes to learning the respective selected course.
  */
-export function createGuestSession(targetSubject: string = 'python-basics', studentClass: string = 'Class 10'): RegisteredUser {
+export function createGuestSession(targetSubject: string = 'html', studentClass: string = 'Class 10'): RegisteredUser {
+  const norm = normalizeSubjectId(targetSubject);
+  const subjectObj = AVAILABLE_SUBJECTS.find((s) => s.id === norm && !s.isComingSoon);
+  const activeSubject = subjectObj ? subjectObj.id : 'html';
+
   const guestUser: RegisteredUser = {
     id: `guest_${Date.now()}`,
     name: 'Guest Explorer',
     email: 'guest@dronacharya.local',
     studentClass: studentClass,
-    targetSubject: targetSubject,
+    targetSubject: activeSubject,
     preferredLanguage: 'en',
     totalXp: 150,
     currentStreak: 1,

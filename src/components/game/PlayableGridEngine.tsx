@@ -95,10 +95,10 @@ export function PlayableGridEngine({
         </div>
 
         {/* Speed Controls */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => onSetSpeed(speed === 1 ? 2 : speed === 2 ? 4 : 1)}
-            className="px-2 py-1 rounded-md bg-white border border-[#1E1E24] text-[10px] font-black text-[#1E1E24] hover:bg-[#F2ECE0] shadow-xs"
+            className="btn-arcade btn-arcade-white text-[10px] px-2.5 py-1"
             title="Toggle Playback Speed"
           >
             {speed}x Speed
@@ -106,7 +106,7 @@ export function PlayableGridEngine({
           <button
             onClick={onReset}
             disabled={isAnimating}
-            className="p-1 rounded-md bg-white border border-[#1E1E24] text-[#1E1E24] hover:bg-[#FEE2E2] disabled:opacity-40"
+            className="btn-arcade btn-arcade-white p-1.5 disabled:opacity-40"
             title="Reset Rover to Start"
           >
             <RotateCcw className="w-3.5 h-3.5" />

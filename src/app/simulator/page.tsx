@@ -413,20 +413,20 @@ def boosted_rescue(cells: list) -> list:
         <div className="flex items-center gap-2">
           <Link
             href="/simulator?mission=mission-rescue-robot"
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition-all ${
+            className={`btn-arcade text-xs px-3 py-1.5 ${
               currentMission.id === 'mission-rescue-robot'
-                ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
-                : 'bg-white text-[#1E1E24] border-[#1E1E24] hover:bg-[#F2ECE0]'
+                ? 'btn-arcade-purple'
+                : 'btn-arcade-white'
             }`}
           >
             Quest 1: Rescue Robot
           </Link>
           <Link
             href="/simulator?mission=mission-hazard-filter"
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition-all ${
+            className={`btn-arcade text-xs px-3 py-1.5 ${
               currentMission.id === 'mission-hazard-filter'
-                ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
-                : 'bg-white text-[#1E1E24] border-[#1E1E24] hover:bg-[#F2ECE0]'
+                ? 'btn-arcade-purple'
+                : 'btn-arcade-white'
             }`}
           >
             Quest 2: Filter Cells
@@ -647,7 +647,7 @@ for step in range(4):
                     : handleRunCellFilter
                 }
                 disabled={isRunning || isAnimating}
-                className="btn-game-purple flex-1 py-2.5 text-xs shadow-[3px_3px_0px_#1E1E24]"
+                className="btn-arcade btn-arcade-purple flex-1 py-2.5 text-xs"
               >
                 {isRunning || isAnimating ? (
                   <>
@@ -835,9 +835,9 @@ for step in range(4):
                 </p>
                 <button
                   onClick={() => triggerSaveProgressModal('simulator_quest_complete')}
-                  className="btn-game-yellow py-2 px-4 text-xs font-black w-full flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
+                  className="btn-arcade btn-arcade-gold py-2 px-4 text-xs w-full flex items-center justify-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#1E1E24]" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#071426]" />
                   <span>Save Progress to Supabase</span>
                 </button>
               </div>
@@ -850,15 +850,15 @@ for step in range(4):
                   setIsCelebrationOpen(false);
                   setIsBattleChallengeOpen(true);
                 }}
-                className="btn-game-yellow w-full sm:w-auto py-2.5 px-6 text-xs shadow-[3px_3px_0px_#1E1E24]"
+                className="btn-arcade btn-arcade-gold w-full sm:w-auto py-2.5 px-6 text-xs flex items-center justify-center gap-2"
               >
-                <Zap className="w-4 h-4 fill-[#1E1E24]" />
+                <Zap className="w-4 h-4 fill-[#071426]" />
                 <span>Try Battle Challenge (+50 XP)</span>
               </button>
 
               <Link
                 href="/paths"
-                className="btn-game-purple w-full sm:w-auto py-2.5 px-6 text-xs shadow-[3px_3px_0px_#1E1E24]"
+                className="btn-arcade btn-arcade-purple w-full sm:w-auto py-2.5 px-6 text-xs flex items-center justify-center gap-2"
               >
                 <span>Continue on World Map</span>
                 <ArrowRight className="w-4 h-4" />
@@ -915,14 +915,14 @@ for step in range(4):
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setIsBattleChallengeOpen(false)}
-                className="btn-game-white text-xs py-2 px-4"
+                className="btn-arcade btn-arcade-white text-xs py-2 px-4"
               >
                 Done
               </button>
               <button
                 onClick={handleRunBattleChallenge}
                 disabled={isRunning}
-                className="btn-game-purple text-xs py-2.5 px-6"
+                className="btn-arcade btn-arcade-purple text-xs py-2.5 px-6 flex items-center gap-1.5"
               >
                 <span>{isRunning ? 'Testing...' : 'Verify Solution'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

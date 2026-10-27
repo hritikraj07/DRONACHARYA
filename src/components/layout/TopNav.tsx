@@ -34,6 +34,7 @@ import {
   MoreHorizontal,
   LogIn,
   UserPlus,
+  Lock,
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -53,20 +54,17 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const moreRef = useRef<HTMLDivElement>(null);
 
   // Subject switch modal state
-  const [selectedClass, setSelectedClass] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedClass, setSelectedClass] = useState('Class 10');
+  const [selectedSubject, setSelectedSubject] = useState('html');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const syncUser = () => {
       const session = getActiveSession();
       const guest = getGuestSession();
       setCurrentUser(session);
       setGuestUser(guest);
-      const effective = session || guest;
-      if (effective) {
-        setSelectedClass(effective.studentClass);
-        setSelectedSubject(effective.targetSubject);
-      }
     };
 
     syncUser();
@@ -80,13 +78,11 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     };
     window.addEventListener('dronacharya_open_save_progress', handleOpenSave);
 
-    const interval = setInterval(syncUser, 600);
     return () => {
       window.removeEventListener('dronacharya_session_change', syncUser);
       window.removeEventListener('storage', syncUser);
       window.removeEventListener('focus', syncUser);
       window.removeEventListener('dronacharya_open_save_progress', handleOpenSave);
-      clearInterval(interval);
     };
   }, [pathname]);
 
@@ -107,6 +103,13 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     setMoreDropdownOpen(false);
   }, [pathname]);
 
+  const handleOpenSwitchModal = () => {
+    const effective = currentUser || guestUser || getGuestSession();
+    setSelectedClass(effective.studentClass || 'Class 10');
+    setSelectedSubject(effective.targetSubject || 'html');
+    setSwitchModalOpen(true);
+  };
+
   const handleLogout = () => {
     setActiveSession(null);
     setCurrentUser(null);
@@ -126,6 +129,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
         setGuestUser(updated);
       }
       setSwitchModalOpen(false);
+      window.dispatchEvent(new Event('dronacharya_session_change'));
       router.refresh();
     }
   };
@@ -134,19 +138,19 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const activeSubjectObj =
     AVAILABLE_SUBJECTS.find((s) => s.id === effectiveUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
-  // Core high-frequency desktop links (compact footprint)
+  // Core Codédex navigation links
   const primaryNavLinks = [
     { name: 'Courses', href: '/courses', icon: BookOpen },
-    { name: 'Roadmap', href: '/paths', icon: Compass },
-    { name: 'Missions', href: '/simulator', icon: Gamepad2 },
-    { name: 'Projects', href: '/projects', icon: FolderGit2 },
+    { name: 'Practice', href: '/simulator', icon: Gamepad2 },
+    { name: 'Builds', href: '/projects', icon: FolderGit2 },
+    { name: 'Community', href: '/leaderboard', icon: Flame },
   ];
 
   // Secondary links housed in clean "More" dropdown
   const secondaryNavLinks = [
+    { name: 'World Map', href: '/paths', icon: Compass },
     { name: 'Quest Hub', href: '/dashboard', icon: Target },
     { name: 'Mastery Seals', href: '/achievements', icon: Award },
-    { name: 'Leaderboard', href: '/leaderboard', icon: Flame },
     { name: 'Squads', href: '/squads', icon: Users },
   ];
 
@@ -162,20 +166,22 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             : 'bg-[#FAF6EE]/95 backdrop-blur-md border-b border-slate-200'
         }`}
       >
-        <div className="w-full px-3 sm:px-6 h-16 flex items-center justify-between flex-nowrap gap-2 sm:gap-4 overflow-visible">
+        <div className="w-full px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between flex-nowrap gap-1.5 sm:gap-2.5 overflow-visible">
           {/* LEFT: Brand Logo & Title */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-nowrap">
             <Link href="/" className="flex items-center gap-2 shrink-0 group">
-              <div className="w-9 h-9 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-lg font-bold border border-[#6C5CE7] transition-transform group-hover:scale-105 shrink-0">
-                द्रो
-              </div>
+              <img
+                src="/logo.png"
+                alt="Dronacharya Logo"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 transition-transform shrink-0 bg-[#FAF6EE]"
+              />
               <div className="flex flex-col shrink-0">
                 <span
-                  className={`font-serif font-black text-sm sm:text-base tracking-tight leading-none flex items-center gap-1.5 ${
+                  className={`font-serif font-black text-xs sm:text-base tracking-tight leading-none flex items-center gap-1.5 ${
                     isAuthPage ? 'text-white' : 'text-[#1E1E24]'
                   }`}
                 >
-                  DRONACHARYA
+                  DRONACHARYA ⋆˙⟡
                   <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
                 </span>
                 <span className="text-[8px] sm:text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
@@ -186,18 +192,18 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
             {/* Current Course Selector Pill */}
             <button
-              onClick={() => setSwitchModalOpen(true)}
-              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-xs font-bold border border-slate-200 text-slate-800 transition-colors cursor-pointer shrink-0"
+              onClick={handleOpenSwitchModal}
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-xs font-bold border border-slate-200 text-slate-800 transition-colors cursor-pointer shrink-0"
               title="Switch Learning Course"
             >
               <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
-              <span className="truncate max-w-[130px]">{activeSubjectObj.name}</span>
+              <span className="truncate max-w-[110px]">{mounted ? activeSubjectObj.name : ''}</span>
               <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
             </button>
           </div>
 
           {/* CENTER: Desktop Primary Navigation Links (Always visible to both guests and logged-in users) */}
-          <nav className="hidden xl:flex items-center gap-1 flex-nowrap shrink-0">
+          <nav className="hidden xl:flex items-center gap-0.5 sm:gap-1 flex-nowrap shrink-0">
             {primaryNavLinks.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -205,7 +211,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border shrink-0 ${
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border shrink-0 ${
                     isActive
                       ? 'bg-[#6C5CE7] text-white border-[#6C5CE7]'
                       : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
@@ -298,7 +304,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 {/* AI Mentor Guidance */}
                 <button
                   onClick={onOpenMentor}
-                  className="btn-game-purple text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
+                  className="btn-arcade btn-arcade-purple text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
                   title="Open AI Mentor Guidance"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
@@ -329,35 +335,36 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 {/* GUEST EXPLORER HUD: Pill badge + Log In + Sign Up (Routes to separate /auth page) */}
                 <Link
                   href="/auth?mode=signup"
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100/80 border border-amber-200 text-xs font-bold text-amber-900 transition-colors cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100/80 border border-amber-200 text-xs font-bold text-amber-900 transition-colors cursor-pointer shrink-0"
                   title="Guest Mode • Sign up to save progress"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                  <span className="hidden sm:inline">Guest Mode • Sign up to save progress</span>
-                  <span className="sm:hidden">Guest • Save</span>
+                  <span className="hidden 2xl:inline">Guest Mode • Sign up to save progress</span>
+                  <span className="hidden md:inline 2xl:hidden">Guest Mode</span>
+                  <span className="md:hidden">Guest</span>
                 </Link>
 
-                {/* Log In Button (Different page: /auth?mode=signin) */}
+                {/* Log In Button (Tactile Slate Pill Button) */}
                 <Link
                   href="/auth?mode=signin"
-                  className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-colors shrink-0 cursor-pointer"
+                  className="btn-arcade btn-arcade-dark text-xs py-1.5 px-3 shrink-0"
                 >
                   Log In
                 </Link>
 
-                {/* Sign Up Button (Different page: /auth?mode=signup) */}
+                {/* Sign Up Button (Tactile Gold Pill Button) */}
                 <Link
                   href="/auth?mode=signup"
-                  className="btn-game-yellow text-xs py-1.5 px-3.5 flex items-center gap-1 shrink-0 cursor-pointer"
+                  className="btn-arcade btn-arcade-gold text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-slate-900" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#071426]" />
                   <span>Sign Up</span>
                 </Link>
 
                 {/* AI Mentor Button */}
                 <button
                   onClick={onOpenMentor}
-                  className="btn-game-purple text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
+                  className="btn-arcade btn-arcade-purple text-xs py-1.5 px-2.5 sm:px-3 flex items-center gap-1 shrink-0"
                   title="Open AI Mentor Guidance"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
@@ -425,14 +432,14 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   <Link
                     href="/auth?mode=signin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-2 text-center rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 hover:bg-slate-50"
+                    className="flex-1 btn-arcade btn-arcade-dark py-2 text-center"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/auth?mode=signup"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 btn-game-yellow text-xs py-2 text-center font-bold"
+                    className="flex-1 btn-arcade btn-arcade-gold py-2 text-center"
                   >
                     Sign Up to Save
                   </Link>
@@ -466,85 +473,94 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
         )}
       </header>
 
-      {/* Switch Class / Subject Modal */}
+      {/* Switch Class / Subject Modal (Pixel-faithful to Image 4) */}
       {switchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setSwitchModalOpen(false)}
           />
-          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 z-10 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+          <div className="relative w-full max-w-md bg-[#0F1424] border border-[#1E293B] rounded-2xl p-6 z-10 shadow-2xl animate-in zoom-in-95 duration-150 text-white">
+            <div className="flex items-start justify-between mb-5">
               <div>
-                <span className="text-[10px] text-[#6C5CE7] uppercase tracking-wider font-black">
-                  Personalized Learning Path
+                <span className="text-[10px] text-[#38BDF8] uppercase tracking-wider font-pixel block mb-1">
+                  PERSONALIZED LEARNING PATH
                 </span>
-                <h3 className="font-serif font-black text-xl text-[#1E1E24]">
-                  What do you want to learn?
+                <h3 className="font-pixel text-base sm:text-lg text-white">
+                  Choose Realm & Grade
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setSwitchModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 cursor-pointer"
+                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveSwitch} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveSwitch} className="space-y-5 text-xs">
               <div>
-                <label className="block font-black text-[#1E1E24] mb-1.5">
-                  Class Standard (Kept separately, up to 12th Pass):
+                <label className="block font-bold text-slate-400 text-xs mb-2">
+                  Class Standard (Aligned with NEP 2020):
                 </label>
-                <div className="space-y-1.5">
-                  {AVAILABLE_CLASSES.map((c) => (
-                    <div
-                      key={c}
-                      onClick={() => setSelectedClass(c)}
-                      className={`p-2.5 rounded-xl border cursor-pointer transition-colors flex items-center justify-between ${
-                        selectedClass === c
-                          ? 'bg-[#EDE9FE] border-[#6C5CE7] font-bold text-[#6C5CE7]'
-                          : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-800'
-                      }`}
-                    >
-                      <span>{c}</span>
-                      {selectedClass === c && <span className="text-[#6C5CE7]">✓ Active</span>}
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {AVAILABLE_CLASSES.map((c) => {
+                    const isActive = selectedClass === c;
+                    return (
+                      <button
+                        type="button"
+                        key={c}
+                        onClick={() => setSelectedClass(c)}
+                        className={`w-full p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          isActive
+                            ? 'bg-[#131A2E] border-2 border-[#FFD214] text-[#FFD214]'
+                            : 'bg-[#131A2E]/60 border-[#1E293B] hover:border-slate-600 text-slate-200'
+                        }`}
+                      >
+                        <span className="font-bold text-xs">{c}</span>
+                        {isActive && (
+                          <span className="font-pixel text-[10px] text-[#FFD214] flex items-center gap-1">
+                            ✓ Active
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               <div>
-                <label className="block font-black text-[#1E1E24] mb-1.5">
-                  Programming Language (Dropdown Menu):
+                <label className="block font-bold text-slate-400 text-xs mb-2">
+                  Target Course Realm:
                 </label>
                 <div className="relative">
                   <select
                     value={selectedSubject}
                     onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="w-full appearance-none px-3.5 py-2.5 border border-slate-200 rounded-xl bg-white text-xs font-bold text-[#1E1E24] focus:outline-none cursor-pointer pr-10"
+                    className="w-full bg-[#131A2E] border border-[#1E293B] rounded-xl px-4 py-3 text-xs font-bold text-white appearance-none pr-10 focus:outline-none focus:border-[#FFD214] cursor-pointer"
                   >
-                    {AVAILABLE_SUBJECTS.map((s) => (
-                      <option key={s.id} value={s.id}>
+                    {AVAILABLE_SUBJECTS.filter((s) => !s.isComingSoon).map((s) => (
+                      <option key={s.id} value={s.id} className="bg-[#0F1424] text-white py-2">
                         {s.name} — {s.tagline}
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 text-[#1E1E24] absolute right-3.5 top-3 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
 
-              <div className="mt-6 pt-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-4 border-t border-[#1E293B] flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setSwitchModalOpen(false)}
-                  className="btn-game-yellow text-xs py-2 px-4 cursor-pointer"
+                  className="px-5 py-2.5 rounded-lg bg-[#1E293B] hover:bg-slate-700 text-white font-bold text-xs border border-slate-600 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-game-purple text-xs py-2 px-5 cursor-pointer"
+                  className="px-6 py-2.5 rounded-lg bg-[#FFD214] hover:bg-[#FACC15] text-[#0F172A] font-black text-xs border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] transition-all active:translate-y-[1px] cursor-pointer"
                 >
                   Save & Update
                 </button>

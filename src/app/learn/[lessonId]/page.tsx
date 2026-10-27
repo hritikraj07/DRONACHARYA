@@ -1118,6 +1118,7 @@ function QuestLearningLab() {
         activeMissionTitle={`${course.title}: ${lesson.title}`}
         missionGoal={lesson.exercise?.instructions || lesson.subtitle || lesson.storyIntro || ''}
         language={isPython ? 'python' : isCssCourse ? 'css' : isJsCourse ? 'javascript' : 'html'}
+        testResults={testResults}
         proactiveTrigger={proactiveTrigger}
         onClearProactiveTrigger={() => setProactiveTrigger(null)}
       />

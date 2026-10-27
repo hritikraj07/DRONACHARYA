@@ -1,17 +1,17 @@
-// Acharya AI Contextual Socratic Mentor Drawer
-// Dynamic AI Engine supporting Live AST Code Analysis, Groq / Gemini / OpenAI LLM APIs,
-// 3-Tier Socratic Pedagogy, and Proactive Error Diagnosis.
+// Acharya AI Context-Aware Live Mentor Drawer
+// Powered by Google Gemini 2.5 Flash SDK (@google/genai)
+// Automatically captures active problem statement, student code, console errors, and produces exact working solutions.
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useDronacharya } from '@/lib/store';
 import { LanguagePreference } from '@/types';
 import {
-  queryAcharyaAI,
+  askMentorAI,
   getStoredAISettings,
   saveAISettings,
   AISettings,
-  AcharyaRequestPayload,
+  MentorHistoryItem,
 } from '@/lib/mentor/acharya-engine';
 import {
   Sparkles,
@@ -31,6 +31,9 @@ import {
   Compass,
   Code2,
   Key,
+  Copy,
+  Check,
+  AlertCircle,
 } from 'lucide-react';
 
 export interface AcharyaDrawerProps {
@@ -49,6 +52,7 @@ export interface AcharyaDrawerProps {
     status?: 'crashed_obstacle' | 'syntax_error' | 'infinite_loop' | 'incomplete_goal' | 'battery_depleted' | 'success';
     lastCollisionCoord?: [number, number];
   };
+  testResults?: Array<{ description: string; passed: boolean; expected?: string }>;
   proactiveTrigger?: {
     type: 'collision' | 'error' | 'battery' | 'syntax';
     message: string;
@@ -61,11 +65,8 @@ interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  socraticQuestion?: string;
-  hintTier?: 1 | 2 | 3;
-  detectedLine?: number;
   timestamp: string;
-  providerUsed?: string;
+  isError?: boolean;
 }
 
 export function AcharyaDrawer({
@@ -77,16 +78,17 @@ export function AcharyaDrawer({
   missionGoal = 'Reach the extraction beacon and write clean code',
   language = 'python',
   simulatorState,
+  testResults,
   proactiveTrigger,
   onClearProactiveTrigger,
 }: AcharyaDrawerProps) {
   const { state, updateProfile } = useDronacharya();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [activeTier, setActiveTier] = useState<1 | 2 | 3>(1);
   const [isThinking, setIsThinking] = useState(false);
   const [showSettingsPopover, setShowSettingsPopover] = useState(false);
-  const [aiSettings, setAiSettings] = useState<AISettings>({ provider: 'auto', apiKey: '' });
+  const [aiSettings, setAiSettings] = useState<AISettings>({ provider: 'gemini', apiKey: '' });
+  const [apiErrorMessage, setApiErrorMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load AI Settings on mount
@@ -96,12 +98,6 @@ export function AcharyaDrawer({
     window.addEventListener('dronacharya_ai_settings_changed', handleSettingsChange);
     return () => window.removeEventListener('dronacharya_ai_settings_changed', handleSettingsChange);
   }, []);
-
-  // Determine current active line count and current line being inspected
-  const codeLines = contextCode.split('\n');
-  const activeLineCount = codeLines.length;
-  const firstNonCommentLineIdx = codeLines.findIndex((l) => l.trim().length > 0 && !l.trim().startsWith('#'));
-  const currentWatchedLine = proactiveTrigger?.line || (firstNonCommentLineIdx !== -1 ? firstNonCommentLineIdx + 1 : 1);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -117,18 +113,15 @@ export function AcharyaDrawer({
           role: 'assistant',
           content:
             state.user.preferredLanguage === 'hi'
-              ? 'प्रणाम शिष्य! मैं आचार्य एआई हूँ। मैं आपके लाइव कोड, कंसोल आउटपुट और सिमुलेटर को देख रहा हूँ। पूछें, आपका तर्क कहाँ अटक रहा है?'
+              ? `प्रणाम! मैं आचार्य एआई हूँ, आपका लाइव मेंटॉर। मैं आपकी सक्रिय समस्या "${activeMissionTitle}" और आपके कोड को देख रहा हूँ। पूछें, मैं सीधे समाधान के साथ आपकी मदद करूँगा।`
               : state.user.preferredLanguage === 'hinglish'
-              ? 'Pranam Shishya! Main Acharya AI hoon. Main tumhare live editor code aur simulator state ko real-time watch kar raha hoon. Jahan bhi confusion ho, pucho!'
-              : 'Greetings, scholar. I am Acharya AI. I am actively observing your live code editor, runtime console, and simulator. How may I illuminate your reasoning without spoiling the solution?',
-          socraticQuestion: 'What step is your mental model currently attempting to execute?',
-          hintTier: 1,
+              ? `Pranam! Main Acharya AI hoon, tumhara context-aware AI mentor. Main tumhare active problem "${activeMissionTitle}", code aur errors ko live monitor kar raha hoon. Jahan bhi phas rahe ho pucho, main exact working solution provide karunga!`
+              : `Greetings! I am Acharya AI, your context-aware mentor powered by Gemini 2.5 Flash. I am actively inspecting "${activeMissionTitle}", your live code editor, and runtime errors. Ask me anything to get direct, working solutions tailored to this problem.`,
           timestamp: 'Just now',
-          providerUsed: 'Acharya Socratic Engine',
         },
       ]);
     }
-  }, [state.user.preferredLanguage]);
+  }, [activeMissionTitle, state.user.preferredLanguage]);
 
   if (!isOpen) return null;
 
@@ -140,70 +133,87 @@ export function AcharyaDrawer({
     e.preventDefault();
     saveAISettings(aiSettings);
     setShowSettingsPopover(false);
+    setApiErrorMessage(null);
   };
 
-  // Main Socratic Query Handler
-  const handleQuery = async (
-    promptText: string,
-    actionType: 'diagnose' | 'explain_error' | 'next_hint' | 'check_logic' | 'chat' = 'chat',
-    tierOverride?: 1 | 2 | 3
-  ) => {
-    const chosenTier = tierOverride || activeTier;
+  // Main Context-Aware Ask Handler
+  const handleAskMentor = async (userQuestion: string) => {
+    if (!userQuestion.trim() || isThinking) return;
 
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
       role: 'user',
-      content: promptText,
-      hintTier: chosenTier,
+      content: userQuestion,
       timestamp: 'Just now',
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setIsThinking(true);
+    setApiErrorMessage(null);
 
     if (onClearProactiveTrigger) onClearProactiveTrigger();
 
+    // Map conversation history
+    const historyPayload: MentorHistoryItem[] = messages.slice(-8).map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
     try {
-      const payload: AcharyaRequestPayload = {
-        missionTitle: activeMissionTitle,
-        missionGoal,
-        studentCode: contextCode,
-        consoleOutputOrError: contextError,
-        simulatorState,
-        hintTier: chosenTier,
-        studentMessage: promptText,
-        actionType,
-        language,
-        preferredLanguage: (state.user.preferredLanguage as 'en' | 'hinglish' | 'hi') || 'en',
-        conversationHistory: messages.slice(-4).map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
-      };
+      const res = await askMentorAI({
+        message: userQuestion,
+        history: historyPayload,
+        context: {
+          missionTitle: activeMissionTitle,
+          problemStatement: missionGoal,
+          code: contextCode,
+          language,
+          errorLog: contextError,
+          simulationState: simulatorState,
+          testResults,
+        },
+      });
 
-      const response = await queryAcharyaAI(payload);
-
-      const assistantMsg: ChatMessage = {
-        id: `a-${Date.now()}`,
-        role: 'assistant',
-        content: response.message,
-        socraticQuestion: response.socraticQuestion,
-        hintTier: response.hintTier,
-        detectedLine: response.detectedLine,
-        timestamp: 'Just now',
-        providerUsed: response.providerUsed,
-      };
-
-      setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err) {
-      console.error('Failed to get Acharya response:', err);
+      if (res.success && res.reply) {
+        const assistantMsg: ChatMessage = {
+          id: `a-${Date.now()}`,
+          role: 'assistant',
+          content: res.reply,
+          timestamp: 'Just now',
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+      } else {
+        const errorText = res.error || 'Failed to generate solution. Please check your Gemini API key.';
+        setApiErrorMessage(errorText);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `err-${Date.now()}`,
+            role: 'assistant',
+            content: `⚠️ ${errorText}`,
+            timestamp: 'Just now',
+            isError: true,
+          },
+        ]);
+      }
+    } catch (err: any) {
+      const netError = 'Network communication error: Unable to reach /api/mentor/ask endpoint.';
+      setApiErrorMessage(netError);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `err-${Date.now()}`,
+          role: 'assistant',
+          content: `⚠️ ${netError}`,
+          timestamp: 'Just now',
+          isError: true,
+        },
+      ]);
     } finally {
       setIsThinking(false);
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -216,7 +226,7 @@ export function AcharyaDrawer({
       {/* Drawer Container */}
       <aside className="relative w-full max-w-lg bg-[#FAF6EE] border-l-2 border-[#1E1E24] shadow-[8px_0px_0px_#1E1E24] flex flex-col h-full z-10 animate-in slide-in-from-right duration-200">
         {/* =========================================================================
-            HEADER: Brand, Live Telemetry Pill, Settings & Close
+            HEADER: Brand, Gemini 2.5 Flash Telemetry Pill, Settings & Close
            ========================================================================= */}
         <div className="p-3.5 border-b-2 border-[#1E1E24] bg-[#EDE9FE]/70 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -226,14 +236,14 @@ export function AcharyaDrawer({
             <div>
               <div className="flex items-center gap-1.5">
                 <h3 className="font-serif font-black text-sm text-[#1E1E24] leading-none">
-                  Acharya AI
+                  Acharya AI Mentor
                 </h3>
-                <span className="text-[9px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-1.5 py-0.2 rounded border border-[#6C5CE7]/30">
-                  Socratic Guru
+                <span className="text-[9px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-1.5 py-0.5 rounded border border-[#6C5CE7]/30">
+                  Gemini 2.5 Flash
                 </span>
               </div>
               <p className="text-[10px] text-[#4A4A58] font-bold mt-0.5">
-                Zero-Spoilers • Real-Time Code Telemetry
+                Context-Aware • Exact Problem Solutions
               </p>
             </div>
           </div>
@@ -243,7 +253,7 @@ export function AcharyaDrawer({
             <div className="flex items-center rounded-lg border-2 border-[#1E1E24] bg-white p-0.5 text-[10px] font-black shadow-[1px_1px_0px_#1E1E24]">
               <button
                 onClick={() => handleLanguageToggle('en')}
-                className={`px-1.5 py-0.5 rounded ${
+                className={`px-1.5 py-0.5 rounded cursor-pointer ${
                   state.user.preferredLanguage === 'en'
                     ? 'bg-[#6C5CE7] text-white'
                     : 'text-slate-600 hover:text-slate-900'
@@ -253,7 +263,7 @@ export function AcharyaDrawer({
               </button>
               <button
                 onClick={() => handleLanguageToggle('hinglish')}
-                className={`px-1.5 py-0.5 rounded ${
+                className={`px-1.5 py-0.5 rounded cursor-pointer ${
                   state.user.preferredLanguage === 'hinglish'
                     ? 'bg-[#6C5CE7] text-white'
                     : 'text-slate-600 hover:text-slate-900'
@@ -261,23 +271,13 @@ export function AcharyaDrawer({
               >
                 Hinglish
               </button>
-              <button
-                onClick={() => handleLanguageToggle('hi')}
-                className={`px-1.5 py-0.5 rounded ${
-                  state.user.preferredLanguage === 'hi'
-                    ? 'bg-[#6C5CE7] text-white'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                हिन्दी
-              </button>
             </div>
 
-            {/* AI Settings Popover Trigger */}
+            {/* AI Settings Trigger */}
             <button
               onClick={() => setShowSettingsPopover(!showSettingsPopover)}
               className="p-1.5 rounded-lg border-2 border-[#1E1E24] bg-white hover:bg-slate-100 text-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] cursor-pointer"
-              title="Configure AI Provider & API Keys"
+              title="Configure Gemini API Key"
               aria-label="AI Settings"
             >
               <Settings className="w-3.5 h-3.5" />
@@ -295,34 +295,34 @@ export function AcharyaDrawer({
         </div>
 
         {/* =========================================================================
-            LIVE TELEMETRY STATUS PILL
+            LIVE WORKSPACE CONTEXT TELEMETRY BAR
            ========================================================================= */}
         <div className="px-4 py-2 bg-[#1E1E24] text-white text-[11px] font-mono flex items-center justify-between gap-2 border-b-2 border-[#1E1E24]">
           <div className="flex items-center gap-2 truncate">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-            <span className="text-[#55EFC4] font-bold">Watching:</span>
-            <span className="text-gray-300 truncate">
-              Line [{currentWatchedLine}] • {language.toUpperCase()} • Pyodide Runtime
+            <span className="text-[#55EFC4] font-bold">Observing:</span>
+            <span className="text-gray-300 truncate font-semibold">
+              {activeMissionTitle} • {language.toUpperCase()}
             </span>
           </div>
           <span className="text-[10px] text-[#FBBF24] font-black uppercase tracking-wider shrink-0 bg-[#FBBF24]/20 px-2 py-0.5 rounded border border-[#FBBF24]/30">
-            {aiSettings.provider === 'local' ? 'Offline AST' : aiSettings.provider.toUpperCase()}
+            Real LLM Active
           </span>
         </div>
 
         {/* =========================================================================
-            SETTINGS POPOVER (MODAL DIALOG)
+            SETTINGS POPOVER (MODAL FOR CUSTOM GEMINI API KEY)
            ========================================================================= */}
         {showSettingsPopover && (
           <div className="p-4 bg-white border-b-2 border-[#1E1E24] shadow-[0px_4px_0px_#1E1E24] space-y-3 animate-in fade-in duration-150">
             <div className="flex items-center justify-between border-b pb-2">
               <div className="flex items-center gap-1.5 text-xs font-black text-[#1E1E24]">
                 <Key className="w-4 h-4 text-[#6C5CE7]" />
-                <span>Acharya AI Model & API Configuration</span>
+                <span>Google Gemini API Configuration</span>
               </div>
               <button
                 onClick={() => setShowSettingsPopover(false)}
-                className="text-xs text-slate-500 hover:text-slate-900 font-bold"
+                className="text-xs text-slate-500 hover:text-slate-900 font-bold cursor-pointer"
               >
                 ✕ Close
               </button>
@@ -330,172 +330,160 @@ export function AcharyaDrawer({
 
             <form onSubmit={handleSaveSettings} className="space-y-3 text-xs">
               <div>
-                <label className="block text-[11px] font-black text-[#1E1E24] mb-1">
-                  Active Intelligence Engine
-                </label>
-                <select
-                  value={aiSettings.provider}
-                  onChange={(e) => setAiSettings({ ...aiSettings, provider: e.target.value as any })}
-                  className="w-full px-2.5 py-1.5 border-2 border-[#1E1E24] rounded-lg text-xs font-bold bg-[#FAF6EE]"
-                >
-                  <option value="auto">Auto (Gemini / Groq / Fallback)</option>
-                  <option value="groq">Groq (Llama 3.3 70B • Blazing Fast)</option>
-                  <option value="gemini">Google Gemini 1.5 Flash</option>
-                  <option value="openai">OpenAI (GPT-4o mini)</option>
-                  <option value="local">Offline Deep Code AST Inspector (Zero Key)</option>
-                </select>
-              </div>
-
-              <div>
                 <label className="block text-[11px] font-black text-[#1E1E24] mb-1 flex items-center justify-between">
-                  <span>Custom API Key (Optional)</span>
-                  <span className="text-[10px] text-gray-500 font-normal">Saved in your browser</span>
+                  <span>Gemini API Key</span>
+                  <span className="text-[10px] text-gray-500 font-normal">Stored safely in browser</span>
                 </label>
                 <input
                   type="password"
                   value={aiSettings.apiKey}
                   onChange={(e) => setAiSettings({ ...aiSettings, apiKey: e.target.value })}
-                  placeholder="gsk_... or AIzaSy... or sk-..."
-                  className="w-full px-2.5 py-1.5 border-2 border-[#1E1E24] rounded-lg font-mono text-xs bg-[#FAF6EE]"
+                  placeholder="AIzaSy..."
+                  className="w-full px-2.5 py-1.5 border-2 border-[#1E1E24] rounded-lg font-mono text-xs bg-[#FAF6EE] text-[#1E1E24]"
                 />
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Or set <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-bold text-[#1E1E24]">GEMINI_API_KEY</code> in your <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-bold text-[#1E1E24]">.env.local</code> file on the server.
+                </p>
               </div>
 
               <div className="flex items-center justify-between pt-1">
                 <span className="text-[10px] text-slate-500">
-                  {aiSettings.apiKey ? '● Custom Key Enabled' : '○ Using Built-in Server Keys / AST'}
+                  {aiSettings.apiKey ? '● Custom Key Configured' : '○ Using Server GEMINI_API_KEY'}
                 </span>
                 <button
                   type="submit"
-                  className="btn-arcade btn-arcade-purple text-[11px] py-1 px-3 shadow-[1px_1px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-purple text-[11px] py-1 px-3 shadow-[1px_1px_0px_#1E1E24] cursor-pointer"
                 >
-                  Save AI Settings
+                  Save Key
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* =========================================================================
-            PROACTIVE MENTOR ALERT BANNER (Auto-triggers on Bug / Collision)
-           ========================================================================= */}
-        {proactiveTrigger && (
-          <div className="m-3 p-3 rounded-xl bg-amber-50 border-2 border-[#F59E0B] shadow-[3px_3px_0px_#B45309] space-y-2 animate-in slide-in-from-top-2 duration-200">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5 animate-bounce" />
-              <div className="flex-1">
-                <div className="text-[11px] font-black uppercase text-[#B45309]">
-                  ⚡ Proactive Diagnostic Detected
-                </div>
-                <p className="text-xs font-bold text-[#1E1E24] mt-0.5">
-                  {proactiveTrigger.message}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-1 border-t border-amber-200">
+        {/* API Error Warning Notice */}
+        {apiErrorMessage && (
+          <div className="m-3 p-3 rounded-xl bg-rose-50 border-2 border-[#EF4444] text-[#991B1B] text-xs font-bold shadow-[2px_2px_0px_#EF4444] flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-[#EF4444] shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p>{apiErrorMessage}</p>
               <button
-                onClick={() =>
-                  handleQuery(
-                    `I hit an issue: "${proactiveTrigger.message}". Please guide me with a Socratic question on Line ${proactiveTrigger.line || currentWatchedLine}.`,
-                    'explain_error',
-                    1
-                  )
-                }
-                className="btn-arcade btn-arcade-yellow text-[10px] py-1 px-3 flex items-center gap-1 cursor-pointer"
+                onClick={() => setShowSettingsPopover(true)}
+                className="mt-1 text-[11px] text-[#6C5CE7] underline font-black block cursor-pointer"
               >
-                <span>🔍 Debug Together</span>
+                Click here to configure your Gemini API Key →
               </button>
             </div>
           </div>
         )}
 
+        {/* Proactive Trigger Alert Banner */}
+        {proactiveTrigger && (
+          <div className="m-3 p-3 rounded-xl bg-amber-50 border-2 border-[#F59E0B] shadow-[3px_3px_0px_#B45309] space-y-2 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-xs font-black uppercase text-[#B45309]">
+                <AlertTriangle className="w-4 h-4" />
+                <span>Issue Detected in Live Code</span>
+              </div>
+              <button
+                onClick={onClearProactiveTrigger}
+                className="text-gray-400 hover:text-gray-700 text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs font-bold text-[#1E1E24] leading-relaxed">
+              {proactiveTrigger.message}
+            </p>
+            <button
+              onClick={() => handleAskMentor(`Diagnose and fix this issue: "${proactiveTrigger.message}" in my active code.`)}
+              disabled={isThinking}
+              className="btn-arcade btn-arcade-yellow text-[10px] py-1 px-3 flex items-center gap-1 cursor-pointer"
+            >
+              <span>⚡ Generate Exact Fix</span>
+            </button>
+          </div>
+        )}
+
         {/* =========================================================================
-            CONTEXT-AWARE ACTION CHIPS (4 Quick Socratic Triggers)
+            CONTEXT-AWARE QUICK ACTION CHIPS
            ========================================================================= */}
         <div className="p-3 border-b-2 border-[#1E1E24] bg-white space-y-1.5">
           <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-[#4A4A58]">
             <span>Contextual Actions</span>
-            <span>Tier {activeTier} Mode</span>
+            <span>Targeted Solutions</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
             <button
               onClick={() =>
-                handleQuery(
-                  'Diagnose my current code line-by-line against the mission goal.',
-                  'diagnose',
-                  1
+                handleAskMentor(
+                  'Analyze my current code against the problem statement, diagnose any syntax or logic issues, and provide the exact working solution.'
                 )
               }
               disabled={isThinking}
-              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5"
+              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
-              <Code2 className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
-              <span className="truncate">🔍 Diagnose Code</span>
+              <Lightbulb className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
+              <span className="truncate">💡 Exact Solution</span>
             </button>
 
             <button
               onClick={() =>
-                handleQuery(
-                  `Explain my last error or simulator state: "${contextError || 'Incomplete goal'}"`,
-                  'explain_error',
-                  2
+                handleAskMentor(
+                  `Inspect my code and explain why this error or behavior occurred: "${contextError || 'Incomplete quest requirement'}"`
                 )
               }
               disabled={isThinking}
-              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5"
+              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
-              <span className="truncate">⚠️ Explain Error</span>
-            </button>
-
-            <button
-              onClick={() => {
-                const nextTier = activeTier === 1 ? 2 : activeTier === 2 ? 3 : 1;
-                setActiveTier(nextTier);
-                handleQuery(
-                  `Escalate to Tier ${nextTier} hint: ${nextTier === 1 ? 'Socratic Probe' : nextTier === 2 ? 'Conceptual Compass' : 'Masked Blueprint'}`,
-                  'next_hint',
-                  nextTier
-                );
-              }}
-              disabled={isThinking}
-              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-white hover:bg-slate-50 text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5"
-            >
-              <Compass className="w-3.5 h-3.5 text-[#00B894] shrink-0" />
-              <span className="truncate">🧭 Next Hint (Tier {activeTier}→{activeTier === 3 ? 1 : activeTier + 1})</span>
+              <span className="truncate">⚠️ Diagnose Error</span>
             </button>
 
             <button
               onClick={() =>
-                handleQuery(
-                  'Dry-run my logic mentally: what edge cases or boundary conditions should I consider before running?',
-                  'check_logic',
-                  1
+                handleAskMentor(
+                  'Check my code logic line-by-line and tell me if any edge cases or quest objectives are missing.'
                 )
               }
               disabled={isThinking}
-              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#E0F2FE] hover:bg-[#BAE6FD] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5"
+              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#D1FAE5] hover:bg-[#A7F3D0] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
-              <Lightbulb className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
-              <span className="truncate">🧪 Check Logic</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
+              <span className="truncate">✅ Verify Logic</span>
+            </button>
+
+            <button
+              onClick={() =>
+                handleAskMentor(
+                  'Explain the core concept behind this quest and how to write optimal code for it.'
+                )
+              }
+              disabled={isThinking}
+              className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#E0F2FE] hover:bg-[#BAE6FD] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
+              <span className="truncate">📖 Concept Guide</span>
             </button>
           </div>
         </div>
 
         {/* =========================================================================
-            MESSAGE THREAD
+            MESSAGE THREAD (Full Multi-Turn Conversation)
            ========================================================================= */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((m, idx) => (
+          {messages.map((m) => (
             <div
               key={m.id}
               className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
             >
               <div
-                className={`max-w-[90%] rounded-2xl p-4 text-xs leading-relaxed border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] ${
+                className={`max-w-[92%] rounded-2xl p-4 text-xs leading-relaxed border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] ${
                   m.role === 'user'
                     ? 'bg-[#1E1E24] text-white'
+                    : m.isError
+                    ? 'bg-rose-50 text-rose-950 border-rose-500'
                     : 'bg-white text-[#1E1E24]'
                 }`}
               >
@@ -503,27 +491,15 @@ export function AcharyaDrawer({
                   <div className="flex items-center justify-between text-[10px] text-[#6C5CE7] font-black uppercase tracking-wider mb-2 border-b border-slate-100 pb-1.5">
                     <span className="flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-[#FFD214] fill-current" />
-                      Acharya • Tier {m.hintTier || 1}
-                      {m.detectedLine ? ` (Line ${m.detectedLine})` : ''}
+                      Acharya AI Mentor
                     </span>
                     <span className="text-gray-400 font-mono text-[9px] lowercase">
-                      {m.providerUsed || 'Socratic Engine'}
+                      gemini-2.5-flash
                     </span>
                   </div>
                 )}
 
-                <FormattedMessageContent
-                  content={m.content}
-                  isLatestAssistant={m.role === 'assistant' && idx === messages.length - 1}
-                  isUser={m.role === 'user'}
-                />
-
-                {m.socraticQuestion && (
-                  <div className="mt-3 p-2.5 rounded-xl bg-[#EDE9FE] border border-[#6C5CE7]/30 text-[#4C1D95] font-bold flex items-start gap-2">
-                    <span className="text-base leading-none">🤔</span>
-                    <span>{m.socraticQuestion}</span>
-                  </div>
-                )}
+                <FormattedMessageContent content={m.content} isUser={m.role === 'user'} />
               </div>
 
               <span className="text-[9px] text-[#71717A] mt-1 px-1 font-mono">
@@ -533,9 +509,9 @@ export function AcharyaDrawer({
           ))}
 
           {isThinking && (
-            <div className="flex items-center gap-2 p-3 bg-white rounded-xl border-2 border-[#1E1E24] text-xs font-bold text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24] w-fit animate-pulse">
+            <div className="flex items-center gap-2.5 p-3 bg-white rounded-xl border-2 border-[#1E1E24] text-xs font-bold text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24] w-fit animate-pulse">
               <Sparkles className="w-4 h-4 text-[#FFD214] animate-spin" />
-              <span>Acharya is contemplating your live code &amp; logic...</span>
+              <span>Acharya is analyzing your code and crafting the exact solution...</span>
             </div>
           )}
 
@@ -543,14 +519,14 @@ export function AcharyaDrawer({
         </div>
 
         {/* =========================================================================
-            PROMPT INPUT FORM
+            PROMPT INPUT FORM (Disabled While Loading to Prevent Duplicate Submissions)
            ========================================================================= */}
         <div className="p-3 border-t-2 border-[#1E1E24] bg-white">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               if (input.trim() && !isThinking) {
-                handleQuery(input.trim(), 'chat');
+                handleAskMentor(input.trim());
               }
             }}
             className="flex items-center gap-2"
@@ -559,8 +535,8 @@ export function AcharyaDrawer({
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Acharya anything about your code or why it failed..."
-              className="flex-1 text-xs px-3.5 py-2.5 border-2 border-[#1E1E24] rounded-xl font-bold bg-[#FAF6EE] text-[#1E1E24] focus:outline-none focus:border-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24]"
+              placeholder="Ask for the solution, bug diagnosis, or logic explanation..."
+              className="flex-1 text-xs px-3.5 py-2.5 border-2 border-[#1E1E24] rounded-xl font-bold bg-[#FAF6EE] text-[#1E1E24] focus:outline-none focus:border-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24] disabled:opacity-50"
               disabled={isThinking}
             />
             <button
@@ -578,52 +554,23 @@ export function AcharyaDrawer({
   );
 }
 
-function FormattedMessageContent({
-  content,
-  isLatestAssistant,
-  isUser,
-}: {
-  content: string;
-  isLatestAssistant?: boolean;
-  isUser?: boolean;
-}) {
-  const [displayedLength, setDisplayedLength] = useState(
-    isLatestAssistant ? 0 : content.length
-  );
+/**
+ * Clean markdown formatter: renders code blocks, copy buttons, inline code, bold text, and bullet points
+ */
+function FormattedMessageContent({ content, isUser }: { content: string; isUser?: boolean }) {
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!isLatestAssistant) {
-      setDisplayedLength(content.length);
-      return;
-    }
+  const handleCopy = (code: string, idx: number) => {
+    navigator.clipboard.writeText(code);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
 
-    setDisplayedLength(0);
-    let current = 0;
-    const step = Math.max(2, Math.floor(content.length / 40));
-    const interval = setInterval(() => {
-      current += step;
-      if (current >= content.length) {
-        setDisplayedLength(content.length);
-        clearInterval(interval);
-      } else {
-        setDisplayedLength(current);
-      }
-    }, 20);
-
-    return () => clearInterval(interval);
-  }, [content, isLatestAssistant]);
-
-  const textToRender = content.slice(0, displayedLength);
-  const isTyping = isLatestAssistant && displayedLength < content.length;
-
-  // Split markdown blocks ```lang ... ```
-  const parts = textToRender.split(/(```[\s\S]*?```)/g);
+  // Split markdown code blocks ```lang ... ```
+  const parts = content.split(/(```[\s\S]*?```)/g);
 
   return (
-    <div
-      className="space-y-2 leading-relaxed"
-      onClick={() => isTyping && setDisplayedLength(content.length)}
-    >
+    <div className="space-y-2 leading-relaxed">
       {parts.map((part, pIdx) => {
         if (part.startsWith('```') && part.endsWith('```')) {
           const raw = part.slice(3, -3);
@@ -631,7 +578,7 @@ function FormattedMessageContent({
           const firstLine = lines[0].trim();
           const hasLang = /^[a-zA-Z0-9_-]+$/.test(firstLine);
           const lang = hasLang ? firstLine : '';
-          const codeBody = hasLang ? lines.slice(1).join('\n') : raw;
+          const codeBody = (hasLang ? lines.slice(1).join('\n') : raw).trim();
 
           return (
             <div
@@ -642,13 +589,20 @@ function FormattedMessageContent({
                 <span className="uppercase text-[#FFD214] font-black">{lang || 'CODE'}</span>
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigator.clipboard.writeText(codeBody.trim());
-                  }}
-                  className="hover:text-white transition-colors cursor-pointer"
+                  onClick={() => handleCopy(codeBody, pIdx)}
+                  className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer text-gray-300"
                 >
-                  Copy
+                  {copiedIdx === pIdx ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      <span className="text-emerald-400">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      <span>Copy</span>
+                    </>
+                  )}
                 </button>
               </div>
               <pre className="p-3 font-mono text-[11px] overflow-x-auto whitespace-pre leading-relaxed text-[#A29BFE]">
@@ -659,11 +613,8 @@ function FormattedMessageContent({
         }
 
         return (
-          <div key={pIdx} className="whitespace-pre-line font-medium">
+          <div key={pIdx} className="whitespace-pre-line font-medium text-xs leading-relaxed">
             {renderInlineMarkdown(part, isUser)}
-            {isTyping && pIdx === parts.length - 1 && (
-              <span className="inline-block w-1.5 h-3 ml-0.5 bg-[#6C5CE7] animate-pulse align-middle" />
-            )}
           </div>
         );
       })}

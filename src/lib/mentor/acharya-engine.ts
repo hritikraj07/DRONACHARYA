@@ -1,13 +1,6 @@
-// Dronacharya Acharya AI Client Engine
-// Coordinates live telemetry, API integration (Gemini / Groq / OpenAI), and client-side AST inspection
-
-import {
-  CodeInspectionContext,
-  inspectPythonCode,
-  inspectWebCode,
-  formatDialect,
-  InspectionResult,
-} from './code-inspector';
+// Dronacharya Context-Aware Live AI Mentor Client Service
+// Integrates directly with POST /api/mentor/ask (Google Gemini gemini-2.5-flash)
+// Passes live code, problem statements, and simulation context for tailored, exact solutions.
 
 export interface AISettings {
   provider: 'auto' | 'gemini' | 'groq' | 'openai' | 'local';
@@ -36,98 +29,153 @@ export function saveAISettings(settings: AISettings): void {
   } catch (e) {}
 }
 
+export interface MentorHistoryItem {
+  role: 'user' | 'assistant' | 'model';
+  content: string;
+}
+
+export interface MentorContext {
+  missionTitle?: string;
+  topicTitle?: string;
+  problemStatement?: string;
+  missionGoal?: string;
+  code?: string;
+  currentAttempt?: string;
+  language?: string;
+  consoleOutput?: string;
+  errorLog?: string;
+  simulationParameters?: Record<string, any>;
+  simulationState?: Record<string, any>;
+  testResults?: Array<{ description: string; passed: boolean; expected?: string }>;
+  currentStep?: string | number;
+}
+
+export interface AskMentorPayload {
+  message: string;
+  history?: MentorHistoryItem[];
+  context?: MentorContext;
+}
+
+export interface AskMentorResult {
+  success: boolean;
+  reply: string;
+  model?: string;
+  error?: string;
+  isConfigError?: boolean;
+}
+
+/**
+ * Send inquiry and live workspace context to POST /api/mentor/ask
+ */
+export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorResult> {
+  const settings = getStoredAISettings();
+
+  try {
+    const res = await fetch('/api/mentor/ask', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(settings.apiKey ? { 'x-custom-api-key': settings.apiKey } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (res.ok && data?.success && data?.data) {
+      return {
+        success: true,
+        reply: data.data.reply,
+        model: data.data.model || 'gemini-2.5-flash',
+      };
+    }
+
+    // Handle authentication / configuration error
+    if (res.status === 401 || data?.isConfigError) {
+      return {
+        success: false,
+        reply: '',
+        error:
+          data?.error ||
+          'GEMINI_API_KEY is missing. Please set GEMINI_API_KEY=your_key in your `.env.local` file, or enter your key in the AI Settings dialog (⚙️) in the top-right of the mentor drawer.',
+        isConfigError: true,
+      };
+    }
+
+    return {
+      success: false,
+      reply: '',
+      error: data?.error || `API returned status ${res.status}: Failed to get solution from AI Mentor.`,
+    };
+  } catch (err: any) {
+    console.error('Network request to /api/mentor/ask failed:', err);
+    return {
+      success: false,
+      reply: '',
+      error:
+        'Network error: Unable to connect to the AI Mentor server. Please check your internet connection or dev server terminal.',
+    };
+  }
+}
+
+/**
+ * Backward-compatible wrapper for existing components
+ */
 export interface AcharyaRequestPayload {
   missionTitle: string;
   missionGoal?: string;
   studentCode: string;
   consoleOutputOrError?: string;
-  simulatorState?: {
-    roverPos?: [number, number];
-    targetPos?: [number, number];
-    battery?: number;
-    heartsLeft?: number;
-    status?: 'crashed_obstacle' | 'syntax_error' | 'infinite_loop' | 'incomplete_goal' | 'battery_depleted' | 'success';
-    lastCollisionCoord?: [number, number];
-  };
-  hintTier: 1 | 2 | 3;
+  simulatorState?: Record<string, any>;
+  hintTier?: number;
   studentMessage?: string;
-  actionType?: 'diagnose' | 'explain_error' | 'next_hint' | 'check_logic' | 'chat';
+  actionType?: string;
   language?: 'python' | 'html' | 'css' | 'javascript';
   preferredLanguage?: 'en' | 'hinglish' | 'hi';
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
+  testResults?: Array<{ description: string; passed: boolean; expected?: string }>;
 }
 
 export interface AcharyaResponse {
   message: string;
-  socraticQuestion: string;
-  hintTier: 1 | 2 | 3;
+  socraticQuestion?: string;
+  hintTier?: number;
   detectedLine?: number;
   issueCategory?: string;
   isFallback: boolean;
   providerUsed: string;
 }
 
-/**
- * Send request to backend Acharya AI endpoint with intelligent offline code inspection fallback
- */
 export async function queryAcharyaAI(payload: AcharyaRequestPayload): Promise<AcharyaResponse> {
-  const settings = getStoredAISettings();
+  const result = await askMentorAI({
+    message:
+      payload.studentMessage ||
+      'Please analyze my current code and problem statement, diagnose any issues, and provide the exact working solution.',
+    history: payload.conversationHistory || [],
+    context: {
+      missionTitle: payload.missionTitle,
+      problemStatement: payload.missionGoal,
+      code: payload.studentCode,
+      language: payload.language || 'python',
+      errorLog: payload.consoleOutputOrError,
+      simulationState: payload.simulatorState,
+      testResults: payload.testResults,
+    },
+  });
 
-  // If set strictly to local, run the deep code inspector directly
-  if (settings.provider === 'local') {
-    return runLocalInspector(payload);
+  if (result.success && result.reply) {
+    return {
+      message: result.reply,
+      isFallback: false,
+      providerUsed: result.model || 'Google Gemini 2.5 Flash',
+    };
   }
-
-  try {
-    const res = await fetch('/api/acharya', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(settings.apiKey ? { 'x-custom-api-key': settings.apiKey } : {}),
-        ...(settings.provider ? { 'x-custom-provider': settings.provider } : {}),
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && data.data) {
-        return data.data;
-      }
-    }
-  } catch (netErr) {
-    console.warn('Network call to /api/acharya failed, falling back to Deep Code Inspector:', netErr);
-  }
-
-  // Fallback to offline Deep Code Inspector
-  return runLocalInspector(payload);
-}
-
-function runLocalInspector(payload: AcharyaRequestPayload): AcharyaResponse {
-  const ctx: CodeInspectionContext = {
-    missionTitle: payload.missionTitle,
-    missionGoal: payload.missionGoal,
-    code: payload.studentCode,
-    consoleError: payload.consoleOutputOrError,
-    simulatorState: payload.simulatorState,
-    language: payload.language || 'python',
-    preferredLanguage: payload.preferredLanguage || 'en',
-    hintTier: payload.hintTier,
-    studentQuery: payload.studentMessage,
-  };
-
-  const isWeb = payload.language === 'html' || payload.language === 'css' || payload.language === 'javascript';
-  const inspection: InspectionResult = isWeb ? inspectWebCode(ctx) : inspectPythonCode(ctx);
-
-  const localized = formatDialect(inspection, payload.hintTier, payload.preferredLanguage || 'en');
 
   return {
-    message: localized.message,
-    socraticQuestion: localized.socraticQuestion,
-    hintTier: payload.hintTier,
-    detectedLine: inspection.detectedLine,
-    issueCategory: inspection.issueCategory,
+    message:
+      result.error ||
+      'Could not generate a response. Please check your GEMINI_API_KEY in .env.local.',
     isFallback: true,
-    providerUsed: 'Local Deep Code Inspector (AST)',
+    providerUsed: 'Configuration / Network Error',
   };
 }

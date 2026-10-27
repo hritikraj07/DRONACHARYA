@@ -303,6 +303,7 @@ export function DungeonCodeEditor({
         logs={logs}
         diagnostic={diagnostic}
         floorNumber={floorNumber}
+        code={code}
         onClearLogs={() => {}}
       />
     </div>

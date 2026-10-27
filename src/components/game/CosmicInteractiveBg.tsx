@@ -288,6 +288,46 @@ const PIXEL_SPRITES: Record<string, PixelSprite> = {
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
   },
+  rover: {
+    name: 'rover',
+    width: 12,
+    height: 10,
+    palette: ['transparent', '#6C5CE7', '#A29BFE', '#FFFFFF', '#10B981'],
+    scale: 3.0,
+    grid: [
+      [0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+      [0, 1, 2, 2, 2, 2, 2, 2, 3, 1, 0, 0],
+      [0, 1, 2, 3, 3, 2, 3, 3, 3, 1, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+      [1, 2, 1, 0, 0, 1, 0, 0, 1, 2, 1, 0],
+      [1, 3, 1, 0, 0, 1, 0, 0, 1, 3, 1, 0],
+      [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+  },
+  python: {
+    name: 'python',
+    width: 12,
+    height: 12,
+    palette: ['transparent', '#38BDF8', '#FBBF24', '#FFFFFF', '#0284C7'],
+    scale: 2.8,
+    grid: [
+      [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 1, 3, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0, 0],
+      [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 0],
+      [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 0],
+      [0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0],
+      [0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0],
+      [0, 0, 0, 0, 2, 2, 2, 2, 3, 2, 0, 0],
+      [0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0],
+      [0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0],
+    ],
+  },
 };
 
 interface FloatingItem {
@@ -466,9 +506,11 @@ export function CosmicInteractiveBg() {
       { id: 11, spriteKey: 'spaceship', x: width * 0.78, y: height * 0.84, vx: 0.07, vy: 0.04, angle: -0.25, vAngle: -0.002, baseY: height * 0.84, floatPhase: 4.1, floatSpeed: 0.016, scale: 1.05, spinActive: 0 },
       { id: 12, spriteKey: 'heart', x: width * 0.92, y: height * 0.86, vx: -0.05, vy: -0.05, angle: 0.12, vAngle: 0.003, baseY: height * 0.86, floatPhase: 1.8, floatSpeed: 0.021, scale: 1.0, spinActive: 0 },
       { id: 13, spriteKey: 'ruby', x: width * 0.84, y: height * 0.94, vx: 0.05, vy: -0.04, angle: 0.2, vAngle: 0.002, baseY: height * 0.94, floatPhase: 2.5, floatSpeed: 0.02, scale: 0.95, spinActive: 0 },
+      { id: 14, spriteKey: 'rover', x: width * 0.16, y: height * 0.28, vx: 0.05, vy: -0.04, angle: 0.0, vAngle: 0.001, baseY: height * 0.28, floatPhase: 1.4, floatSpeed: 0.016, scale: 1.15, spinActive: 0 },
+      { id: 15, spriteKey: 'python', x: width * 0.82, y: height * 0.26, vx: -0.06, vy: 0.03, angle: 0.1, vAngle: -0.002, baseY: height * 0.26, floatPhase: 2.1, floatSpeed: 0.018, scale: 1.1, spinActive: 0 },
     ];
 
-    // Floating Programming Glyphs & Symbols ({ }, < />, 01, [ ], =>, λ)
+    // Floating Programming Glyphs & Symbols ({ }, < />, 01, [ ], =>, λ, Python commands)
     const codeGlyphs: CodeGlyph[] = [
       { text: '{ }', x: width * 0.25, y: height * 0.2, vx: 0.04, vy: -0.03, floatPhase: 0.5, floatSpeed: 0.016, color: '#21D4FD', fontSize: 18, baseOpacity: 0.4 },
       { text: '< />', x: width * 0.76, y: height * 0.22, vx: -0.05, vy: 0.03, floatPhase: 1.8, floatSpeed: 0.018, color: '#A78BFA', fontSize: 20, baseOpacity: 0.45 },
@@ -478,6 +520,10 @@ export function CosmicInteractiveBg() {
       { text: 'λ', x: width * 0.8, y: height * 0.74, vx: -0.04, vy: -0.04, floatPhase: 1.2, floatSpeed: 0.015, color: '#21D4FD', fontSize: 22, baseOpacity: 0.4 },
       { text: 'print()', x: width * 0.14, y: height * 0.34, vx: 0.03, vy: -0.02, floatPhase: 2.8, floatSpeed: 0.012, color: '#36E0B0', fontSize: 14, baseOpacity: 0.32 },
       { text: 'return', x: width * 0.84, y: height * 0.38, vx: -0.03, vy: 0.03, floatPhase: 3.5, floatSpeed: 0.014, color: '#FF6B79', fontSize: 14, baseOpacity: 0.3 },
+      { text: 'rover.move_forward()', x: width * 0.35, y: height * 0.15, vx: 0.03, vy: -0.01, floatPhase: 1.1, floatSpeed: 0.013, color: '#21D4FD', fontSize: 13, baseOpacity: 0.45 },
+      { text: 'for step in range(5):', x: width * 0.62, y: height * 0.16, vx: -0.02, vy: 0.02, floatPhase: 2.3, floatSpeed: 0.014, color: '#A78BFA', fontSize: 13, baseOpacity: 0.45 },
+      { text: 'energy = 100', x: width * 0.18, y: height * 0.62, vx: 0.02, vy: 0.01, floatPhase: 3.8, floatSpeed: 0.015, color: '#36E0B0', fontSize: 12, baseOpacity: 0.4 },
+      { text: 'def rescue_robot():', x: width * 0.74, y: height * 0.65, vx: -0.03, vy: -0.01, floatPhase: 4.4, floatSpeed: 0.016, color: '#FFC83D', fontSize: 13, baseOpacity: 0.42 },
     ];
 
     // Helper to draw a pixel sprite onto canvas
@@ -773,17 +819,17 @@ export function CosmicInteractiveBg() {
         if (item.y < pad) { item.y = pad; item.vy = Math.abs(item.vy) * 0.8 + 0.1; }
         if (item.y > height - pad) { item.y = height - pad; item.vy = -Math.abs(item.vy) * 0.8 - 0.1; }
 
-        // Center card clearance avoidance (pushes sprites gently toward edges)
+        // Center clearance: subtle gentle drift so sprites gracefully float around and behind the frosted glass
         const centerX = width * 0.5;
-        const centerY = height * 0.45;
-        const clearW = Math.min(width * 0.42, 340);
-        const clearH = Math.min(height * 0.48, 380);
+        const centerY = height * 0.48;
+        const clearW = Math.min(width * 0.28, 220);
+        const clearH = Math.min(height * 0.32, 240);
 
         if (
           Math.abs(item.x - centerX) < clearW &&
           Math.abs(item.y - centerY) < clearH
         ) {
-          const pushX = item.x > centerX ? 0.3 : -0.3;
+          const pushX = item.x > centerX ? 0.05 : -0.05;
           item.vx += pushX;
         }
 

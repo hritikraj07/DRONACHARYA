@@ -28,6 +28,14 @@ import {
   Zap,
   GraduationCap,
   ArrowLeft,
+  Heart,
+  Code2,
+  ShieldCheck,
+  Cpu,
+  Bot,
+  Trophy,
+  Users,
+  Flame,
 } from 'lucide-react';
 
 export default function AuthPage() {
@@ -205,19 +213,118 @@ export default function AuthPage() {
       {/* 2. Upgraded Interactive Cosmic Coding Universe Background with 3D Parallax */}
       <CosmicInteractiveBg />
 
-      {/* 3. Center Authentication & Guest Demo Card (Clean Edges, Zero Shadow) */}
-      <main className="relative z-10 flex-1 flex items-center justify-center py-10 px-4 sm:px-6 my-auto">
-        <div className="relative w-full max-w-xl">
-          {/* Professional Glassmorphism Card (Clean edges, 1px border, no shadow) */}
+      {/* 3. Center Authentication & Guest Demo Card + Side Companion Telemetry */}
+      <main className="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10 px-4 sm:px-6 my-auto w-full max-w-7xl mx-auto">
+        <div className="w-full flex items-center justify-center gap-6 xl:gap-8">
+          {/* ========================================================
+              LEFT DESKTOP WIDGET: ACHARYA AI COMPANION MENTOR
+             ======================================================== */}
           <div
-            className="w-full p-6 sm:p-9 rounded-2xl text-[#1E1E24] bg-white border border-slate-200 relative"
+            className="hidden lg:flex flex-col w-72 shrink-0 p-5 rounded-2xl border border-white/50 text-[#1E1E24] relative self-stretch justify-between"
             style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.62)',
+              backdropFilter: 'blur(20px) saturate(175%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(175%)',
               boxShadow: 'none',
             }}
           >
+            {/* Top Tag & Status */}
+            <div>
+              <div className="flex items-center justify-between text-[10px] font-mono font-bold text-slate-500 mb-3 border-b border-slate-200/80 pb-2">
+                <span>[AI.MENTOR.v2.4]</span>
+                <span className="flex items-center gap-1 text-emerald-600 font-extrabold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  ONLINE
+                </span>
+              </div>
+
+              {/* Avatar + Title */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#6C5CE7] to-[#A29BFE] text-white flex items-center justify-center shrink-0 border border-white/80">
+                  <Bot className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Acharya AI</h3>
+                  <p className="text-[11px] text-slate-500 font-medium">Digital Gurukul Mentor</p>
+                </div>
+              </div>
+
+              {/* Speech bubble */}
+              <div className="p-3.5 rounded-xl bg-white/75 border border-slate-200/90 text-xs font-medium text-slate-700 leading-relaxed relative mb-4">
+                <span className="font-bold text-[#6C5CE7]">&quot;Namaste, Scholar!</span> No boring slides here. You will command rovers, build algorithms, and solve interactive quests in Python.&quot;
+              </div>
+
+              {/* Perks list */}
+              <div className="space-y-2 text-xs font-semibold text-slate-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">✓</div>
+                  <span>Instant in-browser Python</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">✓</div>
+                  <span>Playable 2D Game Simulators</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">✓</div>
+                  <span>Real-time code diagnosis</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">✓</div>
+                  <span>Permanent Cloud Save</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom tip */}
+            <div className="pt-3 border-t border-slate-200/80 mt-4 text-[11px] text-slate-500 font-medium flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <span>Tip: Guest Demo lets you play immediately without logging in.</span>
+            </div>
+          </div>
+
+          {/* ========================================================
+              CENTER AUTHENTICATION & GUEST DEMO CARD
+             ======================================================== */}
+          <div className="relative w-full max-w-xl shrink-0">
+            {/* Corner Cyber Brackets */}
+            <div className="absolute -top-3 left-2 text-[9px] font-mono text-slate-400 select-none pointer-events-none hidden sm:block">
+              ┌─ [GURUKUL.SECURE]
+            </div>
+            <div className="absolute -top-3 right-2 text-[9px] font-mono text-slate-400 select-none pointer-events-none hidden sm:block">
+              [REALM.01] ─┐
+            </div>
+
+            {/* Professional Glassmorphism Card (Translucent Frosted Glass, clean edges, 1px border, no shadow) */}
+            <div
+              className="w-full p-6 sm:p-9 rounded-2xl text-[#1E1E24] relative border border-white/60 backdrop-blur-2xl"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.62)',
+                backdropFilter: 'blur(22px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+                boxShadow: 'none',
+              }}
+            >
+            {/* 1. Live Platform Network Ticker Pill */}
+            <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 rounded-full bg-white/65 border border-white/70 backdrop-blur-md mb-5 text-[11px] font-bold text-slate-700">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                <span className="hidden sm:inline">Gurukul Network Online</span>
+                <span className="sm:hidden">Online</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-[#6C5CE7] font-extrabold flex items-center gap-1">
+                  <Code2 className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                  Python 3.12 Engine
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-amber-800 text-[10px] font-extrabold bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-300/70">
+                <Sparkles className="w-3 h-3 text-amber-600" />
+                <span>8 Active Coding Lands</span>
+              </div>
+            </div>
+
             {/* Brand Header */}
-            <div className="text-center mb-6">
-              <div className="relative inline-block mb-2.5">
+            <div className="text-center mb-5">
+              <div className="relative inline-block mb-2">
                 <div className="w-12 h-12 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-2xl font-black border border-[#6C5CE7]">
                   द्रो
                 </div>
@@ -234,16 +341,16 @@ export default function AuthPage() {
                   : 'Sign In to Your Quest'}
               </h1>
 
-              <div className="flex items-center justify-center gap-2 mt-2.5">
-                <div className="h-px w-10 bg-slate-200" />
-                <span className="text-[10px] text-[#6C5CE7] font-black uppercase tracking-widest flex items-center gap-1 bg-[#EDE9FE] px-2.5 py-0.5 rounded-full border border-indigo-200">
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <div className="h-px w-10 bg-slate-200/80" />
+                <span className="text-[10px] text-[#6C5CE7] font-black uppercase tracking-widest flex items-center gap-1 bg-[#EDE9FE]/90 px-2.5 py-0.5 rounded-full border border-indigo-200/70">
                   <Sparkles className="w-3 h-3 text-[#D97706]" />
                   <span>Gurukul Gateway</span>
                 </span>
-                <div className="h-px w-10 bg-slate-200" />
+                <div className="h-px w-10 bg-slate-200/80" />
               </div>
 
-              <p className="text-xs sm:text-sm text-[#4A4A58] font-medium mt-2 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#4A4A58] font-medium mt-1.5 max-w-md mx-auto leading-relaxed">
                 {authMode === 'guest'
                   ? 'No registration needed. Choose your programming track to start playing immediately.'
                   : authMode === 'signup'
@@ -252,26 +359,63 @@ export default function AuthPage() {
               </p>
             </div>
 
+            {/* 2. Interactive Feature Badges Strip (Playable Simulators • AI Mentor • Gamified XP) */}
+            <div className="grid grid-cols-3 gap-2 mb-5">
+              <div className="p-2.5 rounded-xl bg-white/65 border border-white/70 backdrop-blur-xs text-center transition-all hover:bg-white/85">
+                <Gamepad2 className="w-4 h-4 mx-auto text-[#6C5CE7] mb-1" />
+                <span className="block text-[10px] font-black uppercase text-slate-900 leading-tight">Playable Simulators</span>
+                <span className="block text-[9px] text-slate-500 font-medium leading-tight mt-0.5">2D Rover & Algorithms</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/65 border border-white/70 backdrop-blur-xs text-center transition-all hover:bg-white/85">
+                <Bot className="w-4 h-4 mx-auto text-amber-600 mb-1" />
+                <span className="block text-[10px] font-black uppercase text-slate-900 leading-tight">Acharya AI Mentor</span>
+                <span className="block text-[9px] text-slate-500 font-medium leading-tight mt-0.5">Real-time Code Diagnostics</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/65 border border-white/70 backdrop-blur-xs text-center transition-all hover:bg-white/85">
+                <Heart className="w-4 h-4 mx-auto text-rose-500 fill-rose-500/20 mb-1" />
+                <span className="block text-[10px] font-black uppercase text-slate-900 leading-tight">Mastery XP & Hearts</span>
+                <span className="block text-[9px] text-slate-500 font-medium leading-tight mt-0.5">Gamified Quest Loop</span>
+              </div>
+            </div>
+
+            {/* Live Community Activity Bar */}
+            <div className="flex items-center justify-around px-3 py-1.5 rounded-xl bg-white/50 border border-slate-200/70 mb-5 text-[10px] font-bold text-slate-600 backdrop-blur-xs">
+              <span className="flex items-center gap-1 text-slate-700">
+                <Users className="w-3 h-3 text-[#6C5CE7]" />
+                <span>1,840+ Active Scholars</span>
+              </span>
+              <span className="text-slate-300">•</span>
+              <span className="flex items-center gap-1 text-slate-700">
+                <Flame className="w-3 h-3 text-orange-500" />
+                <span>48k+ Loops Run Today</span>
+              </span>
+              <span className="text-slate-300">•</span>
+              <span className="flex items-center gap-1 text-slate-700">
+                <Trophy className="w-3 h-3 text-amber-500" />
+                <span>98.4% Pass Rate</span>
+              </span>
+            </div>
+
             {/* Quick Start / Play Instantly Guest Banner */}
             {authMode !== 'guest' && (
               <div
-                className="mb-5 p-3.5 sm:p-4 rounded-xl border border-amber-300 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative bg-amber-50"
+                className="mb-5 p-3.5 sm:p-4 rounded-xl border border-amber-300/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative bg-amber-100/75 backdrop-blur-xs"
                 style={{
                   boxShadow: 'none',
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-200 text-[#1E1E24] flex items-center justify-center shrink-0 font-black border border-amber-300">
+                  <div className="w-10 h-10 rounded-xl bg-amber-200/90 text-[#1E1E24] flex items-center justify-center shrink-0 font-black border border-amber-300">
                     <Gamepad2 className="w-5 h-5 text-amber-900" />
                   </div>
                   <div>
                     <div className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-2">
                       <span>Ready to start your adventure?</span>
-                      <span className="text-[10px] bg-[#10B981] text-white px-2 py-0.5 rounded-full font-bold">
+                      <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold">
                         Instant
                       </span>
                     </div>
-                    <div className="text-[11px] sm:text-xs text-slate-600 font-medium mt-0.5">
+                    <div className="text-[11px] sm:text-xs text-slate-700 font-medium mt-0.5">
                       Explore the coding world without creating an account.
                     </div>
                   </div>
@@ -291,8 +435,19 @@ export default function AuthPage() {
               </div>
             )}
 
+            {/* Current Active Mission Rover Callout */}
+            <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-indigo-50/70 border border-indigo-200/70 mb-5 text-[11px] font-medium text-slate-700 backdrop-blur-xs">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+                <span>Sector Online: <strong>Stage 3 Loop Lab (Rover Arya)</strong></span>
+              </span>
+              <span className="text-[10px] font-bold text-[#6C5CE7] bg-white/80 px-2 py-0.5 rounded border border-indigo-200">
+                +150 XP
+              </span>
+            </div>
+
             {/* Segmented Tab Switcher (Sign In vs Create Account vs Guest Demo) */}
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 mb-5 relative">
+            <div className="flex bg-slate-900/10 p-1 rounded-xl border border-slate-300/60 mb-5 relative backdrop-blur-xs">
               <button
                 type="button"
                 onClick={() => {
@@ -301,8 +456,8 @@ export default function AuthPage() {
                 }}
                 className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer relative ${
                   authMode === 'signin'
-                    ? 'bg-white text-[#6C5CE7] border border-slate-200'
-                    : 'text-slate-600 hover:text-slate-900 border border-transparent'
+                    ? 'bg-white/95 text-[#6C5CE7] border border-white/80'
+                    : 'text-slate-700 hover:text-slate-900 border border-transparent'
                 }`}
               >
                 Sign In
@@ -316,8 +471,8 @@ export default function AuthPage() {
                 }}
                 className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer relative ${
                   authMode === 'signup'
-                    ? 'bg-white text-[#6C5CE7] border border-slate-200'
-                    : 'text-slate-600 hover:text-slate-900 border border-transparent'
+                    ? 'bg-white/95 text-[#6C5CE7] border border-white/80'
+                    : 'text-slate-700 hover:text-slate-900 border border-transparent'
                 }`}
               >
                 Create Account
@@ -330,8 +485,8 @@ export default function AuthPage() {
                 }}
                 className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 relative ${
                   authMode === 'guest'
-                    ? 'bg-white text-amber-700 border border-slate-200'
-                    : 'text-slate-600 hover:text-slate-900 border border-transparent'
+                    ? 'bg-white/95 text-amber-700 border border-white/80'
+                    : 'text-slate-700 hover:text-slate-900 border border-transparent'
                 }`}
               >
                 <Gamepad2 className="w-3.5 h-3.5 text-amber-600" />
@@ -377,10 +532,10 @@ export default function AuthPage() {
                         <div
                           key={sub.id}
                           onClick={() => setGuestSubject(sub.id)}
-                          className={`p-3.5 rounded-xl border transition-colors cursor-pointer flex flex-col justify-between ${
+                          className={`p-3.5 rounded-xl border transition-colors cursor-pointer flex flex-col justify-between backdrop-blur-xs ${
                             isSelected
-                              ? 'bg-amber-50 border-amber-400 ring-1 ring-amber-400'
-                              : 'bg-white hover:bg-slate-50 border-slate-200'
+                              ? 'bg-amber-100/85 border-amber-400 ring-1 ring-amber-400'
+                              : 'bg-white/60 hover:bg-white/80 border-slate-200/90'
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -417,10 +572,10 @@ export default function AuthPage() {
                           key={cls}
                           type="button"
                           onClick={() => setGuestClass(cls)}
-                          className={`py-2 px-2 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
+                          className={`py-2 px-2 rounded-xl border text-xs font-bold transition-colors cursor-pointer backdrop-blur-xs ${
                             isSelected
                               ? 'bg-[#6C5CE7] text-white border-[#6C5CE7]'
-                              : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'
+                              : 'bg-white/60 text-slate-700 hover:bg-white/80 border-slate-200/90'
                           }`}
                         >
                           {cls}
@@ -431,7 +586,7 @@ export default function AuthPage() {
                 </div>
 
                 {/* Course Preview Callout */}
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <div className="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200/70 space-y-1 backdrop-blur-xs">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#6C5CE7]">
                     <Zap className="w-3.5 h-3.5 text-amber-500" />
                     <span>Launching: {selectedGuestSubjectObj.name} ({guestClass})</span>
@@ -456,7 +611,7 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setAuthMode('signin')}
-                    className="w-full sm:w-auto py-3 px-4 rounded-xl bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 border border-slate-200 shrink-0 transition-colors cursor-pointer"
+                    className="w-full sm:w-auto py-3 px-4 rounded-xl bg-white/70 hover:bg-white/90 text-xs font-bold text-slate-700 border border-slate-200/90 shrink-0 transition-colors cursor-pointer backdrop-blur-xs"
                   >
                     ← Back to Login
                   </button>
@@ -482,7 +637,7 @@ export default function AuthPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       onBlur={() => setEmail((prev) => prev.trim())}
                       placeholder="student@learning.edu"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6C5CE7] focus:outline-none transition-colors"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/55 hover:bg-white/70 focus:bg-white/95 border border-slate-300/80 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:border-[#6C5CE7] focus:outline-none transition-all backdrop-blur-xs"
                     />
                   </div>
                 </div>
@@ -499,7 +654,7 @@ export default function AuthPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your database password"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6C5CE7] focus:outline-none transition-colors"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/55 hover:bg-white/70 focus:bg-white/95 border border-slate-300/80 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:border-[#6C5CE7] focus:outline-none transition-all backdrop-blur-xs"
                     />
                   </div>
                 </div>
@@ -609,7 +764,7 @@ export default function AuthPage() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Aryabhata Sharma"
-                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6C5CE7] focus:outline-none transition-colors"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/55 hover:bg-white/70 focus:bg-white/95 border border-slate-300/80 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:border-[#6C5CE7] focus:outline-none transition-all backdrop-blur-xs"
                         />
                       </div>
                     </div>
@@ -625,7 +780,7 @@ export default function AuthPage() {
                           onChange={(e) => setEmail(e.target.value)}
                           onBlur={() => setEmail((prev) => prev.trim())}
                           placeholder="student@learning.edu"
-                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6C5CE7] focus:outline-none transition-colors"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/55 hover:bg-white/70 focus:bg-white/95 border border-slate-300/80 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:border-[#6C5CE7] focus:outline-none transition-all backdrop-blur-xs"
                         />
                       </div>
                     </div>
@@ -640,7 +795,7 @@ export default function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="At least 6 characters"
-                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#6C5CE7] focus:outline-none transition-colors"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/55 hover:bg-white/70 focus:bg-white/95 border border-slate-300/80 text-xs sm:text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:border-[#6C5CE7] focus:outline-none transition-all backdrop-blur-xs"
                         />
                       </div>
                     </div>
@@ -683,10 +838,10 @@ export default function AuthPage() {
                           <div
                             key={cls}
                             onClick={() => setStudentClass(cls)}
-                            className={`p-3.5 rounded-xl border transition-colors cursor-pointer flex items-center justify-between ${
+                            className={`p-3.5 rounded-xl border transition-colors cursor-pointer flex items-center justify-between backdrop-blur-xs ${
                               isSelected
-                                ? 'bg-amber-50 border-amber-400 font-bold'
-                                : 'bg-white hover:bg-slate-50 border-slate-200'
+                                ? 'bg-amber-100/85 border-amber-400 font-bold'
+                                : 'bg-white/60 hover:bg-white/80 border-slate-200/90'
                             }`}
                           >
                             <div className="flex items-center gap-2.5">
@@ -712,7 +867,7 @@ export default function AuthPage() {
                       <button
                         type="button"
                         onClick={() => setSignupStep(1)}
-                        className="py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 border border-slate-200 cursor-pointer transition-colors"
+                        className="py-2.5 px-4 rounded-xl bg-white/70 hover:bg-white/90 text-xs font-bold text-slate-700 border border-slate-200/90 cursor-pointer transition-colors backdrop-blur-xs"
                       >
                         ← Back
                       </button>
@@ -748,7 +903,7 @@ export default function AuthPage() {
                         <select
                           value={targetSubject}
                           onChange={(e) => setTargetSubject(e.target.value)}
-                          className="w-full appearance-none px-4 py-3 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-[#6C5CE7] cursor-pointer pr-10"
+                          className="w-full appearance-none px-4 py-3 border border-slate-300/80 rounded-xl bg-white/70 hover:bg-white/85 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-[#6C5CE7] cursor-pointer pr-10 backdrop-blur-xs"
                         >
                           {AVAILABLE_SUBJECTS.map((sub) => (
                             <option key={sub.id} value={sub.id}>
@@ -760,7 +915,7 @@ export default function AuthPage() {
                       </div>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200/70 space-y-1.5 backdrop-blur-xs">
                       <div className="flex items-center gap-2 text-xs font-bold text-[#6C5CE7]">
                         <Gamepad2 className="w-4 h-4 text-rose-500" />
                         <span>Included Mission: Rescue the Robot with Python Loops</span>
@@ -774,7 +929,7 @@ export default function AuthPage() {
                       <button
                         type="button"
                         onClick={() => setSignupStep(2)}
-                        className="py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 border border-slate-200 cursor-pointer transition-colors"
+                        className="py-2.5 px-4 rounded-xl bg-white/70 hover:bg-white/90 text-xs font-bold text-slate-700 border border-slate-200/90 cursor-pointer transition-colors backdrop-blur-xs"
                       >
                         ← Back
                       </button>
@@ -790,9 +945,105 @@ export default function AuthPage() {
                 )}
               </div>
             )}
+
+            {/* 4. Trust, Cloud & Tech Stack Bar */}
+            <div className="mt-6 pt-4 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-slate-500 font-medium">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Encrypted Cloud Sync via Supabase Auth</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1">
+                  <Cpu className="w-3 h-3 text-[#6C5CE7]" />
+                  Python 3.12 WebAssembly
+                </span>
+                <span>•</span>
+                <span>Zero Local Setup Required</span>
+              </div>
+            </div>
           </div>
         </div>
-      </main>
+
+        {/* ========================================================
+            RIGHT DESKTOP WIDGET: ACTIVE SECTOR MISSION TELEMETRY
+           ======================================================== */}
+        <div
+          className="hidden lg:flex flex-col w-72 shrink-0 p-5 rounded-2xl border border-white/50 text-[#1E1E24] relative self-stretch justify-between"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.62)',
+            backdropFilter: 'blur(20px) saturate(175%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(175%)',
+            boxShadow: 'none',
+          }}
+        >
+          {/* Top Tag & Status */}
+          <div>
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-slate-500 mb-3 border-b border-slate-200/80 pb-2">
+              <span>[SECTOR.RADAR // 03]</span>
+              <span className="flex items-center gap-1 text-[#6C5CE7] font-extrabold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6C5CE7] animate-pulse" />
+                ACTIVE
+              </span>
+            </div>
+
+            {/* Rover Mission Lore */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Gamepad2 className="w-4 h-4 text-rose-500" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Rover Arya Rescue</h3>
+              </div>
+              <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                The Clockwork Citadel operates on infinite automated gear cycles. Guide Rover Arya using Python for-loops!
+              </p>
+            </div>
+
+            {/* Telemetry Metrics */}
+            <div className="space-y-2 mb-4">
+              <div className="p-2.5 rounded-xl bg-white/75 border border-slate-200/90 text-xs">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                  <span>Battery Cell</span>
+                  <span className="font-bold text-emerald-600">100% Full</span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full w-full" />
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white/75 border border-slate-200/90 text-xs flex items-center justify-between">
+                <span className="text-[11px] text-slate-600 font-medium">Core Concept:</span>
+                <span className="font-mono font-bold text-[11px] text-[#6C5CE7] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
+                  for i in range(5):
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white/75 border border-slate-200/90 text-xs flex items-center justify-between">
+                <span className="text-[11px] text-slate-600 font-medium">Mission Reward:</span>
+                <span className="font-bold text-[11px] text-amber-700 flex items-center gap-1">
+                  <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                  +150 XP
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Demo Button */}
+          <div className="pt-3 border-t border-slate-200/80 mt-4">
+            <button
+              type="button"
+              onClick={() => {
+                setAuthMode('guest');
+                setGuestSubject('python');
+                setErrorMsg(null);
+              }}
+              className="w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-900 text-xs font-bold border border-amber-400 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Play className="w-3.5 h-3.5 fill-slate-900" />
+              <span>Test Mission in Guest Mode</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
     </div>
   );
 }

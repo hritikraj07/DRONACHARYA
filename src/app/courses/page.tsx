@@ -144,10 +144,10 @@ export default function CoursesPage() {
               </p>
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
-                  href="/learn/py-less-1-1"
+                  href="/courses/python/dashboard"
                   className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Launch Python Quest →</span>
+                  <span>Launch Python Dashboard →</span>
                 </Link>
                 <Link
                   href="/dungeon"
@@ -248,7 +248,7 @@ export default function CoursesPage() {
                           <span>Syllabus</span>
                         </Link>
                         <Link
-                          href={`/learn/${firstLessonId}`}
+                          href={c.id === 'python' ? '/courses/python/dashboard' : `/learn/${firstLessonId}`}
                           className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
                           <span>Play</span>

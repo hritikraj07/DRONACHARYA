@@ -49,6 +49,7 @@ interface MissionSpec {
   initialCode: string;
   xpReward: number;
   initialCells?: BioCell[];
+  testCases?: Array<{ id: string; inputDescription: string; expectedOutput: string; codeSnippet: string }>;
 }
 
 const MISSIONS: Record<string, MissionSpec> = {
@@ -120,6 +121,133 @@ def filter_healthy_cells(data_cells: list) -> list:
       { id: 3, charge: 80, isContaminated: false },
       { id: 4, charge: -35, isContaminated: true },
       { id: 5, charge: 65, isContaminated: false },
+    ],
+  },
+  'mission-hello-python': {
+    id: 'mission-hello-python',
+    stageNumber: 1,
+    realmName: 'Starter Village',
+    title: 'Hello, Python!',
+    concept: 'print() & Standard Output',
+    story:
+      'Begin your journey through the Digital Gurukul. Write your first Python program and instruct the computer to output a message to the console screen.',
+    instructions: [
+      'Use the built-in print() function.',
+      'Wrap your text inside quotes, for example: print("Hello, Dronacharya!").',
+      'Run the code and verify the output appears in the live console.',
+    ],
+    initialCode: `# 🐍 Mission 1: Hello, Python!
+# Objective: Write your first Python program to print a greeting!
+
+print("Hello, Dronacharya! I am ready to code in Python.")
+`,
+    xpReward: 50,
+    testCases: [
+      {
+        id: 't1',
+        inputDescription: 'Program executes and outputs text to console',
+        expectedOutput: 'Hello, Dronacharya!',
+        codeSnippet: 'assert True',
+      },
+    ],
+  },
+  'mission-calculator': {
+    id: 'mission-calculator',
+    stageNumber: 2,
+    realmName: 'Function Fortress',
+    title: 'Build a Calculator',
+    concept: 'Functions, Operators & Conditionals',
+    story:
+      'Engineers at the observatory require an automated calculator tool. Build a Python function calculate(a, b, op) that handles addition, subtraction, multiplication, and division.',
+    instructions: [
+      'Define calculate(a, b, op) with arithmetic handling.',
+      'Check if op is "+", "-", "*", or "/".',
+      'Handle division by zero gracefully by returning "Error: Division by zero".',
+      'Return the calculated numeric result.',
+    ],
+    initialCode: `# 🧮 Mission 2: Build a Calculator
+# Objective: Create a function calculate(a, b, op) that computes results.
+
+def calculate(a, b, op):
+    if op == '+':
+        return a + b
+    elif op == '-':
+        return a - b
+    elif op == '*':
+        return a * b
+    elif op == '/':
+        return a / b if b != 0 else "Error: Division by zero"
+    return "Invalid operator"
+
+# Test your calculator function:
+print("10 + 5 =", calculate(10, 5, "+"))
+print("30 - 8 =", calculate(30, 8, "-"))
+print("6 * 7 =", calculate(6, 7, "*"))
+print("40 / 5 =", calculate(40, 5, "/"))
+`,
+    xpReward: 100,
+    testCases: [
+      {
+        id: 't1',
+        inputDescription: 'calculate(10, 5, "+") == 15',
+        expectedOutput: '15',
+        codeSnippet: 'assert calculate(10, 5, "+") == 15',
+      },
+      {
+        id: 't2',
+        inputDescription: 'calculate(20, 4, "/") == 5.0',
+        expectedOutput: '5.0',
+        codeSnippet: 'assert calculate(20, 4, "/") == 5 or calculate(20, 4, "/") == 5.0',
+      },
+    ],
+  },
+  'mission-todo-list': {
+    id: 'mission-todo-list',
+    stageNumber: 3,
+    realmName: 'Array Islands',
+    title: 'Create a To-Do List',
+    concept: 'Lists, Dictionaries & State',
+    story:
+      'Manage daily adventurer objectives by writing a TodoList class or manager to append new tasks, mark items complete, and inspect remaining tasks.',
+    instructions: [
+      'Implement add_task(title) to append tasks to a list.',
+      'Implement complete_task(index) to mark an item complete.',
+      'Implement get_pending_count() to return the number of pending tasks.',
+    ],
+    initialCode: `# 📝 Mission 3: Create a To-Do List Manager
+# Objective: Build task manager to add, complete, and count pending tasks.
+
+class TodoList:
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, title):
+        self.tasks.append({"title": title, "done": False})
+        print(f"Added quest: '{title}'")
+
+    def complete_task(self, index):
+        if 0 <= index < len(self.tasks):
+            self.tasks[index]["done"] = True
+            print(f"Completed quest: '{self.tasks[index]['title']}'")
+
+    def get_pending_count(self):
+        return sum(1 for t in self.tasks if not t["done"])
+
+# Test the task manager:
+todo = TodoList()
+todo.add_task("Master Python Variables")
+todo.add_task("Defeat Dungeon Goblin")
+todo.complete_task(0)
+print("Pending tasks:", todo.get_pending_count())
+`,
+    xpReward: 150,
+    testCases: [
+      {
+        id: 't1',
+        inputDescription: 'TodoList add_task and get_pending_count',
+        expectedOutput: '1',
+        codeSnippet: 't = TodoList(); t.add_task("A"); t.add_task("B"); t.complete_task(0); assert t.get_pending_count() == 1',
+      },
     ],
   },
 };
@@ -397,6 +525,66 @@ def boosted_rescue(cells: list) -> list:
     };
 
     animateConveyor();
+  };
+
+  // Run General Python Challenge (Hello Python, Calculator, To-Do List)
+  const handleRunGeneralPythonChallenge = async () => {
+    setIsRunning(true);
+    setConsoleLogs((prev) => [
+      ...prev,
+      '▶ Compiling & executing Python program in WebAssembly sandbox...',
+    ]);
+
+    const testCases = currentMission.testCases || [
+      { id: 't1', inputDescription: 'Program executes successfully without error', expectedOutput: 'Success', codeSnippet: 'assert True' },
+    ];
+
+    const result = await executePythonChallenge(code, testCases, currentMission.id);
+    setFilterSimResult(result);
+    setIsRunning(false);
+
+    if (result.stdout && result.stdout.trim().length > 0) {
+      const outLines = result.stdout.split('\n').filter(Boolean);
+      setConsoleLogs((prev) => [...prev, ...outLines.map((l: string) => `> ${l}`)]);
+    }
+
+    if (result.allPassed) {
+      setConsoleLogs((prev) => [
+        ...prev,
+        '✨ All assertion checks passed!',
+        `🎉 Mission Complete! +${currentMission.xpReward} XP awarded.`,
+      ]);
+
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      } catch (e) {}
+
+      recordGameProgress({
+        missionId: currentMission.id,
+        earnedXp: currentMission.xpReward,
+        subject: 'python',
+      });
+
+      setIsCelebrationOpen(true);
+    } else {
+      deductHeart();
+      if (result.stderr) {
+        setConsoleLogs((prev) => [...prev, `❌ Error: ${result.stderr}`]);
+      }
+      setTerminalSubTab('diagnostics');
+      setProactiveTrigger({
+        type: 'syntax',
+        message:
+          result.stderr ||
+          result.diagnosticExplanation ||
+          'One or more assertion checks did not pass. Inspect test output.',
+      });
+      setIsMentorOpen(true);
+    }
   };
 
   // Run Follow-Up Battle Challenge
@@ -682,7 +870,7 @@ for step in range(4):
               onSetSpeed={setAnimationSpeed}
               collectedBatteries={collectedBatteries}
             />
-          ) : (
+          ) : currentMission.id === 'mission-hazard-filter' ? (
             <CellFilterEngine
               cells={cells}
               activeCellIndex={activeCellIndex}
@@ -691,6 +879,85 @@ for step in range(4):
               quarantineCount={quarantineCount}
               onReset={handleReset}
             />
+          ) : (
+            <div className="card-game p-5 bg-white flex flex-col justify-between space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b-2 border-[#1E1E24]/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
+                    <Terminal className="w-4 h-4 text-[#306998]" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif font-black text-sm text-[#1E1E24]">
+                      {currentMission.title}
+                    </h3>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      {currentMission.concept}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-pixel text-emerald-800 bg-[#DCFCE7] px-2 py-0.5 rounded border border-emerald-300">
+                  +{currentMission.xpReward} XP
+                </span>
+              </div>
+
+              {/* Mission Objectives & Verification Checks */}
+              <div className="space-y-2.5">
+                <span className="text-xs font-black uppercase text-[#1E1E24] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                  Mission Test Assertions
+                </span>
+                <div className="space-y-2">
+                  {(currentMission.testCases || []).map((t, i) => {
+                    const testItem = filterSimResult?.testResults?.find((tr) => tr.testId === t.id);
+                    const isPassed = testItem?.passed;
+                    return (
+                      <div
+                        key={t.id}
+                        className={`p-3 rounded-xl border-2 transition-all flex items-start gap-2.5 ${
+                          isPassed
+                            ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-[2px_2px_0px_#10B981]'
+                            : testItem
+                            ? 'bg-rose-50 border-rose-500 text-rose-900 shadow-[2px_2px_0px_#EF4444]'
+                            : 'bg-[#FAF6EE] border-[#1E1E24] text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                        }`}
+                      >
+                        <div className="mt-0.5">
+                          {isPassed ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          ) : testItem ? (
+                            <XCircle className="w-4 h-4 text-rose-600" />
+                          ) : (
+                            <span className="w-4 h-4 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-mono font-bold">
+                              {i + 1}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold leading-tight">{t.inputDescription}</p>
+                          <span className="text-[10px] font-mono opacity-75 mt-0.5 block">
+                            Expected: {t.expectedOutput}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Status bar */}
+              <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs font-bold text-gray-700 space-y-1">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span>Environment:</span>
+                  <span className="text-emerald-700 font-mono">CPython 3.12 WebAssembly</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span>Execution:</span>
+                  <span className="font-mono">
+                    {filterSimResult?.allPassed ? 'Passed (100%)' : 'Awaiting Run'}
+                  </span>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
@@ -734,7 +1001,9 @@ for step in range(4):
                 onClick={
                   currentMission.id === 'mission-rescue-robot'
                     ? handleRunRobotCode
-                    : handleRunCellFilter
+                    : currentMission.id === 'mission-hazard-filter'
+                    ? handleRunCellFilter
+                    : handleRunGeneralPythonChallenge
                 }
                 disabled={isRunning || isAnimating}
                 className="btn-arcade btn-arcade-purple flex-1 py-2.5 text-xs"

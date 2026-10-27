@@ -163,10 +163,10 @@ function CourseDetailContent() {
                 ← Explore Active Quests
               </Link>
               <Link
-                href="/learn/html-less-1-1"
+                href="/courses/python/dashboard"
                 className="px-6 py-3 bg-[#FFD214] text-[#1E1E24] font-black text-xs rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] transition-all hover:scale-105"
               >
-                Play HTML Now →
+                Play Python Now →
               </Link>
             </div>
           </div>
@@ -231,10 +231,20 @@ function CourseDetailContent() {
           </div>
 
           {/* Action CTAs */}
-          <div className="shrink-0 flex flex-col gap-3 min-w-[200px]">
+          <div className="shrink-0 flex flex-col gap-2.5 min-w-[200px]">
+            {course.id === 'python' && (
+              <Link
+                href="/courses/python/dashboard"
+                className="btn-arcade btn-arcade-gold py-3 px-6 flex items-center justify-center gap-2 text-center cursor-pointer select-none"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Python Dashboard</span>
+              </Link>
+            )}
+
             <Link
               href={`/learn/${nextLessonId}`}
-              className="btn-arcade btn-arcade-purple py-3 px-6 flex items-center justify-center gap-2 text-center cursor-pointer select-none"
+              className="btn-arcade btn-arcade-purple py-2.5 px-6 flex items-center justify-center gap-2 text-center cursor-pointer select-none"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>{completedCount > 0 ? 'Continue Quest' : 'Start Chapter 1'}</span>
@@ -242,7 +252,7 @@ function CourseDetailContent() {
 
             <Link
               href="/simulator"
-              className="btn-arcade btn-arcade-white py-2.5 px-6 flex items-center justify-center gap-2 text-center"
+              className="btn-arcade btn-arcade-white py-2 px-6 flex items-center justify-center gap-2 text-center"
             >
               <Gamepad2 className="w-3.5 h-3.5" />
               <span>Free Code Sandbox</span>

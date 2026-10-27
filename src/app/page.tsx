@@ -592,7 +592,7 @@ export default function HomePage() {
                           <span>Syllabus</span>
                         </Link>
                         <Link
-                          href={`/learn/${firstLessonId}`}
+                          href={c.id === 'python' ? '/courses/python/dashboard' : `/learn/${firstLessonId}`}
                           className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
                           <span>Play</span>

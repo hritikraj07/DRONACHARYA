@@ -48,55 +48,7 @@ export interface SubjectMetadata {
 }
 
 export const AVAILABLE_SUBJECTS: SubjectMetadata[] = [
-  // 4 ACTIVE PLAYABLE TRACKS
-  {
-    id: 'html',
-    name: 'HTML',
-    title: 'HTML: The Blueprint',
-    slug: 'html',
-    category: 'Web Development',
-    icon: 'FileCode',
-    badge: 'Active Quest',
-    tagline: 'Structure of the Web: Elements, Semantic Tags & Mini-Portfolio',
-    description: 'Learn the foundational markup language that powers every website on the internet. Write tags, embed media, and architect responsive pages.',
-    isAvailable: true,
-    isComingSoon: false,
-    totalChapters: 3,
-    totalLessons: 7,
-    color: '#E44D26',
-  },
-  {
-    id: 'css',
-    name: 'CSS',
-    title: 'CSS: Colors & Layouts',
-    slug: 'css',
-    category: 'Web Development',
-    icon: 'Palette',
-    badge: 'Active Quest',
-    tagline: 'Styling & Design: Selectors, Box Model, Flexbox & Grid Systems',
-    description: 'Bring websites to life with colors, typography, modern Box Model mechanics, Flexbox layouts, and CSS Grid responsive galleries.',
-    isAvailable: true,
-    isComingSoon: false,
-    totalChapters: 3,
-    totalLessons: 7,
-    color: '#264DE4',
-  },
-  {
-    id: 'javascript',
-    name: 'JavaScript',
-    title: 'JavaScript: Interactive Web',
-    slug: 'javascript',
-    category: 'Programming',
-    icon: 'Code2',
-    badge: 'Active Quest',
-    tagline: 'Interactivity & Logic: Variables, Conditionals, DOM & Events',
-    description: 'Master the programming language of the browser. Create dynamic user interactions, manipulate the DOM, and control game logic.',
-    isAvailable: true,
-    isComingSoon: false,
-    totalChapters: 3,
-    totalLessons: 7,
-    color: '#F7DF1E',
-  },
+  // ONLY ACTIVE PLAYABLE TRACK: PYTHON
   {
     id: 'python',
     name: 'Python',
@@ -111,7 +63,57 @@ export const AVAILABLE_SUBJECTS: SubjectMetadata[] = [
     isComingSoon: false,
     totalChapters: 8,
     totalLessons: 24,
-    color: '#3776AB',
+    color: '#6C5CE7',
+  },
+
+  // COMING SOON TRACKS
+  {
+    id: 'html',
+    name: 'HTML',
+    title: 'HTML: The Blueprint',
+    slug: 'html',
+    category: 'Web Development',
+    icon: 'FileCode',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Structure of the Web: Elements, Semantic Tags & Mini-Portfolio',
+    description: 'Learn the foundational markup language that powers every website on the internet. Write tags, embed media, and architect responsive pages.',
+    isAvailable: false,
+    isComingSoon: true,
+    totalChapters: 3,
+    totalLessons: 7,
+    color: '#E44D26',
+  },
+  {
+    id: 'css',
+    name: 'CSS',
+    title: 'CSS: Colors & Layouts',
+    slug: 'css',
+    category: 'Web Development',
+    icon: 'Palette',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Styling & Design: Selectors, Box Model, Flexbox & Grid Systems',
+    description: 'Bring websites to life with colors, typography, modern Box Model mechanics, Flexbox layouts, and CSS Grid responsive galleries.',
+    isAvailable: false,
+    isComingSoon: true,
+    totalChapters: 3,
+    totalLessons: 7,
+    color: '#264DE4',
+  },
+  {
+    id: 'javascript',
+    name: 'JavaScript',
+    title: 'JavaScript: Interactive Web',
+    slug: 'javascript',
+    category: 'Programming',
+    icon: 'Code2',
+    badge: 'Coming Soon ⏳',
+    tagline: 'Interactivity & Logic: Variables, Conditionals, DOM & Events',
+    description: 'Master the programming language of the browser. Create dynamic user interactions, manipulate the DOM, and control game logic.',
+    isAvailable: false,
+    isComingSoon: true,
+    totalChapters: 3,
+    totalLessons: 7,
+    color: '#F7DF1E',
   },
 
   // 6 LOCKED COMING SOON TRACKS
@@ -254,7 +256,7 @@ const DEFAULT_GUEST: RegisteredUser = {
   name: 'Guest Explorer',
   email: 'guest@dronacharya.local',
   studentClass: 'Class 10',
-  targetSubject: 'html',
+  targetSubject: 'python',
   preferredLanguage: 'hinglish',
   totalXp: 0,
   currentStreak: 1,
@@ -838,10 +840,10 @@ export function triggerSaveProgressModal(reason: string = 'save_progress') {
  * Create an immediate guest demo session without requiring credentials.
  * Directly routes to learning the respective selected course.
  */
-export function createGuestSession(targetSubject: string = 'html', studentClass: string = 'Class 10'): RegisteredUser {
+export function createGuestSession(targetSubject: string = 'python', studentClass: string = 'Class 10'): RegisteredUser {
   const norm = normalizeSubjectId(targetSubject);
   const subjectObj = AVAILABLE_SUBJECTS.find((s) => s.id === norm && !s.isComingSoon);
-  const activeSubject = subjectObj ? subjectObj.id : 'html';
+  const activeSubject = subjectObj ? subjectObj.id : 'python';
 
   const guestUser: RegisteredUser = {
     id: `guest_${Date.now()}`,

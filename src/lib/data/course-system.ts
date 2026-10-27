@@ -116,10 +116,10 @@ export const COURSES_CATALOG: Course[] = [
     totalLessons: 7,
     xpReward: 350,
     iconName: 'FileCode',
-    badgeText: 'Active Quest',
-    badgeColor: 'bg-[#E44D26] text-white',
-    isAvailable: true,
-    isComingSoon: false,
+    badgeText: 'Coming Soon ⏳',
+    badgeColor: 'bg-amber-100 text-amber-800 border border-amber-300',
+    isAvailable: false,
+    isComingSoon: true,
     chapters: [
       {
         id: 'html-ch-1',
@@ -717,10 +717,10 @@ export const COURSES_CATALOG: Course[] = [
     totalLessons: 7,
     xpReward: 350,
     iconName: 'Palette',
-    badgeText: 'Active Quest',
-    badgeColor: 'bg-[#264DE4] text-white',
-    isAvailable: true,
-    isComingSoon: false,
+    badgeText: 'Coming Soon ⏳',
+    badgeColor: 'bg-amber-100 text-amber-800 border border-amber-300',
+    isAvailable: false,
+    isComingSoon: true,
     chapters: [
       {
         id: 'css-ch-1',
@@ -1330,10 +1330,10 @@ h1 {
     totalLessons: 7,
     xpReward: 350,
     iconName: 'Code2',
-    badgeText: 'Active Quest',
-    badgeColor: 'bg-[#F7DF1E] text-[#1E1E24]',
-    isAvailable: true,
-    isComingSoon: false,
+    badgeText: 'Coming Soon ⏳',
+    badgeColor: 'bg-amber-100 text-amber-800 border border-amber-300',
+    isAvailable: false,
+    isComingSoon: true,
     chapters: [
       {
         id: 'js-ch-1',
@@ -2381,14 +2381,14 @@ export function findLessonById(lessonId: string): {
   }
 
   // Fallback to first lesson of HTML 101 if not found
-  const firstCourse = COURSES_CATALOG[0];
-  if (firstCourse && firstCourse.chapters[0] && firstCourse.chapters[0].lessons[0]) {
-    const lesson = firstCourse.chapters[0].lessons[0];
-    const chapter = firstCourse.chapters[0];
+  const pythonCourse = COURSES_CATALOG.find((c) => c.id === 'python') || COURSES_CATALOG[0];
+  if (pythonCourse && pythonCourse.chapters[0] && pythonCourse.chapters[0].lessons[0]) {
+    const lesson = pythonCourse.chapters[0].lessons[0];
+    const chapter = pythonCourse.chapters[0];
     return {
       lesson,
       chapter,
-      course: firstCourse,
+      course: pythonCourse,
       prevLesson: null,
       nextLesson: chapter.lessons[1] || null,
     };
@@ -2401,7 +2401,8 @@ export function findLessonById(lessonId: string): {
  * Helper to find a course by slug or ID with alias normalization.
  */
 export function findCourseBySlugOrId(idOrSlug: string): Course | null {
-  if (!idOrSlug) return COURSES_CATALOG[0];
+  const pythonCourse = COURSES_CATALOG.find((c) => c.id === 'python') || COURSES_CATALOG[0];
+  if (!idOrSlug) return pythonCourse;
   const clean = idOrSlug.toLowerCase().trim();
 
   // Normalize aliases
@@ -2413,5 +2414,5 @@ export function findCourseBySlugOrId(idOrSlug: string): Course | null {
   if (clean === 'c-programming' || clean === 'cpp-programming' || clean === 'c++') target = 'cpp';
 
   const match = COURSES_CATALOG.find((c) => c.id === target || c.slug === target);
-  return match || COURSES_CATALOG[0];
+  return match || pythonCourse;
 }

@@ -137,23 +137,23 @@ export default function CoursesPage() {
                 <span>Recommended Starter Path</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-                Web Development Trio + Python Realm
+                Python Programming Realm 🐍
               </h2>
               <p className="text-xs sm:text-sm font-bold text-purple-100 leading-relaxed">
-                Begin your journey with HTML to master the skeleton of the internet, style with CSS, add intelligence with JavaScript, or venture into the algorithms and game physics of Python!
+                Step into the live game-based Python universe! Control Rover Arya, master loops, conditionals, and functions in real sandboxed Python, or battle monsters in the Python Code Dungeon.
               </p>
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
-                  href="/learn/html-less-1-1"
+                  href="/learn/py-less-1-1"
                   className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Start HTML Quest →</span>
+                  <span>Launch Python Quest →</span>
                 </Link>
                 <Link
-                  href="/learn/py-less-1-1"
+                  href="/dungeon"
                   className="btn-arcade btn-arcade-white px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Play Python Quest →</span>
+                  <span>⚔️ Python Dungeon Arena</span>
                 </Link>
               </div>
             </div>

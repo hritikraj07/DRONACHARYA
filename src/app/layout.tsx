@@ -35,11 +35,11 @@ export const metadata: Metadata = {
     'Start your coding adventure with Dronacharya. The most fun and beginner-friendly way to learn Python, HTML, CSS, and JavaScript.',
   icons: {
     icon: [
-      { url: '/logo-round.png', type: 'image/png' },
+      { url: '/logo-title.png', type: 'image/png' },
       { url: '/icon.png', type: 'image/png' },
       { url: '/favicon.ico' },
     ],
-    shortcut: '/logo-round.png',
+    shortcut: '/logo-title.png',
     apple: '/apple-icon.png',
   },
 };

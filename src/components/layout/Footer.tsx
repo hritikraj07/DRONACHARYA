@@ -204,27 +204,27 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/learn/html-less-1-1" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>HTML Web Forge</span>
-                    <span className="text-[10px] font-mono text-[#00B894] font-bold">Active</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/learn/css-less-1-1" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>CSS Stylist Peak</span>
-                    <span className="text-[10px] font-mono text-[#00B894] font-bold">Active</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/learn/js-less-1-1" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>JavaScript Nexus</span>
-                    <span className="text-[10px] font-mono text-[#00B894] font-bold">Active</span>
-                  </Link>
-                </li>
-                <li>
                   <Link href="/learn/py-less-1-1" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
                     <span>Python Sanctuary</span>
-                    <span className="text-[10px] font-mono text-[#00B894] font-bold">Active</span>
+                    <span className="text-[10px] font-mono text-[#00B894] font-bold">Active Quest</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
+                    <span>HTML Web Forge</span>
+                    <span className="text-[10px] font-mono text-amber-500 font-bold">Coming Soon</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
+                    <span>CSS Stylist Peak</span>
+                    <span className="text-[10px] font-mono text-amber-500 font-bold">Coming Soon</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
+                    <span>JavaScript Nexus</span>
+                    <span className="text-[10px] font-mono text-amber-500 font-bold">Coming Soon</span>
                   </Link>
                 </li>
               </ul>

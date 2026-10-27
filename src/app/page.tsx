@@ -501,7 +501,7 @@ export default function HomePage() {
                   : 'text-[#4A4A58] hover:text-[#1E1E24]'
               }`}
             >
-              Active Quests (4)
+              Active Quests ({COURSES_CATALOG.filter((c) => !c.isComingSoon).length})
             </button>
             <button
               onClick={() => setJourneyFilter('coming')}
@@ -511,7 +511,7 @@ export default function HomePage() {
                   : 'text-[#4A4A58] hover:text-[#1E1E24]'
               }`}
             >
-              Coming Soon (6)
+              Coming Soon ({COURSES_CATALOG.filter((c) => c.isComingSoon).length})
             </button>
           </div>
         </div>

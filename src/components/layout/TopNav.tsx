@@ -92,6 +92,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
   const navLinks = [
+    { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'World Map', href: '/paths', icon: Compass },
     { name: 'Missions', href: '/simulator', icon: Gamepad2 },
     { name: 'Quest Hub', href: '/dashboard', icon: Target },

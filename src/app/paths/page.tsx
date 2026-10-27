@@ -25,19 +25,19 @@ export default function PathsPage() {
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#E9DFC9] border border-[#B49A65] text-xs font-semibold text-[#7A6230] mb-2">
             <Compass className="w-3.5 h-3.5 text-[#B49A65]" />
-            <span>Gurukul Questlines</span>
+            <span>Learning Roadmap</span>
           </div>
           <h1 className="font-serif font-bold text-3xl sm:text-4xl text-[#252820]">
-            Learning Paths & Quest Map
+            Learn: {path.title}
           </h1>
           <p className="text-sm text-[#575A51] mt-1">
-            Navigate narrative missions where theoretical concepts are transformed into verified skills.
+            Complete step-by-step interactive missions to turn theoretical concepts into practical coding ability.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <div className="text-xs text-[#7E8276]">Total Missions Completed</div>
+            <div className="text-xs text-[#7E8276]">Missions Completed</div>
             <div className="font-serif font-bold text-xl text-[#354B3A]">
               {path.missions.filter((m) => m.isCompleted).length} / {path.missions.length}
             </div>
@@ -54,7 +54,7 @@ export default function PathsPage() {
             </div>
             <div>
               <span className="text-xs font-semibold text-[#A65F43] uppercase tracking-wider">
-                Algorithms & Systems Track
+                Beginner Track
               </span>
               <h2 className="font-serif font-bold text-2xl text-[#252820] mt-0.5">
                 {path.title}

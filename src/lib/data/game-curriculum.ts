@@ -31,104 +31,117 @@ export interface SubjectCurriculum {
 }
 
 export const SUBJECT_CURRICULA: Record<string, SubjectCurriculum> = {
-  'python-algorithms': {
-    subjectId: 'python-algorithms',
-    subjectName: 'Python & Algorithmic Thinking',
-    category: 'Computer Science',
+  'python-basics': {
+    subjectId: 'python-basics',
+    subjectName: 'Python Programming',
+    category: 'Programming',
     levels: [
       {
         id: 'py-lvl-1',
         levelNumber: 1,
-        title: 'Level 1: The Spell of Variables & Logic',
-        subtitle: 'Foundations of Computational Memory',
-        storyNarrative: 'You stand before the Iron Gate of Drona’s Citadel. The stone sentinel demands a correct calculation of gate power before granting entry.',
-        conceptTeaser: 'Variables in Python hold references to memory values. Use conditional statements to evaluate paths.',
+        title: 'Level 1: Rescue the Robot',
+        subtitle: 'Learn Python Loops',
+        storyNarrative: 'A rescue robot is stranded in the field with a depleted battery. It has gathered scattered power cells on the ground. Write a loop to calculate the total energy from all collected battery cells so the robot can power up and return to base!',
+        conceptTeaser: 'Loops let you repeat code for every item in a list. In Python, write: "for cell in battery_cells:" and add each cell to total_energy.',
         xpReward: 50,
         puzzle: {
-          question: 'What is the value of `power` after this spell executes?\n\n```python\nmana = 10\npower = mana * 2 if mana > 5 else mana\n```',
+          question: 'Which loop syntax correctly visits each item in a list named `battery_cells` in Python?',
           options: [
-            { id: 'a', text: '10', isCorrect: false },
-            { id: 'b', text: '20', isCorrect: true },
-            { id: 'c', text: '5', isCorrect: false },
-            { id: 'd', text: 'True', isCorrect: false },
+            { id: 'a', text: 'loop cell in battery_cells:', isCorrect: false },
+            { id: 'b', text: 'for cell in battery_cells:', isCorrect: true },
+            { id: 'c', text: 'repeat(battery_cells):', isCorrect: false },
+            { id: 'd', text: 'foreach battery_cells as cell:', isCorrect: false },
           ],
-          hint: 'Since `mana = 10` is greater than 5, the condition is satisfied: `mana * 2 = 20`.',
+          hint: 'Python uses the keyword "for" followed by the variable name and "in list:".',
         },
         arenaChallenge: {
-          instructions: 'Write a function `unlock_gate(code: int) -> bool` that returns True if the code is even and greater than 10, otherwise False.',
-          starterCode: `def unlock_gate(code: int) -> bool:
-    # Defeat the Sentinel: Return True if code > 10 and is even
-    pass
+          instructions: 'Write a function `rescue_robot(battery_cells: list) -> int` that loops through battery_cells and returns the sum of all cell charges.',
+          starterCode: `def rescue_robot(battery_cells: list) -> int:
+    total_energy = 0
+    # TODO: Write a loop to add each cell in battery_cells to total_energy
+    for cell in battery_cells:
+        total_energy += cell
+    return total_energy
 `,
-          solutionPattern: 'code > 10 and code % 2 == 0',
+          solutionPattern: 'for cell in battery_cells:',
           testCases: [
-            { input: 'unlock_gate(12)', expected: 'True' },
-            { input: 'unlock_gate(9)', expected: 'False' },
-            { input: 'unlock_gate(15)', expected: 'False' },
+            { input: 'rescue_robot([10, 20, 30])', expected: '60' },
+            { input: 'rescue_robot([5, 15, 25, 35])', expected: '80' },
+            { input: 'rescue_robot([0, 0, 50])', expected: '50' },
+            { input: 'rescue_robot([])', expected: '0' },
           ],
         },
       },
       {
         id: 'py-lvl-2',
         levelNumber: 2,
-        title: 'Level 2: The Loop of Fire',
-        subtitle: 'Iterating Through Arrays & Lists',
-        storyNarrative: 'The sacred river has floating lotus stepping stones containing mana crystals. Traverse them in a single pass without burning the call stack!',
-        conceptTeaser: 'Loops (`for item in array`) enable rapid aggregation and traversal in linear O(n) time.',
+        title: 'Level 2: Filter Damaged Cells',
+        subtitle: 'Loops with If Conditions',
+        storyNarrative: 'Some battery cells are damaged and carry negative charges! Update your loop to only add healthy cells that have positive values (> 0).',
+        conceptTeaser: 'Use an "if cell > 0:" check inside your loop to filter out unwanted or damaged items.',
         xpReward: 75,
         puzzle: {
-          question: 'What will `sum([x for x in [1, 2, 3, 4] if x % 2 == 0])` return?',
+          question: 'What will `sum([x for x in [10, -5, 20] if x > 0])` equal?',
           options: [
-            { id: 'a', text: '10', isCorrect: false },
-            { id: 'b', text: '6 (2 + 4)', isCorrect: true },
-            { id: 'c', text: '4', isCorrect: false },
-            { id: 'd', text: '8', isCorrect: false },
+            { id: 'a', text: '25', isCorrect: false },
+            { id: 'b', text: '30 (10 + 20)', isCorrect: true },
+            { id: 'c', text: '-5', isCorrect: false },
+            { id: 'd', text: '0', isCorrect: false },
           ],
-          hint: 'The list comprehension filters only even numbers: [2, 4], whose sum is 6.',
+          hint: 'The condition filters out -5, so only 10 and 20 are added, giving 30.',
         },
         arenaChallenge: {
-          instructions: 'Write a function `gather_crystals(mana_list: list) -> int` that sums all values greater than 5.',
-          starterCode: `def gather_crystals(mana_list: list) -> int:
-    # TODO: Return sum of elements > 5
-    pass
+          instructions: 'Write a function `filter_healthy_cells(battery_cells: list) -> int` that only sums numbers greater than 0.',
+          starterCode: `def filter_healthy_cells(battery_cells: list) -> int:
+    total = 0
+    # TODO: Add only positive numbers (> 0)
+    for cell in battery_cells:
+        if cell > 0:
+            total += cell
+    return total
 `,
-          solutionPattern: 'sum(x for x in mana_list if x > 5)',
+          solutionPattern: 'if cell > 0:',
           testCases: [
-            { input: 'gather_crystals([2, 6, 8, 3])', expected: '14' },
-            { input: 'gather_crystals([1, 2, 3])', expected: '0' },
+            { input: 'filter_healthy_cells([10, -5, 20])', expected: '30' },
+            { input: 'filter_healthy_cells([-1, -2, -3])', expected: '0' },
+            { input: 'filter_healthy_cells([50, -10, 50])', expected: '100' },
           ],
         },
       },
       {
         id: 'py-lvl-3',
         levelNumber: 3,
-        title: 'Level 3: The Labyrinth of Recursion',
-        subtitle: 'Base Conditions & Terminating Infinite Loops',
-        storyNarrative: 'A deep recursive abyss opens beneath you! You must establish a stopping rule before memory overflows and destroys the Gurukul bridge.',
-        conceptTeaser: 'Every recursive function must possess a Base Case that directly returns without recursive calls.',
+        title: 'Level 3: Robot Grid Navigator',
+        subtitle: 'Guiding the Robot Home',
+        storyNarrative: 'The robot is charged! Now process a list of direction commands ("UP", "DOWN", "LEFT", "RIGHT") to navigate it across coordinate obstacles back to the base camp.',
+        conceptTeaser: 'Combine loops with multiple if/elif branches to update (x, y) coordinates step-by-step.',
         xpReward: 100,
         puzzle: {
-          question: 'Why does `def loop(n): return loop(n-1)` trigger a RecursionError?',
+          question: 'If a robot starts at (0, 0) and processes ["RIGHT", "RIGHT", "UP"], what is its final coordinate?',
           options: [
-            { id: 'a', text: 'Because Python does not allow recursion.', isCorrect: false },
-            { id: 'b', text: 'Because there is no base condition to arrest the countdown.', isCorrect: true },
-            { id: 'c', text: 'Because subtraction takes too much CPU power.', isCorrect: false },
+            { id: 'a', text: '(0, 3)', isCorrect: false },
+            { id: 'b', text: '(2, 1)', isCorrect: true },
+            { id: 'c', text: '(1, 2)', isCorrect: false },
+            { id: 'd', text: '(3, 0)', isCorrect: false },
           ],
-          hint: 'Without `if n <= 1: return`, the function never terminates and consumes all call frames.',
+          hint: 'Moving RIGHT increases x twice: x=2. Moving UP increases y once: y=1. Final position: (2, 1).',
         },
         arenaChallenge: {
-          instructions: 'Fix `route_cost(n)` so that `route_cost(0) = 0`, `route_cost(1) = 1`, and `route_cost(n) = route_cost(n-1) + route_cost(n-2)`.',
-          starterCode: `def route_cost(n: int) -> int:
-    # Establish base case: if n <= 1: return n
-    if n <= 1:
-        return n
-    return route_cost(n - 1) + route_cost(n - 2)
+          instructions: 'Write a function `move_robot(commands: list) -> list` that starts at [0, 0] and updates coordinates for "UP" and "RIGHT".',
+          starterCode: `def move_robot(commands: list) -> list:
+    x, y = 0, 0
+    for cmd in commands:
+        if cmd == "RIGHT":
+            x += 1
+        elif cmd == "UP":
+            y += 1
+    return [x, y]
 `,
-          solutionPattern: 'if n <= 1: return n',
+          solutionPattern: 'for cmd in commands:',
           testCases: [
-            { input: 'route_cost(0)', expected: '0' },
-            { input: 'route_cost(1)', expected: '1' },
-            { input: 'route_cost(6)', expected: '8' },
+            { input: 'move_robot(["RIGHT", "RIGHT", "UP"])', expected: '[2, 1]' },
+            { input: 'move_robot(["UP", "UP"])', expected: '[0, 2]' },
+            { input: 'move_robot([])', expected: '[0, 0]' },
           ],
         },
       },
@@ -312,3 +325,5 @@ export const SUBJECT_CURRICULA: Record<string, SubjectCurriculum> = {
     ],
   },
 };
+
+SUBJECT_CURRICULA['python-algorithms'] = SUBJECT_CURRICULA['python-basics'];

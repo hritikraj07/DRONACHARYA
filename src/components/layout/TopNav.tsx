@@ -77,12 +77,11 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
   const navLinks = [
-    { name: 'Game Arena', href: '/dashboard', icon: Target },
-    { name: 'Simulator', href: '/simulator', icon: Code2 },
+    { name: 'Dashboard', href: '/dashboard', icon: Target },
+    { name: 'Learn', href: '/paths', icon: BookOpen },
+    { name: 'Missions', href: '/simulator', icon: Code2 },
     { name: 'Projects', href: '/projects', icon: FolderGit2 },
-    { name: 'Squads', href: '/squads', icon: Users },
-    { name: 'Seals', href: '/achievements', icon: Award },
-    { name: 'Leaderboard', href: '/leaderboard', icon: Compass },
+    { name: 'My Progress', href: '/portfolio', icon: Award },
   ];
 
   return (
@@ -100,7 +99,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   DRONACHARYA
                 </span>
                 <span className="text-[9px] tracking-widest uppercase text-[#7E8276] font-medium mt-0.5">
-                  Digital Gurukul
+                  AI Learning Platform
                 </span>
               </div>
             </Link>
@@ -110,7 +109,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               <button
                 onClick={() => setSwitchModalOpen(true)}
                 className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E9DFC9] hover:bg-[#D8CFC0] text-xs border border-[#B49A65] text-[#252820] transition-colors cursor-pointer"
-                title="Click to Switch Learning Course or Class"
+                title="Click to Switch Learning Topic"
               >
                 <BookOpen className="w-3.5 h-3.5 text-[#354B3A]" />
                 <span className="font-medium truncate max-w-[200px]">{activeSubjectObj.name}</span>
@@ -173,14 +172,14 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   <span className="hidden sm:inline font-semibold">Lvl {currentUser.level || 1}</span>
                 </div>
 
-                {/* Acharya AI Mentor Trigger Button */}
+                {/* AI Mentor Trigger Button */}
                 <button
                   onClick={onOpenMentor}
                   className="btn-brass text-xs py-1.5 px-2.5 shadow-2xs"
-                  title="Open Acharya AI Guidance"
+                  title="Open AI Mentor Guidance"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#B49A65]" />
-                  <span className="hidden md:inline">Acharya AI</span>
+                  <span className="hidden md:inline">AI Mentor</span>
                 </button>
 
                 {/* Logout Action */}
@@ -259,10 +258,10 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             <div className="flex items-center justify-between border-b border-[#D8CFC0] pb-3 mb-4">
               <div>
                 <span className="text-[10px] text-[#A65F43] uppercase tracking-wider font-semibold">
-                  Personalize Curriculum
+                  Personalized Learning
                 </span>
                 <h3 className="font-serif font-bold text-xl text-[#252820]">
-                  Switch Class & Subject
+                  What do you want to learn?
                 </h3>
               </div>
               <button
@@ -276,7 +275,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             <form onSubmit={handleSaveSwitch} className="space-y-4 text-xs">
               <div>
                 <label className="block font-semibold text-[#252820] mb-1">
-                  1. Current Class / Education Level
+                  Education Level
                 </label>
                 <select
                   value={selectedClass}
@@ -291,7 +290,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
               <div>
                 <label className="block font-semibold text-[#252820] mb-1">
-                  2. What Subject Do You Want To Learn Now?
+                  Choose a Topic
                 </label>
                 <div className="space-y-2 mt-2">
                   {AVAILABLE_SUBJECTS.map((s) => (
@@ -305,10 +304,22 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                       }`}
                     >
                       <div>
-                        <div className="text-sm text-[#252820]">{s.name}</div>
+                        <div className="text-sm text-[#252820] flex items-center gap-2">
+                          <span>{s.name}</span>
+                          {s.isAvailable && (
+                            <span className="text-[10px] bg-[#354B3A] text-white px-2 py-0.5 rounded font-normal">
+                              Ready
+                            </span>
+                          )}
+                          {!s.isAvailable && !s.isCustom && (
+                            <span className="text-[10px] bg-[#D8CFC0] text-[#575A51] px-2 py-0.5 rounded font-normal">
+                              Track Preview
+                            </span>
+                          )}
+                        </div>
                         <div className="text-[11px] text-[#7E8276] font-normal">{s.tagline}</div>
                       </div>
-                      <span className="text-xs text-[#354B3A]">{selectedSubject === s.id ? '✓ Active' : ''}</span>
+                      <span className="text-xs text-[#354B3A]">{selectedSubject === s.id ? '✓ Selected' : ''}</span>
                     </div>
                   ))}
                 </div>
@@ -326,7 +337,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   type="submit"
                   className="btn-primary text-xs py-2 px-5"
                 >
-                  Switch & Update Game Arena
+                  Save & Update
                 </button>
               </div>
             </form>

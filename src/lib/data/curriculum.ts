@@ -1,168 +1,122 @@
-// Dronacharya Master Curriculum Data & Diagnostic Trials
+// Dronacharya Simplified Learning Curriculum
+// Focus: Turning theoretical knowledge into practical skills through interactive missions
 import { LearningPath, MasterySeal, CapstoneProject, GurukulSquad } from '@/types';
 
 export const INITIAL_SKILLS = [
-  { id: 'py.recursion.base_case', name: 'Recursive Base Cases', domain: 'Algorithms', description: 'Terminating recursive call stacks safely' },
-  { id: 'py.recursion.memoization', name: 'Memoization & Overlap', domain: 'Algorithms', description: 'Caching recursive outputs to prevent O(2^n) exponential blowup' },
-  { id: 'py.ds.doubly_linked_list', name: 'Doubly-Linked Lists', domain: 'Data Structures', description: 'Bidirectional pointer traversal and O(1) removal' },
-  { id: 'py.ds.hash_map', name: 'Hash Map Lookup', domain: 'Data Structures', description: 'Amortized O(1) key-value access and collision handling' },
-  { id: 'sys.cache.lru_eviction', name: 'LRU Cache Eviction', domain: 'Systems', description: 'Least Recently Used cache invalidation and memory boundaries' },
-  { id: 'ml.hyperparameters', name: 'ML Hyperparameters', domain: 'Machine Learning', description: 'Learning rate, batch size, and regularization tradeoffs' },
+  { id: 'py.loops.basics', name: 'Python Loops', domain: 'Programming Basics', description: 'Looping through sequences and lists with for loops' },
+  { id: 'py.logic.conditions', name: 'Conditionals (If/Else)', domain: 'Programming Basics', description: 'Making decisions and filtering items in code' },
+  { id: 'py.functions.returns', name: 'Functions & Return Values', domain: 'Programming Basics', description: 'Packaging logic into reusable functions' },
+  { id: 'py.lists.operations', name: 'List Operations', domain: 'Data Basics', description: 'Accessing, slicing, and aggregating list elements' },
 ];
 
 export const DIAGNOSTIC_QUESTIONS = [
   {
     id: 'diag-01',
-    difficulty: 'foundational',
-    skillId: 'py.recursion.base_case',
-    title: 'The Infinite Spiral',
-    prompt: 'Look at the following Python function. What will occur when `countdown(3)` is executed?',
-    codeSnippet: 'def countdown(n):\n    print(n)\n    return countdown(n - 1)',
+    difficulty: 'beginner',
+    skillId: 'py.loops.basics',
+    title: 'Looping in Python',
+    prompt: 'Which syntax correctly loops through every item in a list named `battery_cells`?',
+    codeSnippet: 'battery_cells = [10, 20, 30]\n# Which loop visits each number?',
     options: [
-      { id: 'a', text: 'It prints 3, 2, 1, 0 and halts normally.' },
-      { id: 'b', text: 'It triggers a RecursionError due to missing base condition.', isCorrect: true },
-      { id: 'c', text: 'It prints 3 indefinitely without error.' },
-      { id: 'd', text: 'It returns None after printing 3.' },
+      { id: 'a', text: 'for cell in battery_cells:', isCorrect: true },
+      { id: 'b', text: 'loop cell in battery_cells:', isCorrect: false },
+      { id: 'c', text: 'repeat(battery_cells):', isCorrect: false },
+      { id: 'd', text: 'foreach battery_cells as cell:', isCorrect: false },
     ],
-    explanation: 'Without a stopping condition (e.g., `if n <= 0: return`), the call stack grows continuously until exceeding the maximum recursion depth.',
+    explanation: 'Python uses the "for item in list:" syntax to iterate over elements one by one.',
   },
   {
     id: 'diag-02',
-    difficulty: 'intermediate',
-    skillId: 'py.recursion.memoization',
-    title: 'Exponential Redundancy',
-    prompt: 'A naive recursive Fibonacci implementation `fib(n) = fib(n-1) + fib(n-2)` takes O(2^n) time. Why?',
+    difficulty: 'beginner',
+    skillId: 'py.loops.basics',
+    title: 'Accumulating Values in a Loop',
+    prompt: 'What will be the final value of `total` after this code runs?',
+    codeSnippet: 'total = 0\nfor x in [5, 10, 15]:\n    total += x\nprint(total)',
     options: [
-      { id: 'a', text: 'Because addition of integers takes exponential time in Python.' },
-      { id: 'b', text: 'Because it repeatedly recomputes the exact same subproblems in recursive branches.', isCorrect: true },
-      { id: 'c', text: 'Because Python handles memory poorly for integers above 100.' },
-      { id: 'd', text: 'Because the base case is evaluated twice per call.' },
+      { id: 'a', text: '15', isCorrect: false },
+      { id: 'b', text: '30 (5 + 10 + 15)', isCorrect: true },
+      { id: 'c', text: '0', isCorrect: false },
+      { id: 'd', text: '10', isCorrect: false },
     ],
-    explanation: 'Subproblems like `fib(3)` are evaluated multiple times across branches. Caching (memoization) reduces complexity to linear O(n).',
-  },
-  {
-    id: 'diag-03',
-    difficulty: 'advanced',
-    skillId: 'sys.cache.lru_eviction',
-    title: 'Optimal Cache Eviction',
-    prompt: 'Which combination of data structures allows both O(1) key retrieval and O(1) least-recently-used node eviction?',
-    options: [
-      { id: 'a', text: 'Binary Search Tree + Array' },
-      { id: 'b', text: 'Hash Map + Doubly-Linked List', isCorrect: true },
-      { id: 'c', text: 'Sorted Array + Circular Queue' },
-      { id: 'd', text: 'Min-Heap + Stack' },
-    ],
-    explanation: 'A Hash Map provides O(1) key-to-node lookup, while a Doubly-Linked List allows O(1) node detachment and insertion at the head/tail.',
+    explanation: 'The loop executes 3 times, adding 5, then 10, then 15 to the running total (giving 30).',
   },
 ];
 
 export const INITIAL_LEARNING_PATHS: LearningPath[] = [
   {
-    id: 'python-algorithms',
-    title: 'Python Computational Mastery',
-    slug: 'python-algorithms',
+    id: 'python-basics',
+    title: 'Python Programming',
+    slug: 'python-basics',
     category: 'algorithms',
-    description: 'Master algorithmic thinking, recursion, and optimal data structures through interactive Gurukul trials.',
+    description: 'Learn Python loops, conditionals, and functions by solving practical coding challenges.',
     icon: 'Terminal',
     missions: [
       {
-        id: 'mission-fib-labyrinth',
-        pathId: 'python-algorithms',
+        id: 'mission-rescue-robot',
+        pathId: 'python-basics',
         sequenceOrder: 1,
-        title: 'The Labyrinth of Fibonacci',
-        subtitle: 'Dynamic Recursion & Terminating Conditions',
-        narrativeContext: 'An automated postal transit hub in Varanasi must compute parcel delivery costs across branching transit networks. A naive implementation is crashing their dispatch nodes.',
-        conceptBriefing: 'Recursion requires two pillars: a Base Case that provides immediate return, and a Recursive Step that breaks the problem into smaller identical units.',
+        title: 'Rescue the Robot',
+        subtitle: 'Learn Python Loops',
+        narrativeContext: 'A small rescue robot is stranded in the field with a depleted battery. It has gathered power cells scattered on the ground. Write a loop to calculate the total energy from all collected battery cells so the robot can power up and return to base.',
+        conceptBriefing: 'Loops allow your computer to repeat actions for every item in a list. Instead of writing separate additions for each cell, use "for cell in battery_cells:" and accumulate the energy into a running total.',
         conceptVisualType: 'call-tree',
-        primarySkillId: 'py.recursion.base_case',
-        xpReward: 120,
-        estTimeMinutes: 15,
+        primarySkillId: 'py.loops.basics',
+        xpReward: 100,
+        estTimeMinutes: 10,
         isUnlocked: true,
         isCompleted: false,
-        initialCode: `# Mission 1: The Labyrinth of Fibonacci
-# Problem: Compute route_cost(n) such that:
-#   route_cost(0) = 0
-#   route_cost(1) = 1
-#   route_cost(n) = route_cost(n-1) + route_cost(n-2)
+        initialCode: `# Mission: Rescue the Robot
+# Goal: Write a function to calculate total energy from all battery cells.
 
-def route_cost(n: int) -> int:
-    # BUG: Missing base conditions! Fix this function.
-    return route_cost(n - 1) + route_cost(n - 2)
+def rescue_robot(battery_cells: list) -> int:
+    total_energy = 0
+    # TODO: Write a loop to add each cell in battery_cells to total_energy
+    
+    return total_energy
 `,
-        solutionPattern: 'if n <= 1: return n',
+        solutionPattern: 'for cell in battery_cells:',
         visibleTests: [
-          { id: 't1', inputDescription: 'route_cost(0)', expectedOutput: '0', codeSnippet: 'assert route_cost(0) == 0' },
-          { id: 't2', inputDescription: 'route_cost(1)', expectedOutput: '1', codeSnippet: 'assert route_cost(1) == 1' },
-          { id: 't3', inputDescription: 'route_cost(6)', expectedOutput: '8', codeSnippet: 'assert route_cost(6) == 8' },
+          { id: 't1', inputDescription: 'rescue_robot([10, 20, 30])', expectedOutput: '60', codeSnippet: 'assert rescue_robot([10, 20, 30]) == 60' },
+          { id: 't2', inputDescription: 'rescue_robot([5, 15, 25, 35])', expectedOutput: '80', codeSnippet: 'assert rescue_robot([5, 15, 25, 35]) == 80' },
+          { id: 't3', inputDescription: 'rescue_robot([0, 0, 50])', expectedOutput: '50', codeSnippet: 'assert rescue_robot([0, 0, 50]) == 50' },
         ],
         hiddenTests: [
-          { id: 't4', inputDescription: 'route_cost(10)', expectedOutput: '55', codeSnippet: 'assert route_cost(10) == 55', isHidden: true },
-          { id: 't5', inputDescription: 'route_cost(12)', expectedOutput: '144', codeSnippet: 'assert route_cost(12) == 144', isHidden: true },
+          { id: 't4', inputDescription: 'rescue_robot([])', expectedOutput: '0', codeSnippet: 'assert rescue_robot([]) == 0', isHidden: true },
+          { id: 't5', inputDescription: 'rescue_robot([100])', expectedOutput: '100', codeSnippet: 'assert rescue_robot([100]) == 100', isHidden: true },
         ],
       },
       {
-        id: 'mission-memo-vault',
-        pathId: 'python-algorithms',
+        id: 'mission-hazard-filter',
+        pathId: 'python-basics',
         sequenceOrder: 2,
-        title: 'The Memoization Vault',
-        subtitle: 'Eliminating Exponential Redundancy',
-        narrativeContext: 'The postal network route cost function works for small values, but calculating route_cost(35) freezes the server for over 5 seconds. You must implement a cache dictionary.',
-        conceptBriefing: 'Memoization stores previously calculated results in a dictionary. Before executing recursive calls, check if the argument exists in the lookup table.',
-        conceptVisualType: 'hash-map',
-        primarySkillId: 'py.recursion.memoization',
-        xpReward: 160,
-        estTimeMinutes: 20,
+        title: 'Filter Damaged Cells',
+        subtitle: 'Loops with If/Else Conditions',
+        narrativeContext: 'Some power cells are damaged and contain negative charges. Upgrade your function to skip any negative values and only count healthy positive cells.',
+        conceptBriefing: 'Inside a loop, you can use an "if cell > 0:" check to decide whether to add a value or ignore it.',
+        conceptVisualType: 'call-tree',
+        primarySkillId: 'py.logic.conditions',
+        xpReward: 120,
+        estTimeMinutes: 12,
         isUnlocked: false,
         isCompleted: false,
-        initialCode: `# Mission 2: The Memoization Vault
-# Optimize route_cost with a memo dictionary to run in O(n) linear time.
+        initialCode: `# Mission: Filter Damaged Cells
+# Only add cells that have positive energy (> 0).
 
-memo = {}
-
-def fast_route_cost(n: int) -> int:
-    # TODO: Check if n in memo, return cached answer.
-    # Otherwise calculate and store in memo before returning.
-    if n <= 1:
-        return n
-    return fast_route_cost(n - 1) + fast_route_cost(n - 2)
+def filter_healthy_cells(battery_cells: list) -> int:
+    total_energy = 0
+    # TODO: Loop through cells and add only positive numbers
+    for cell in battery_cells:
+        if cell > 0:
+            total_energy += cell
+    return total_energy
 `,
-        solutionPattern: 'if n in memo: return memo[n]',
+        solutionPattern: 'if cell > 0:',
         visibleTests: [
-          { id: 'm1', inputDescription: 'fast_route_cost(10)', expectedOutput: '55', codeSnippet: 'assert fast_route_cost(10) == 55' },
-          { id: 'm2', inputDescription: 'fast_route_cost(30)', expectedOutput: '832040', codeSnippet: 'assert fast_route_cost(30) == 832040' },
+          { id: 'h1', inputDescription: 'filter_healthy_cells([10, -5, 20])', expectedOutput: '30', codeSnippet: 'assert filter_healthy_cells([10, -5, 20]) == 30' },
+          { id: 'h2', inputDescription: 'filter_healthy_cells([-1, -2, -3])', expectedOutput: '0', codeSnippet: 'assert filter_healthy_cells([-1, -2, -3]) == 0' },
         ],
         hiddenTests: [
-          { id: 'm3', inputDescription: 'fast_route_cost(40)', expectedOutput: '102334155', codeSnippet: 'assert fast_route_cost(40) == 102334155', isHidden: true },
-        ],
-      },
-      {
-        id: 'mission-hash-sifter',
-        pathId: 'python-algorithms',
-        sequenceOrder: 3,
-        title: 'The Anagram Sifter',
-        subtitle: 'Hash Map Frequency Verification',
-        narrativeContext: 'Ancient Sanskrit manuscripts were transcribed across multiple palm leaves. You must build an algorithm to verify whether two verses are exact anagrams of each other.',
-        conceptBriefing: 'A Hash Map tracks character frequencies. In O(n) time, compare letter counts across both words.',
-        conceptVisualType: 'hash-map',
-        primarySkillId: 'py.ds.hash_map',
-        xpReward: 180,
-        estTimeMinutes: 20,
-        isUnlocked: false,
-        isCompleted: false,
-        initialCode: `# Mission 3: The Anagram Sifter
-# Return True if s1 and s2 contain identical character frequencies.
-
-def is_verse_anagram(s1: str, s2: str) -> bool:
-    # TODO: Implement frequency counter dictionary
-    pass
-`,
-        solutionPattern: 'counts = {}',
-        visibleTests: [
-          { id: 'a1', inputDescription: 'is_verse_anagram("listen", "silent")', expectedOutput: 'True', codeSnippet: 'assert is_verse_anagram("listen", "silent") is True' },
-          { id: 'a2', inputDescription: 'is_verse_anagram("drona", "arjuna")', expectedOutput: 'False', codeSnippet: 'assert is_verse_anagram("drona", "arjuna") is False' },
-        ],
-        hiddenTests: [
-          { id: 'a3', inputDescription: 'is_verse_anagram("gurukul", "kulugur")', expectedOutput: 'True', codeSnippet: 'assert is_verse_anagram("gurukul", "kulugur") is True', isHidden: true },
+          { id: 'h3', inputDescription: 'filter_healthy_cells([50, -10, 50])', expectedOutput: '100', codeSnippet: 'assert filter_healthy_cells([50, -10, 50]) == 100', isHidden: true },
         ],
       },
     ],
@@ -171,98 +125,105 @@ def is_verse_anagram(s1: str, s2: str) -> bool:
 
 export const INITIAL_SEALS: MasterySeal[] = [
   {
-    id: 'seal-recursive-archer',
-    title: 'Seal of the Recursive Archer',
-    category: 'Algorithms & Data Structures',
-    description: 'Awarded for mastering terminating conditions and call stack safety with zero infinite loops.',
-    iconName: 'Target',
-    requiredSkillId: 'py.recursion.base_case',
-    verificationHash: 'd7a8f3b2049e7d81c4e20984ba16a903e61a49c9f82d1c7e90e72c81a2e9b04d',
+    id: 'seal-robot-rescuer',
+    title: 'Robot Rescuer Badge',
+    category: 'Python Programming',
+    description: 'Awarded for successfully mastering loops to rescue the stranded field robot.',
+    iconName: 'Award',
+    requiredSkillId: 'py.loops.basics',
+    verificationHash: 'rob01-rescue-loop-verified',
     isUnlocked: false,
   },
   {
-    id: 'seal-memoization-vault',
-    title: 'Seal of the Memoization Vault',
-    category: 'Algorithms & Complexity',
-    description: 'Awarded for collapsing O(2^n) exponential recursion down to linear O(n) runtime.',
-    iconName: 'Zap',
-    requiredSkillId: 'py.recursion.memoization',
-    verificationHash: '8b3c9f21e05d4a7b98c34f12a87d09e53b61c7849e01f2a34b5c6d7e8f901a2b',
-    isUnlocked: false,
-  },
-  {
-    id: 'seal-lru-architect',
-    title: 'Seal of the Cache Architect',
-    category: 'Systems Engineering',
-    description: 'Awarded for completing the multi-file LRU In-Memory Cache Capstone with TTL eviction.',
-    iconName: 'Server',
-    requiredSkillId: 'sys.cache.lru_eviction',
-    verificationHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    id: 'seal-grid-navigator',
+    title: 'Robot Navigator Badge',
+    category: 'Applied Projects',
+    description: 'Awarded for applying loops and conditionals to navigate a robot across coordinate grids.',
+    iconName: 'Compass',
+    requiredSkillId: 'py.logic.conditions',
+    verificationHash: 'rob02-navigator-verified',
     isUnlocked: false,
   },
 ];
 
 export const INITIAL_CAPSTONES: CapstoneProject[] = [
   {
-    id: 'lru-cache-project',
-    title: 'In-Memory Cache with TTL & LRU Eviction',
-    slug: 'lru-cache-project',
-    category: 'Systems & Data Structures',
-    description: 'Architect a production-ready, high-throughput in-memory cache supporting O(1) lookups, least-recently-used (LRU) invalidation, and Time-to-Live (TTL) key expiration.',
+    id: 'capstone-robot-navigator',
+    title: 'Robot Grid Navigator',
+    slug: 'robot-grid-navigator',
+    category: 'Practical Python Project',
+    description: 'Connect what you learned in "Rescue the Robot" to a practical project. Build a step-by-step grid navigation program that reads movement commands, avoids boundaries, and guides the robot home.',
     learningObjectives: [
-      'Implement an O(1) key-value store using Hash Maps and Doubly-Linked Lists.',
-      'Handle deterministic eviction when capacity limit is breached.',
-      'Simulate automated TTL background cleanup with timestamp expiry.',
-      'Pass multi-threaded stress and edge-case unit test suites.',
+      'Use Python loops to process a sequence of robot movement commands.',
+      'Track robot coordinates (x, y) and remaining battery accurately.',
+      'Stop safely if the robot reaches the edge or runs out of battery.',
+      'Pass automated test cases verifying that the robot finishes at the expected coordinates.',
     ],
-    prerequisites: ['Python OOP', 'Doubly-Linked Lists', 'Hash Maps'],
+    prerequisites: ['Python Loops', 'Conditionals (If/Else)', 'Basic Coordinates'],
     milestones: [
-      { id: 'm1', title: 'Milestone 1: Doubly-Linked Node & List', description: 'Create Node and LinkedList with insert_head and remove_node methods.', testChecklist: ['O(1) node detachment', 'Null head/tail pointers check'], isCompleted: false },
-      { id: 'm2', title: 'Milestone 2: LRU Cache Core', description: 'Combine HashMap with LinkedList to achieve get() and put() in O(1).', testChecklist: ['Capacity overflow eviction', 'Access time touch updates'], isCompleted: false },
-      { id: 'm3', title: 'Milestone 3: TTL Timestamp Expiry', description: 'Store expiry timestamps and invalidate stale entries on retrieval.', testChecklist: ['Expired keys return None', 'Active keys preserved'], isCompleted: false },
+      { id: 'm1', title: 'Milestone 1: Movement Loop', description: 'Loop through commands and update coordinates for UP, DOWN, LEFT, and RIGHT.', testChecklist: ['Coordinate update logic', 'Loop termination'], isCompleted: false },
+      { id: 'm2', title: 'Milestone 2: Battery Management', description: 'Deduct 1 battery point per move and stop if battery drops to 0.', testChecklist: ['Battery check', 'Prevent negative battery'], isCompleted: false },
     ],
     starterFiles: {
-      'cache.py': `# In-Memory Cache Implementation
-from typing import Any, Optional
-import time
+      'robot_navigator.py': `# Practical Project: Robot Grid Navigator
+# Apply your loop and conditional knowledge to guide the robot home!
 
-class Node:
-    def __init__(self, key: str, value: Any, ttl_seconds: Optional[int] = None):
-        self.key = key
-        self.value = value
-        self.expiry = time.time() + ttl_seconds if ttl_seconds else None
-        self.prev = None
-        self.next = None
+def navigate_robot(grid_size: int, commands: list, battery: int) -> dict:
+    """
+    Guides the robot across a grid from (0, 0).
+    Commands: 'UP', 'DOWN', 'LEFT', 'RIGHT'
+    Each move consumes 1 battery.
+    """
+    x, y = 0, 0
+    moves_completed = 0
 
-class LRUCacheWithTTL:
-    def __init__(self, capacity: int):
-        self.capacity = capacity
-        self.lookup = {}
-        # TODO: Implement dummy head and tail nodes
-        self.head = Node("__HEAD__", None)
-        self.tail = Node("__TAIL__", None)
-        self.head.next = self.tail
-        self.tail.prev = self.head
+    for move in commands:
+        if battery <= 0:
+            break
+            
+        if move == 'UP' and y < grid_size - 1:
+            y += 1
+        elif move == 'DOWN' and y > 0:
+            y -= 1
+        elif move == 'RIGHT' and x < grid_size - 1:
+            x += 1
+        elif move == 'LEFT' and x > 0:
+            x -= 1
+            
+        battery -= 1
+        moves_completed += 1
 
-    def get(self, key: str) -> Optional[Any]:
-        # TODO: Return value if not expired, move to head
-        return None
-
-    def put(self, key: str, value: Any, ttl_seconds: Optional[int] = None) -> None:
-        # TODO: Insert or update, evict tail if capacity exceeded
-        pass
+    return {
+        "final_position": (x, y),
+        "remaining_battery": battery,
+        "moves_completed": moves_completed
+    }
 `,
-      'test_cache.py': `# Unit Test Harness
+      'test_navigator.py': `# Test Harness for Robot Grid Navigator
+from robot_navigator import navigate_robot
+
 def run_tests():
-    # Test suite verifying O(1) behavior and TTL
-    print("Testing LRU Cache...")
+    # Test 1: Moving right and up
+    res1 = navigate_robot(5, ['RIGHT', 'RIGHT', 'UP'], 10)
+    assert res1['final_position'] == (2, 1), f"Expected (2, 1), got {res1['final_position']}"
+    assert res1['remaining_battery'] == 7, f"Expected 7, got {res1['remaining_battery']}"
+
+    # Test 2: Battery runs out
+    res2 = navigate_robot(5, ['RIGHT', 'RIGHT', 'RIGHT'], 2)
+    assert res2['final_position'] == (2, 0), f"Expected (2, 0), got {res2['final_position']}"
+    assert res2['remaining_battery'] == 0, f"Expected 0, got {res2['remaining_battery']}"
+
+    print("All Robot Navigator tests passed successfully!")
+
+if __name__ == '__main__':
+    run_tests()
 `,
     },
     rubricCriteria: {
-      functionality: '40 pts: Correct get, put, delete, and eviction behavior across 10 tests.',
-      edgeCases: '25 pts: Zero capacity, duplicate updates, and expired TTL edge cases.',
-      complexity: '20 pts: Strict O(1) runtime operations without full-list scans.',
-      codeStyle: '15 pts: Type hints, modular separation, and docstrings.',
+      functionality: '40 pts: Correct grid coordinate calculation and battery tracking.',
+      edgeCases: '30 pts: Safely handles empty commands and battery running out.',
+      complexity: '15 pts: Clean linear loop processing without unnecessary complexity.',
+      codeStyle: '15 pts: Readable variable names and clear comments.',
     },
     isSubmitted: false,
     isVerified: false,
@@ -271,18 +232,17 @@ def run_tests():
 
 export const INITIAL_SQUADS: GurukulSquad[] = [
   {
-    id: 'squad-kashi-coders',
-    name: 'Kashi Algorithmic Guild',
-    joinCode: 'KASHI7',
-    description: 'Focused on systems programming, high-performance data structures, and competitive problem-solving.',
+    id: 'squad-beginners',
+    name: 'Python Learners Club',
+    joinCode: 'PY2026',
+    description: 'A friendly group of learners mastering programming step by step.',
     members: [
-      { userId: 'u-1', username: 'kavya-reddy', fullName: 'Kavya Reddy', role: 'leader', contributionXp: 840 },
-      { userId: 'u-2', username: 'priya-patel', fullName: 'Priya Patel', role: 'member', contributionXp: 520 },
-      { userId: 'u-3', username: 'rohit-v', fullName: 'Rohit Verma', role: 'member', contributionXp: 380 },
+      { userId: 'u-1', username: 'kavya-reddy', fullName: 'Kavya Reddy', role: 'member', contributionXp: 200 },
+      { userId: 'u-2', username: 'priya-p', fullName: 'Priya Patel', role: 'member', contributionXp: 180 },
     ],
-    collectiveXp: 1740,
-    weeklyGoal: 'Complete 10 Recursive & Dynamic Programming Missions',
-    activeChallenge: 'The Distributed Hash Ring Simulation',
-    progressPercentage: 68,
+    collectiveXp: 380,
+    weeklyGoal: 'Complete Rescue the Robot challenge',
+    activeChallenge: 'Robot Grid Navigation',
+    progressPercentage: 75,
   },
 ];

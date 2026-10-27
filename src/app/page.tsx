@@ -257,12 +257,12 @@ export default function HomePage() {
               द्रो
             </div>
             <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#252820]">
-              {authMode === 'signin' ? 'Scholar Sign In' : 'Enroll in Dronacharya'}
+              {authMode === 'signin' ? 'Sign In to Continue' : 'What do you want to learn?'}
             </h1>
             <p className="text-xs sm:text-sm text-[#575A51] mt-1.5 max-w-md mx-auto">
               {authMode === 'signin'
-                ? 'Enter your registered credentials to access your personalized learning arena.'
-                : 'Select your class and the subject you want to master through gamified interactive learning.'}
+                ? 'Enter your email and password to access your learning dashboard.'
+                : 'Choose a topic to begin turning theoretical knowledge into practical skills.'}
             </p>
           </div>
 
@@ -281,7 +281,7 @@ export default function HomePage() {
                   : 'border-transparent text-[#7E8276] hover:text-[#252820]'
               }`}
             >
-              Sign In to Account
+              Sign In
             </button>
             <button
               type="button"
@@ -296,7 +296,7 @@ export default function HomePage() {
                   : 'border-transparent text-[#7E8276] hover:text-[#252820]'
               }`}
             >
-              Sign Up (Select Class & Course)
+              New Student (Choose Topic)
             </button>
           </div>
 
@@ -431,7 +431,7 @@ export default function HomePage() {
               {/* Subject Selection Cards */}
               <div>
                 <label className="block font-semibold text-[#252820] mb-1.5">
-                  What Subject Do You Want To Learn?
+                  Choose a Topic to Learn:
                 </label>
                 <div className="space-y-1.5">
                   {AVAILABLE_SUBJECTS.map((s) => (
@@ -445,7 +445,19 @@ export default function HomePage() {
                       }`}
                     >
                       <div>
-                        <div className="text-xs text-[#252820]">{s.name}</div>
+                        <div className="text-xs text-[#252820] flex items-center gap-2">
+                          <span>{s.name}</span>
+                          {s.isAvailable && (
+                            <span className="text-[9px] bg-[#354B3A] text-white px-1.5 py-0.2 rounded font-normal">
+                              Available Now
+                            </span>
+                          )}
+                          {!s.isAvailable && !s.isCustom && (
+                            <span className="text-[9px] bg-[#D8CFC0] text-[#575A51] px-1.5 py-0.2 rounded font-normal">
+                              Preview
+                            </span>
+                          )}
+                        </div>
                         <div className="text-[10px] text-[#7E8276] font-normal">{s.tagline}</div>
                       </div>
                       <span className="text-xs text-[#354B3A]">
@@ -454,6 +466,23 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Custom Topic Input */}
+                {authSubject === 'custom-topic' && (
+                  <div className="mt-2 p-2.5 rounded-lg bg-white border border-[#354B3A]">
+                    <label className="block text-[11px] font-semibold text-[#252820] mb-1">
+                      Type your custom topic:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. SQL, Data Structures, Git"
+                      className="w-full px-2.5 py-1.5 border border-[#D8CFC0] rounded text-xs bg-[#FAF8F5] focus:outline-none focus:border-[#354B3A]"
+                      onChange={(e) => {
+                        // Keep track of custom topic
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <button

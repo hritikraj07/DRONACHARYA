@@ -101,12 +101,12 @@ export default function AuthPage() {
             द्रो
           </div>
           <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#252820]">
-            {isSignUp ? 'Enroll in Dronacharya Gurukul' : 'Scholar Sign In'}
+            {isSignUp ? 'What do you want to learn?' : 'Sign In to Continue'}
           </h1>
           <p className="text-xs sm:text-sm text-[#575A51] mt-1 max-w-md mx-auto">
             {isSignUp
-              ? 'Select what class you are in and what subject you want to master through gamified learning.'
-              : 'Enter your registered credentials to access your personalized game arena.'}
+              ? 'Choose a topic to begin turning theoretical knowledge into practical skills.'
+              : 'Enter your email and password to access your learning dashboard.'}
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function AuthPage() {
                 : 'border-transparent text-[#7E8276] hover:text-[#252820]'
             }`}
           >
-            Sign In to Existing Account
+            Sign In
           </button>
           <button
             type="button"
@@ -138,7 +138,7 @@ export default function AuthPage() {
                 : 'border-transparent text-[#7E8276] hover:text-[#252820]'
             }`}
           >
-            Create New Account (Sign Up)
+            New Student (Choose Topic)
           </button>
         </div>
 

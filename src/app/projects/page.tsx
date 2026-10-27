@@ -21,7 +21,8 @@ export default function ProjectsPage() {
   const { state, submitProject } = useDronacharya();
   const project = state.capstones[0];
 
-  const [activeFile, setActiveFile] = useState('cache.py');
+  const fileKeys = Object.keys(project.starterFiles);
+  const [activeFile, setActiveFile] = useState(fileKeys[0] || 'robot_navigator.py');
   const [files, setFiles] = useState(project.starterFiles);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState<any>(project.submissionScore || null);
@@ -36,7 +37,7 @@ export default function ProjectsPage() {
       const score = submitProject(project.id, files);
       setEvaluationResult(score);
       setIsSubmitting(false);
-    }, 1000);
+    }, 800);
   };
 
   return (
@@ -46,13 +47,13 @@ export default function ProjectsPage() {
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#E9DFC9] border border-[#B49A65] text-xs font-semibold text-[#7A6230] mb-2">
             <FolderGit2 className="w-3.5 h-3.5 text-[#B49A65]" />
-            <span>Capstone Project Workspace</span>
+            <span>Practical Project Workspace</span>
           </div>
           <h1 className="font-serif font-bold text-3xl text-[#252820]">
             {project.title}
           </h1>
           <p className="text-xs sm:text-sm text-[#575A51] mt-1">
-            Build industry-grade systems evaluated against rigorous 4-tier architectural rubrics.
+            Apply the loop and conditional concepts you learned to build a working navigation program.
           </p>
         </div>
 

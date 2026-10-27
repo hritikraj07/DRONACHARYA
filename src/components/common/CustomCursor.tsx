@@ -2,21 +2,21 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-// Crisp 32x32 retro pixel art mascot cursors (base64 PNG for zero-latency, zero-network instant display)
+// Sleek 16-bit retro pixel arrow & pointer hand (base64 PNG for instant, zero-latency rendering)
 const CURSOR_ASSETS = {
   default:
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAwElEQVR4nO2WPQqAMAxGHdydxDt4VGdvoLurZxBP4eToLPhDhEAtTSvaNB384EPs4HtWgk2SmJIV5QEVg2OCS6hwEQlxgSgkKAFxCZsIrnuTpAR0ESzL53JJuARFBaKQ+CxATYPt3puEbQrEBLa2M0KodZYdeJJpXr4LvJUAODa4gAqH1k3PMwkusDf4Ewl2uE0iGNwkQYFZf9nw8HXMj6FKb2V9ax2+L9V1xQYVAJjYDqAEwNSKHNW8H7/+/IklJ+ct4eunPKwRAAAAAElFTkSuQmCC',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAgElEQVR4nO3WSwoAIQwDUE/iau5/xRm6EESsP0wCQ7N10YcUTcr5eZMyBpAibLhFhigAGaIGSBAtgI7oAagID0BDjAAUxAwAR6wAoIhVAAyxA4AgTnbgKsJ7iOBX7wHKMBrC+4zogN4ACmJUSGiA2TltIQOxg5B2SHmVj0Qiv8oH3zMF7f1d6rEAAAAASUVORK5CYII=',
   pointer:
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA5ElEQVR4nO3WsQrCMBDG8QzuTuI7+KidfQPdXX0G8SmcOnYWtHLCyXFcwjXNd3XoQRAD+v8RKSYlNdv9YdR7YUPx5303LoLg+HvoTAS9h8E4LgESQa88cIQ+ARkPQ8hAKCBlnoJwRCksAfCT8AwE4o3nALxXDZsC0BD92VBEDrYo4C8QVQDrt7S+GALwxkqARz98VzPA63wxQ9Y+x5sCvCPj1YBahI4fT9e4J0DHZwOmICBxLwIaLyFKYci/I92Ubt3mt+BRHZeXVcY0P+ocgGL6BMIAjKCYXPArmYWYfdNZZx1jPqu0qONU3pU5AAAAAElFTkSuQmCC',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAsUlEQVR4nO2VUQqAIAyGfegIPvvUaT1aj56kE2QMEgZtYbppxH7YQwv6P7fcnCMUwpqp/BCBOWgaRAGYBmEAnwaAZ3UoDuApLwpFGeEcfifeLuqjlDknqmVNJ2/VrWXJ11dGAiDjqiWfjz3WQ0gBFAgwxhBVIBoQr6qgBTH8Z8QA1cbSEN1zoQdCbDK2QIjvip5JKAtx3WUuVLckvtNUDAPY4kKGOoBDm5ILVXOTyfRrnZLrz3UFnLNvAAAAAElFTkSuQmCC',
   active:
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA6ElEQVR4nO2WPwrCUAyHO7g7Fe/gCTxj595Ad1cXLyCewsmxowhaiRB4xrz0/envFak/yJAM/b6mUFJVIsvVupczaz5qCLI53noJo/5+rr/mMAkN/uyachIS7gpoEtTDxIY2QD0HLmHBi0gMweESIXBXAiISAvdJcJ8sFgPXRLI+UyrckvodAR9cW+t8BB67vfpg35xyuXbvihawthAahk8i4MKp2u0h7V+QIiHhWQKxEqPDYyRg8BAJONySKAbXJHxg6H3A19KpWXwU9K0l3D1YWaaYAMEm2wBLEMwt+HfXJLLPrX9mmxfVX7nioVggewAAAABJRU5ErkJggg==',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAApElEQVR4nO3VMQ6AIAwFUAaPwMzkaTmaIyfhBGIwIelQEKSlDP1JBzGhD02KMTvGuTOJNs8RQxSAGGJrQH5mR9UArXVSFNYIrsF35L8L2xRrXssUYqRRD+DdL9h+FAUgwa8WbLqj70dQAQpi6PRciKHm2yDEAVSI6bkwgyCbjH8Q5HfFskn4iQi2Way3JJxsWC0DXP5Aix1gwE1ZK9bmGo1Gw5kH/1CdpomOKbEAAAAASUVORK5CYII=',
 };
 
-// Hotspot offsets (fingertip position within 32x32 bounding box)
+// Precise hotspot offsets (arrow tip at (1, 1), pointer index fingertip at (5, 1))
 const HOTSPOTS = {
-  default: { x: 3, y: 2 },
-  pointer: { x: 4, y: 3 },
-  active: { x: 4, y: 3 },
+  default: { x: 1, y: 1 },
+  pointer: { x: 5, y: 1 },
+  active: { x: 5, y: 2 },
 };
 
 export function CustomCursor() {

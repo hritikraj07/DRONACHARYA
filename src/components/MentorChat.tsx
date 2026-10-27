@@ -1,7 +1,7 @@
 'use client';
 
 // Dronacharya Interactive Context-Aware AI Mentor Chat Component
-// Powered by Google Gemini 2.5 Flash SDK (@google/genai) via POST /api/mentor/ask
+// Powered by Google Gemini 2.0 Flash-Lite SDK (@google/genai) via POST /api/mentor/ask
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -47,7 +47,7 @@ export function MentorChat({
   problemContext = 'Solve the active programming challenge',
   userAttempt = '',
   title = 'Acharya AI Mentor',
-  subtitle = 'Context-Aware Interactive Solver (gemini-2.5-flash)',
+  subtitle = 'Ultra-Fast Interactive Solver (gemini-2.0-flash-lite)',
   onClose,
   className = '',
   initialMessage,
@@ -58,7 +58,7 @@ export function MentorChat({
       role: 'assistant',
       content:
         initialMessage ||
-        `Greetings, Coder! I am your AI Mentor powered by **Gemini 2.5 Flash**. I have direct visibility into your active problem statement and live code attempt. Ask me anything to get immediate diagnoses, tailored explanations, and working solutions.`,
+        `Greetings, Coder! I am your AI Mentor powered by **Gemini 2.0 Flash-Lite**. I have direct visibility into your active problem statement and live code attempt. Ask me anything to get immediate diagnoses, tailored explanations, and working solutions.`,
       timestamp: 'Just now',
     },
   ]);

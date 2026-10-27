@@ -134,7 +134,7 @@ export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorR
         payload.onChunk?.(text, accumulated);
       }
 
-      const modelUsed = res.headers.get('X-Model-Used') || 'gemini-2.5-flash';
+      const modelUsed = res.headers.get('X-Model-Used') || 'gemini-2.0-flash-lite';
       return {
         success: true,
         reply: accumulated,
@@ -147,7 +147,7 @@ export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorR
     return {
       success: true,
       reply: data?.reply || data?.data?.reply || '',
-      model: data?.data?.model || 'gemini-2.5-flash',
+      model: data?.data?.model || 'gemini-2.0-flash-lite',
     };
   } catch (err: any) {
     console.error('Network request to /api/mentor/ask failed:', err);

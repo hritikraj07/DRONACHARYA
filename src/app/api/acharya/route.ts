@@ -81,7 +81,7 @@ ${studentMessage || 'Please analyze my current code, diagnose any errors or inco
     const ai = new GoogleGenAI({ apiKey });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash-lite',
       contents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,

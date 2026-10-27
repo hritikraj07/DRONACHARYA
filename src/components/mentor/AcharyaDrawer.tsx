@@ -1,5 +1,5 @@
 // Acharya AI Context-Aware Live Mentor Drawer
-// Powered by Google Gemini 2.5 Flash SDK (@google/genai)
+// Powered by Google Gemini 2.0 Flash-Lite SDK (@google/genai)
 // Automatically captures active problem statement, student code, console errors, and produces exact working solutions.
 'use client';
 
@@ -116,7 +116,7 @@ export function AcharyaDrawer({
               ? `प्रणाम! मैं आचार्य एआई हूँ, आपका लाइव मेंटॉर। मैं आपकी सक्रिय समस्या "${activeMissionTitle}" और आपके कोड को देख रहा हूँ। पूछें, मैं सीधे समाधान के साथ आपकी मदद करूँगा।`
               : state.user.preferredLanguage === 'hinglish'
               ? `Pranam! Main Acharya AI hoon, tumhara context-aware AI mentor. Main tumhare active problem "${activeMissionTitle}", code aur errors ko live monitor kar raha hoon. Jahan bhi phas rahe ho pucho, main exact working solution provide karunga!`
-              : `Greetings! I am Acharya AI, your context-aware mentor powered by Gemini 2.5 Flash. I am actively inspecting "${activeMissionTitle}", your live code editor, and runtime errors. Ask me anything to get direct, working solutions tailored to this problem.`,
+              : `Greetings! I am Acharya AI, your context-aware mentor powered by Gemini 2.0 Flash-Lite. I am actively inspecting "${activeMissionTitle}", your live code editor, and runtime errors. Ask me anything to get direct, working solutions tailored to this problem.`,
           timestamp: 'Just now',
         },
       ]);
@@ -507,7 +507,7 @@ export function AcharyaDrawer({
                       Acharya AI Mentor
                     </span>
                     <span className="text-gray-400 font-mono text-[9px] lowercase">
-                      gemini-2.5-flash
+                      gemini-2.0-flash-lite
                     </span>
                   </div>
                 )}

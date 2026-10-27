@@ -1,5 +1,5 @@
 // Dronacharya Code Dungeon & Craft Realm: Live Context-Aware AI Mentor Console
-// Powered by Google Gemini 2.5 Flash SDK (@google/genai)
+// Powered by Google Gemini 2.0 Flash-Lite SDK (@google/genai)
 // Replaces static keyword-matching and mock setTimeout with real, intelligent coding solutions.
 'use client';
 
@@ -49,7 +49,7 @@ export function DungeonAcharyaConsole({
   >([
     {
       sender: 'acharya',
-      text: `Greetings, Apprentice! I am Acharya AI, powered by Gemini 2.5 Flash. I am actively watching Floor ${floorNumber}, your hero commands, and dungeon telemetry. Ask me anything to get exact working code solutions.`,
+      text: `Greetings, Apprentice! I am Acharya AI, powered by Gemini 2.0 Flash-Lite. I am actively watching Floor ${floorNumber}, your hero commands, and dungeon telemetry. Ask me anything to get exact working code solutions.`,
     },
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);

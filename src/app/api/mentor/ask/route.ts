@@ -1,5 +1,5 @@
 // Dronacharya Context-Aware Live AI Mentor API
-// Powered by official Google Gemini SDK (@google/genai) and model gemini-2.0-flash-lite
+// Powered by official Google Gemini SDK (@google/genai) and model gemini-2.5-pro
 // Inspects active problem statement, user code, runtime errors, and provides tailored, direct working solutions.
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -167,15 +167,15 @@ ${query}`;
     // Initialize Google Gemini SDK client
     const ai = new GoogleGenAI({ apiKey });
 
-    // Primary model: gemini-2.0-flash-lite with ultra-low latency streaming
+    // Primary model: gemini-2.5-pro for deep reasoning and complex problem-solving
     let streamResult;
-    let activeModel = 'gemini-2.0-flash-lite';
+    let activeModel = 'gemini-2.5-pro';
 
     const modelConfig = {
       systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.2, // Low temperature for deterministic coding solutions
-      maxOutputTokens: 800,
-      thinkingConfig: { thinkingBudget: 0 },
+      temperature: 0.35, // Focused, accurate debugging and code synthesis (0.3-0.4)
+      maxOutputTokens: 2048,
+      thinkingConfig: { thinkingBudget: -1 }, // Enables full chain-of-thought reasoning
     };
 
     try {
@@ -185,10 +185,10 @@ ${query}`;
         config: modelConfig,
       });
     } catch (modelErr: any) {
-      // If gemini-2.0-flash-lite is not available for this key, fall back to recommended next-gen model
+      // If gemini-2.5-pro is not available for this key, fall back to recommended next-gen pro model
       const msg = modelErr?.message || '';
       if (msg.includes('not found') || msg.includes('no longer available') || msg.includes('404')) {
-        activeModel = 'gemini-3.8-flash';
+        activeModel = 'gemini-3.1-pro-preview';
         streamResult = await ai.models.generateContentStream({
           model: activeModel,
           contents,

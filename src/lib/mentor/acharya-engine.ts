@@ -1,5 +1,5 @@
 // Dronacharya Context-Aware Live AI Mentor Client Service
-// Integrates directly with POST /api/mentor/ask (Google Gemini gemini-2.5-flash)
+// Integrates directly with POST /api/mentor/ask (Google Gemini gemini-2.5-pro)
 // Passes live code, problem statements, and simulation context for tailored, exact solutions.
 
 export interface AISettings {
@@ -134,7 +134,7 @@ export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorR
         payload.onChunk?.(text, accumulated);
       }
 
-      const modelUsed = res.headers.get('X-Model-Used') || 'gemini-2.0-flash-lite';
+      const modelUsed = res.headers.get('X-Model-Used') || 'gemini-2.5-pro';
       return {
         success: true,
         reply: accumulated,
@@ -147,7 +147,7 @@ export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorR
     return {
       success: true,
       reply: data?.reply || data?.data?.reply || '',
-      model: data?.data?.model || 'gemini-2.0-flash-lite',
+      model: data?.data?.model || 'gemini-2.5-pro',
     };
   } catch (err: any) {
     console.error('Network request to /api/mentor/ask failed:', err);

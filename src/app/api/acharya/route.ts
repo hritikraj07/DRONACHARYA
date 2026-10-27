@@ -81,11 +81,12 @@ ${studentMessage || 'Please analyze my current code, diagnose any errors or inco
     const ai = new GoogleGenAI({ apiKey });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-lite',
+      model: 'gemini-2.5-pro',
       contents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.2,
+        temperature: 0.35,
+        thinkingConfig: { thinkingBudget: -1 },
       },
     });
 

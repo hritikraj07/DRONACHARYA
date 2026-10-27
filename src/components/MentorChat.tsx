@@ -1,7 +1,7 @@
 'use client';
 
 // Dronacharya Interactive Context-Aware AI Mentor Chat Component
-// Powered by Google Gemini 2.0 Flash-Lite SDK (@google/genai) via POST /api/mentor/ask
+// Powered by Google Gemini 2.5 Pro SDK (@google/genai) via POST /api/mentor/ask
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -47,7 +47,7 @@ export function MentorChat({
   problemContext = 'Solve the active programming challenge',
   userAttempt = '',
   title = 'Acharya AI Mentor',
-  subtitle = 'Ultra-Fast Interactive Solver (gemini-2.0-flash-lite)',
+  subtitle = 'Deep Reasoning Solver (gemini-2.5-pro)',
   onClose,
   className = '',
   initialMessage,
@@ -58,7 +58,7 @@ export function MentorChat({
       role: 'assistant',
       content:
         initialMessage ||
-        `Greetings, Coder! I am your AI Mentor powered by **Gemini 2.0 Flash-Lite**. I have direct visibility into your active problem statement and live code attempt. Ask me anything to get immediate diagnoses, tailored explanations, and working solutions.`,
+        `Greetings, Coder! I am your AI Mentor powered by **Gemini 2.5 Pro**. I have direct visibility into your active problem statement and live code attempt. Ask me anything to get immediate diagnoses, tailored explanations, and working solutions.`,
       timestamp: 'Just now',
     },
   ]);
@@ -219,6 +219,9 @@ export function MentorChat({
         </div>
 
         <div className="flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/30 shadow-xs">
+            gemini-2.5-pro
+          </span>
           {userAttempt && (
             <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4EDDA] text-[#155724] border border-[#155724]/30">
               <Code2 className="w-3 h-3" />

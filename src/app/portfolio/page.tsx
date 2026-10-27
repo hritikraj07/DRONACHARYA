@@ -92,8 +92,8 @@ export default function MyProgressPage() {
               <FolderGit2 className="w-4 h-4 text-[#A65F43]" />
               <span>Applied Practical Projects</span>
             </h3>
-            <Link href="/projects" className="text-xs text-[#354B3A] font-semibold underline">
-              Open Workspace
+            <Link href="/dungeon" className="text-xs text-[#354B3A] font-semibold underline">
+              Enter Dungeon
             </Link>
           </div>
 

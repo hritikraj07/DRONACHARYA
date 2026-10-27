@@ -246,7 +246,7 @@ export default function AuthPage() {
               {authMode === 'guest'
                 ? 'Explore all realms and interactive studios with zero signup required.'
                 : authMode === 'signup'
-                ? 'Embark on RPG quests, earn XP, and unlock verifiable Mastery Seals.'
+                ? 'Embark on RPG quests, earn XP, and unlock verifiable achievements.'
                 : 'Enter your credentials to load your saved progress and rank.'}
             </p>
           </div>

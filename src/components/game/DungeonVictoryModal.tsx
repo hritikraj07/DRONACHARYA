@@ -104,10 +104,10 @@ export function DungeonVictoryModal({
             <div>
               <div className="flex items-center gap-1.5 text-xs font-black uppercase text-[#6C5CE7]">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Mastery Seal Unlocked!</span>
+                <span>Dungeon Trophy Unlocked!</span>
               </div>
               <h3 className="font-serif font-black text-base text-[#1E1E24]">
-                Dungeon Architect Seal
+                Dungeon Architect Trophy
               </h3>
               <p className="text-[11px] text-[#4A4A58]">
                 Conquered all 4 Code Dungeon &amp; Craft Floors. Verifiable on your public portfolio!

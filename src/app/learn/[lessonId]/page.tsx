@@ -25,6 +25,7 @@ import {
 } from '@/lib/simulator/python-interpreter';
 import { recordGameProgress } from '@/lib/db/auth-db';
 import { AcharyaDrawer } from '@/components/mentor/AcharyaDrawer';
+import { PythonOdysseyArena } from '@/components/game/PythonOdysseyArena';
 import {
   BookOpen,
   ArrowRight,
@@ -99,6 +100,11 @@ function QuestLearningLab() {
   // Language dialect preference
   const [dialect, setDialect] = useState<'english' | 'hinglish'>('english');
   const [isAcharyaOpen, setIsAcharyaOpen] = useState(false);
+  const [proactiveTrigger, setProactiveTrigger] = useState<{
+    type: 'collision' | 'error' | 'battery' | 'syntax';
+    message: string;
+    line?: number;
+  } | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
 
   // Progressive Hint Tier (0: hidden, 1: nudge, 2: clue, 3: blueprint, 4: solution)
@@ -326,6 +332,17 @@ function QuestLearningLab() {
 
       if (passed) {
         handleSuccessPass();
+      } else {
+        const firstFailed = validation.testResults.find((t) => !t.passed);
+        setProactiveTrigger({
+          type: runRes.stderr ? 'syntax' : 'error',
+          message:
+            runRes.stderr ||
+            (firstFailed
+              ? `Verification failed: ${firstFailed.description}`
+              : 'Python code executed but did not satisfy the quest conditions.'),
+        });
+        setIsAcharyaOpen(true);
       }
       setIsRunning(false);
     } else {
@@ -366,6 +383,15 @@ function QuestLearningLab() {
 
       if (passed) {
         handleSuccessPass();
+      } else {
+        const firstFailed = validation.testResults.find((t) => !t.passed);
+        setProactiveTrigger({
+          type: 'error',
+          message:
+            firstFailed?.description ||
+            'Web markup/scripting did not pass all quest test cases.',
+        });
+        setIsAcharyaOpen(true);
       }
       setIsRunning(false);
     }
@@ -424,6 +450,11 @@ function QuestLearningLab() {
     );
   }
 
+  // Python Quests: Render Rover Arya's Odyssey 2D RPG Adventure Game Arena
+  if (isPython) {
+    return <PythonOdysseyArena initialQuestId={rawId} />;
+  }
+
   // Hints array from exercise
   const hints = lesson.exercise?.hints || [
     'Read the quest story instructions closely.',
@@ -435,7 +466,7 @@ function QuestLearningLab() {
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-[#F5F2EB] text-[#1E1E24] overflow-hidden select-none">
+    <div className="h-screen flex flex-col bg-[#F5F2EB] text-[#1E1E24] overflow-hidden">
       {/* TOP HEADER: BREADCRUMBS & QUEST CONTROLS */}
       <header className="h-14 bg-white border-b-2 border-[#1E1E24] px-4 flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3">
@@ -858,7 +889,7 @@ function QuestLearningLab() {
           </div>
 
           {/* CODE EDITOR TEXTAREA (TOP HALF OF RIGHT PANEL) */}
-          <div className="h-1/2 flex bg-[#12131C] border-b-2 border-[#1E1E24] overflow-hidden">
+          <div className="flex-1 min-h-0 flex bg-[#12131C] border-b-2 border-[#1E1E24] overflow-hidden">
             {/* Line Numbers Simulation */}
             <div className="w-10 bg-[#0E0F17] text-gray-600 font-mono text-xs py-3 select-none text-right pr-2 space-y-1 overflow-hidden shrink-0">
               {Array.from({ length: 40 }).map((_, i) => (
@@ -908,7 +939,7 @@ function QuestLearningLab() {
 
           {/* LOWER HALF: REALISTIC LIVE BROWSER SANDBOX (WEB) OR INTERACTIVE OUTPUT (PYTHON) */}
           {isWeb ? (
-            <div className="h-1/2 flex flex-col bg-[#161824] border-t-2 border-[#1E1E24]">
+            <div className="flex-1 min-h-0 flex flex-col bg-[#161824] border-t-2 border-[#1E1E24] overflow-hidden">
               {/* Modern Browser Chrome Toolbar */}
               <div className="h-10 bg-[#1A1C29] border-b border-[#2B2E42] px-3 flex items-center justify-between shrink-0 select-none gap-2">
                 {/* Left: Window Controls & Nav */}
@@ -975,21 +1006,23 @@ function QuestLearningLab() {
                 </div>
               </div>
 
-              {/* Browser Canvas Body */}
-              <div className="flex-1 overflow-hidden relative flex items-center justify-center bg-[#0E0F17]">
+              {/* Browser Canvas Body: 100% Flush, no left gap */}
+              <div className="flex-1 overflow-hidden relative w-full h-full bg-white">
                 {isMobilePreview ? (
-                  <div className="h-[96%] w-[375px] max-w-[95%] bg-white rounded-2xl border-4 border-[#2B2E42] shadow-2xl overflow-hidden flex flex-col transition-all">
-                    {/* Mobile speaker notch */}
-                    <div className="h-4 bg-[#1E2030] flex items-center justify-center shrink-0">
-                      <div className="w-12 h-1 rounded-full bg-gray-600" />
+                  <div className="w-full h-full flex items-center justify-center bg-[#0E0F17]">
+                    <div className="h-[96%] w-[375px] max-w-[95%] bg-white rounded-2xl border-4 border-[#2B2E42] shadow-2xl overflow-hidden flex flex-col transition-all">
+                      {/* Mobile speaker notch */}
+                      <div className="h-4 bg-[#1E2030] flex items-center justify-center shrink-0">
+                        <div className="w-12 h-1 rounded-full bg-gray-600" />
+                      </div>
+                      <iframe
+                        ref={iframeRef}
+                        srcDoc={previewDoc}
+                        title="Dronacharya Mobile Web Sandbox"
+                        sandbox="allow-scripts allow-modals"
+                        className="w-full flex-1 bg-white border-0"
+                      />
                     </div>
-                    <iframe
-                      ref={iframeRef}
-                      srcDoc={previewDoc}
-                      title="Dronacharya Mobile Web Sandbox"
-                      sandbox="allow-scripts allow-modals"
-                      className="w-full flex-1 bg-white border-0"
-                    />
                   </div>
                 ) : (
                   <iframe
@@ -997,7 +1030,7 @@ function QuestLearningLab() {
                     srcDoc={previewDoc}
                     title="Dronacharya Desktop Web Sandbox"
                     sandbox="allow-scripts allow-modals"
-                    className="w-full h-full bg-white border-0"
+                    className="w-full h-full bg-white border-0 block"
                   />
                 )}
               </div>
@@ -1073,12 +1106,20 @@ function QuestLearningLab() {
         contextCode={
           isPython
             ? pythonCode
-            : `<!-- HTML -->\n${htmlCode}\n\n/* CSS */\n${cssCode}\n\n// JS\n${jsCode}`
+            : isCssCourse
+            ? cssCode
+            : isJsCourse
+            ? jsCode
+            : htmlCode
         }
         contextError={
           consoleLogs.find((l) => l.level === 'error')?.message || ''
         }
         activeMissionTitle={`${course.title}: ${lesson.title}`}
+        missionGoal={lesson.exercise?.instructions || lesson.subtitle || lesson.storyIntro || ''}
+        language={isPython ? 'python' : isCssCourse ? 'css' : isJsCourse ? 'javascript' : 'html'}
+        proactiveTrigger={proactiveTrigger}
+        onClearProactiveTrigger={() => setProactiveTrigger(null)}
       />
     </div>
   );

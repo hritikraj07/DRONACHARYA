@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDronacharya } from '@/lib/store';
 import { getActiveSession, getGuestSession, triggerSaveProgressModal, RegisteredUser, AVAILABLE_SUBJECTS } from '@/lib/db/auth-db';
+import { getVaultState, VaultState } from '@/lib/game/vault-ledger';
 import {
   ArrowRight,
   Target,
@@ -33,6 +34,12 @@ export default function DashboardPage() {
   const { state } = useDronacharya();
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [isGuest, setIsGuest] = useState(false);
+  const [vaultState, setVaultState] = useState<VaultState>({
+    securityVault: 500,
+    withdrawableVault: 0,
+    unlockedQuests: [],
+    unlockedSeals: [],
+  });
 
   useEffect(() => {
     const syncUser = () => {
@@ -47,11 +54,17 @@ export default function DashboardPage() {
       }
     };
     syncUser();
+    setVaultState(getVaultState());
+
+    const syncVault = () => setVaultState(getVaultState());
+
     window.addEventListener('dronacharya_session_change', syncUser);
     window.addEventListener('storage', syncUser);
+    window.addEventListener('dronacharya_vault_changed', syncVault);
     return () => {
       window.removeEventListener('dronacharya_session_change', syncUser);
       window.removeEventListener('storage', syncUser);
+      window.removeEventListener('dronacharya_vault_changed', syncVault);
     };
   }, []);
 
@@ -127,9 +140,17 @@ export default function DashboardPage() {
               <span className="text-[10px] font-black uppercase text-[#059669] block">Total XP</span>
               <span className="font-serif font-black text-xl text-[#059669]">{totalXp}</span>
             </div>
-            <div className="bg-[#FEE2E2] border-2 border-[#1E1E24] rounded-xl px-4 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+            <div className="bg-[#FAF6EE] border-2 border-[#1E1E24] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+              <span className="text-[10px] font-black uppercase text-amber-800 block">🔒 Security Vault</span>
+              <span className="font-serif font-black text-lg text-[#1E1E24]">₹{vaultState.securityVault}</span>
+            </div>
+            <div className="bg-[#D1FAE5] border-2 border-[#10B981] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+              <span className="text-[10px] font-black uppercase text-emerald-800 block">💸 Withdrawable</span>
+              <span className="font-serif font-black text-lg text-emerald-700">₹{vaultState.withdrawableVault}</span>
+            </div>
+            <div className="bg-[#FEE2E2] border-2 border-[#1E1E24] rounded-xl px-3 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
               <span className="text-[10px] font-black uppercase text-[#DC2626] block">Hearts</span>
-              <span className="font-serif font-black text-xl text-[#EF4444]">{currentUser?.hearts ?? 3} ❤️</span>
+              <span className="font-serif font-black text-lg text-[#EF4444]">{currentUser?.hearts ?? 3} ❤️</span>
             </div>
           </div>
         </div>
@@ -212,6 +233,46 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Featured Game Mode: Rover Arya's Python Odyssey (2D RPG Arena) */}
+          <div className="card-game p-6 bg-gradient-to-br from-[#FAF6EE] via-[#EDE9FE] to-[#FEF3C7] border-2 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] relative overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-black text-white bg-[#6C5CE7] px-3 py-1 rounded-full border border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 fill-[#FFD214]" />
+                <span>2D RPG Game Arena • 5 Quests</span>
+              </span>
+              <span className="text-xs font-black text-[#059669] bg-[#D1FAE5] px-2.5 py-0.5 rounded border border-[#1E1E24]">
+                ₹10 Unlocked / Quest
+              </span>
+            </div>
+
+            <h2 className="font-serif font-black text-2xl text-[#1E1E24] mb-1 flex items-center gap-2">
+              <span>Rover Arya&apos;s Python Odyssey</span>
+              <span className="text-lg">🎮🚀</span>
+            </h2>
+            <p className="text-xs font-bold text-[#6C5CE7] mb-2">
+              Learn Real Python: Syntax, Variables, Conditionals &amp; Loops through 4 Playable Realms
+            </p>
+            <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
+              Control Rover Arya across an 8x8 interactive canvas. Solve real coding challenges to awaken optical sensors, cross voltage bridges, charge thrusters, deflect laser barriers, and harvest energy loops to unlock your <strong>Guru Dakshina Vault</strong>!
+            </p>
+
+            <div className="flex items-center justify-between pt-4 border-t-2 border-[#1E1E24]/15">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#6C5CE7]">
+                <span>🔒 ₹{vaultState.securityVault}</span>
+                <span>→</span>
+                <span className="text-emerald-700 font-black">💸 ₹{vaultState.withdrawableVault} Unlocked</span>
+              </div>
+
+              <Link
+                href="/learn/py-less-1-1"
+                className="btn-arcade text-xs py-2 px-5 btn-arcade-yellow shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Play Python Odyssey 🎮</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
           {/* Active Featured Mission: Rescue the Robot */}
           <div className="card-game p-6 bg-white shadow-[4px_4px_0px_#6C5CE7] relative">
             <div className="flex items-center justify-between mb-3">
@@ -276,64 +337,87 @@ export default function DashboardPage() {
 
         {/* Right Column: Practical Projects & Mastery */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Capstone Project Card */}
-          <div className="card-game p-6 bg-[#FEF3C7]">
+          {/* Guru Dakshina Two-Vault Commitment Ledger Card */}
+          <div className="card-game p-6 bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-black uppercase tracking-wider text-[#D97706] flex items-center gap-1.5">
-                <FolderGit2 className="w-4 h-4" />
-                Practical Project
+                <Sparkles className="w-4 h-4" />
+                Anti-Dropout Engine
               </span>
               <span className="text-[10px] font-black bg-white px-2 py-0.5 rounded border border-[#1E1E24]">
-                Capstone Track
+                Guru Dakshina
               </span>
             </div>
 
             <h3 className="font-serif font-black text-xl text-[#1E1E24] mb-2">
-              Autonomous Robot Fleet Controller
+              Two-Vault Commitment Ledger
             </h3>
             <p className="text-xs text-[#4A4A58] leading-relaxed mb-4">
-              Build a complete command-line Python software system that coordinates multiple exploration rovers, schedules battery routes, and exports performance logs.
+              Your locked commitment vault transfers ₹10 into your withdrawable balance for every quest and test harness you conquer. Zero dropouts, 100% refund upon completion.
             </p>
 
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              <div className="p-2.5 rounded-xl bg-white border border-[#1E1E24] text-center">
+                <span className="text-[10px] font-bold text-gray-500 block">🔒 Security Vault</span>
+                <span className="text-base font-black text-[#D97706]">₹450</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white border border-[#1E1E24] text-center">
+                <span className="text-[10px] font-bold text-gray-500 block">💸 Withdrawable</span>
+                <span className="text-base font-black text-[#059669]">₹50</span>
+              </div>
+            </div>
+
             <Link
-              href="/projects"
-              className="btn-game-yellow w-full text-xs py-2.5 text-center shadow-[3px_3px_0px_#1E1E24]"
+              href="/simulator"
+              className="btn-arcade btn-arcade-gold w-full text-xs py-2.5 text-center flex items-center justify-center gap-1.5"
             >
-              <span>Open Project Lab</span>
+              <span>Launch Practice Quest (+₹10)</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Mastery Seals Card */}
-          <div className="card-game p-6 bg-white">
+          {/* Interactive Coding Arena Card */}
+          <div className="card-game p-6 bg-white border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24]">
             <h3 className="font-serif font-black text-base text-[#1E1E24] mb-2 flex items-center gap-2">
-              <Award className="w-5 h-5 text-[#F59E0B]" />
-              <span>Verifiable Mastery Seals</span>
+              <Gamepad2 className="w-5 h-5 text-[#6C5CE7]" />
+              <span>Interactive Practice Arenas</span>
             </h3>
-            <p className="text-xs text-[#4A4A58] mb-4">
-              Seals unlocked by proving independent coding mastery in the Bug-to-Battle arena:
+            <p className="text-xs text-[#4A4A58] mb-4 leading-relaxed">
+              Real code controlling autonomous rovers and hazardous decontamination bio-cells:
             </p>
 
             <div className="space-y-2.5">
-              <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#10B981] border border-[#1E1E24] flex items-center justify-center text-white font-bold text-xs">
-                  ✓
+              <Link
+                href="/simulator?mission=mission-rescue-robot"
+                className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-between hover:bg-[#EDE9FE] transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#6C5CE7] border border-[#1E1E24] flex items-center justify-center text-white font-bold text-xs">
+                    🎮
+                  </div>
+                  <div>
+                    <span className="font-black text-xs text-[#1E1E24] block">Rover Arya Rescue</span>
+                    <span className="text-[11px] text-[#7E7E8F]">Navigate loops & battery bounds</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-black text-xs text-[#1E1E24] block">Loop Navigator Seal</span>
-                  <span className="text-[11px] text-[#7E7E8F]">Demonstrated sequential range loops and state accumulators</span>
-                </div>
-              </div>
+                <ArrowRight className="w-4 h-4 text-[#6C5CE7]" />
+              </Link>
 
-              <div className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center gap-3 opacity-60">
-                <div className="w-8 h-8 rounded-lg bg-[#E8E1D2] border border-[#1E1E24] flex items-center justify-center text-[#7E7E8F] font-bold text-xs">
-                  🔒
+              <Link
+                href="/simulator?mission=mission-hazard-filter"
+                className="p-3 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-between hover:bg-[#FEF3C7] transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#F59E0B] border border-[#1E1E24] flex items-center justify-center text-white font-bold text-xs">
+                    ⚡
+                  </div>
+                  <div>
+                    <span className="font-black text-xs text-[#1E1E24] block">Bio-Cell Hazard Filter</span>
+                    <span className="text-[11px] text-[#7E7E8F]">Conditional logic & arrays</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-black text-xs text-[#1E1E24] block">Condition Sentinel Seal</span>
-                  <span className="text-[11px] text-[#7E7E8F]">Requires completing Stage 4: Hazard Filter</span>
-                </div>
-              </div>
+                <ArrowRight className="w-4 h-4 text-[#D97706]" />
+              </Link>
             </div>
           </div>
         </div>

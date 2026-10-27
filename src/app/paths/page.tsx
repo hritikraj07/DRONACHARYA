@@ -58,7 +58,7 @@ export default function PathsPage() {
 
 function PathsContent() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'roadmap' | 'worldmap'>('roadmap');
+  const [activeTab, setActiveTab] = useState<'roadmap' | 'worldmap'>('worldmap');
   const [selectedStageNum, setSelectedStageNum] = useState<number>(1);
   const [progressState, setProgressState] = useState<LearnerProgressState | null>(null);
   const [inspectingTopic, setInspectingTopic] = useState<CurriculumTopic | null>(null);

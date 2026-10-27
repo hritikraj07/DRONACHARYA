@@ -145,22 +145,24 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const activeSubjectObj =
     AVAILABLE_SUBJECTS.find((s) => s.id === effectiveUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
-  // Core Codédex navigation links
+  // Core Codédex navigation links (Builds removed)
   const primaryNavLinks = [
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Practice', href: '/simulator', icon: Gamepad2 },
-    { name: 'Builds', href: '/projects', icon: FolderGit2 },
+    { name: 'World Map', href: '/paths', icon: Compass },
     { name: 'Community', href: '/leaderboard', icon: Flame },
   ];
 
-  // Secondary links housed in clean "More" dropdown
+  // Secondary links housed in clean "More" dropdown (Mastery Seals removed; Settings only visible after login)
   const secondaryNavLinks = [
     { name: 'Code Dungeon', href: '/dungeon', icon: Pickaxe },
-    { name: 'World Map', href: '/paths', icon: Compass },
-    { name: 'Quest Hub', href: '/dashboard', icon: Target },
-    { name: 'Mastery Seals', href: '/achievements', icon: Award },
     { name: 'Squads', href: '/squads', icon: Users },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    ...(currentUser
+      ? [
+          { name: 'Quest Hub', href: '/dashboard', icon: Target },
+          { name: 'Settings', href: '/settings', icon: Settings },
+        ]
+      : []),
   ];
 
   const allNavLinks = [...primaryNavLinks, ...secondaryNavLinks];

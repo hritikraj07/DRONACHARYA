@@ -181,39 +181,39 @@ export function DungeonCodeEditor({
 
       {/* 3. Main Body: Code Editor Tab vs Blueprints Tab */}
       {activeTab === 'editor' ? (
-        <div className="card-game bg-[#1E1E24] border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] rounded-xl overflow-hidden flex flex-col flex-1 min-h-[300px]">
+        <div className="bg-[#181920] border-2 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] rounded-2xl overflow-hidden flex flex-col flex-1 min-h-[340px]">
           {/* Editor Sub-header */}
-          <div className="p-2.5 bg-[#2A2A32] border-b border-white/10 flex items-center justify-between text-xs text-slate-300 font-mono">
+          <div className="p-3 bg-[#22232E] border-b-2 border-[#12131A] flex items-center justify-between text-xs text-slate-200 font-mono">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-              <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-              <span className="ml-2 font-bold text-[#FBBF24]">hero_script.py</span>
+              <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]" />
+              <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
+              <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]" />
+              <span className="ml-2 font-black text-[#FFD214] tracking-wide">hero_script.py</span>
             </div>
-            <span className="text-[10px] text-slate-500">Python 3.12 Engine</span>
+            <span className="text-[11px] text-gray-400 font-bold bg-[#161720] px-2 py-0.5 rounded border border-gray-700">Python 3.12 Engine</span>
           </div>
 
           {/* Code Editor with Line Numbers */}
-          <div className="flex flex-1 relative font-mono text-xs overflow-hidden">
+          <div className="flex flex-1 relative font-mono text-xs overflow-hidden bg-[#181920]">
             {/* Line Numbers Gutter */}
-            <div className="w-10 bg-[#16161B] text-slate-600 select-none py-3 text-right pr-2 text-[11px] border-r border-white/10">
+            <div className="w-11 bg-[#12131A] text-gray-500 font-mono text-[11px] select-none py-3 text-right pr-2.5 border-r border-[#2A2B38] shrink-0">
               {Array.from({ length: lineCount }).map((_, i) => (
-                <div key={`line-${i + 1}`}>{i + 1}</div>
+                <div key={`line-${i + 1}`} className="leading-[1.4rem]">{i + 1}</div>
               ))}
             </div>
 
-            {/* Editable Text Area */}
+            {/* Editable Text Area (High-Contrast White/Mint text on dark editor background) */}
             <textarea
               value={code}
               onChange={(e) => onChangeCode(e.target.value)}
               spellCheck={false}
-              className="flex-1 bg-transparent text-[#FAF6EE] p-3 leading-[1.35rem] resize-none outline-none font-mono text-xs overflow-y-auto selection:bg-[#FBBF24] selection:text-[#1E1E24]"
+              className="flex-1 bg-[#181920] text-[#F8FAFC] p-3 leading-[1.4rem] resize-none outline-none font-mono text-xs sm:text-[13px] overflow-y-auto selection:bg-[#6C5CE7] selection:text-white caret-[#FFD214] placeholder-gray-600"
               placeholder="# Write your Python dungeon commands here..."
             />
           </div>
 
           {/* 4. Execution Controls Action Bar */}
-          <div className="p-3 bg-[#2A2A32] border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <div className="p-3 bg-[#22232E] border-t-2 border-[#12131A] flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               {/* Primary Run Code Button */}
               <button

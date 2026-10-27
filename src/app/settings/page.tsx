@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useDronacharya } from '@/lib/store';
 import { LanguagePreference } from '@/types';
 import {
@@ -27,6 +28,7 @@ import {
 } from '@/lib/db/auth-db';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { state, updateProfile, resetDemoState } = useDronacharya();
 
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
@@ -36,17 +38,30 @@ export default function SettingsPage() {
   const [selectedSubject, setSelectedSubject] = useState<string>('python');
   const [selectedClass, setSelectedClass] = useState<string>('Class 10');
   const [savedFeedback, setSavedFeedback] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const session = getActiveSession() || getGuestSession();
-    if (session) {
-      setCurrentUser(session);
-      if (session.name) setFullName(session.name);
-      if (session.targetSubject) setSelectedSubject(session.targetSubject);
-      if (session.studentClass) setSelectedClass(session.studentClass);
-      if (session.preferredLanguage) setLang(session.preferredLanguage as LanguagePreference);
+    const session = getActiveSession();
+    if (!session) {
+      router.push('/auth?mode=signin');
+      return;
     }
-  }, []);
+    setCurrentUser(session);
+    if (session.name) setFullName(session.name);
+    if (session.targetSubject) setSelectedSubject(session.targetSubject);
+    if (session.studentClass) setSelectedClass(session.studentClass);
+    if (session.preferredLanguage) setLang(session.preferredLanguage as LanguagePreference);
+    setIsCheckingAuth(false);
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
+        <div className="w-8 h-8 border-4 border-[#6C5CE7] border-t-transparent rounded-full animate-spin mb-3" />
+        <p className="text-xs font-bold text-[#4A4A58]">Verifying Adventurer Credentials...</p>
+      </div>
+    );
+  }
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

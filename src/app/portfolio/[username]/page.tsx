@@ -144,9 +144,9 @@ function PortfolioContent({ params }: { params: Promise<{ username: string }> })
           </div>
         </div>
 
-        {/* Right Column: Verified Mastery Seals & Skill Graph */}
+        {/* Right Column: Verified Quest Badges & Skill Graph */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Seals Medallion Case */}
+          {/* Badges Medallion Case */}
           <div className="card-game">
             <h3 className="font-black text-base text-[#1E1E24] flex items-center gap-2 mb-1">
               <Award className="w-4 h-4 text-[#FBBF24]" />

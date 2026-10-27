@@ -234,14 +234,10 @@ function CourseDetailContent() {
           <div className="shrink-0 flex flex-col gap-3 min-w-[200px]">
             <Link
               href={`/learn/${nextLessonId}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/learn/${nextLessonId}`);
-              }}
               className="btn-arcade btn-arcade-purple py-3 px-6 flex items-center justify-center gap-2 text-center cursor-pointer select-none"
             >
-              <Play className="w-3.5 h-3.5 fill-current pointer-events-none" />
-              <span className="pointer-events-none">{completedCount > 0 ? 'Continue Quest' : 'Start Chapter 1'}</span>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>{completedCount > 0 ? 'Continue Quest' : 'Start Chapter 1'}</span>
             </Link>
 
             <Link
@@ -253,6 +249,37 @@ function CourseDetailContent() {
             </Link>
           </div>
         </div>
+
+        {/* SPECIAL FEATURED BANNER: ROVER ARYA'S PYTHON ODYSSEY (2D RPG GAME) */}
+        {(course.id === 'python' || course.slug === 'python') && (
+          <div className="card-game p-6 bg-gradient-to-r from-[#FAF6EE] via-[#EDE9FE] to-[#FEF3C7] border-2 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] flex flex-col md:flex-row items-center justify-between gap-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-white bg-[#6C5CE7] px-2.5 py-0.5 rounded shadow-[1px_1px_0px_#1E1E24]">
+                  Playable 2D RPG Adventure
+                </span>
+                <span className="text-[10px] font-black uppercase text-[#92400E] bg-[#FEF3C7] px-2 py-0.5 rounded border border-[#F59E0B]">
+                  Two-Vault Guru Dakshina Active
+                </span>
+              </div>
+              <h3 className="font-serif font-black text-2xl text-[#1E1E24] flex items-center gap-2">
+                <span>Rover Arya&apos;s Odyssey</span>
+                <span>🎮🕹️</span>
+              </h3>
+              <p className="text-xs text-[#4A4A58] font-bold max-w-xl leading-relaxed">
+                Experience all 4 Python Chapters inside a retro-arcade 2D grid world. Write real Python code to ignite headlights, calculate bridge power, activate plasma shields, and harvest energy loops!
+              </p>
+            </div>
+
+            <Link
+              href="/learn/py-less-1-1"
+              className="btn-arcade btn-arcade-yellow text-xs py-3 px-6 shrink-0 flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24] cursor-pointer"
+            >
+              <span>Play Python Odyssey 🎮</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
 
         {/* SYLLABUS CHAPTER ACCORDIONS */}
         <div className="space-y-4">
@@ -363,14 +390,10 @@ function CourseDetailContent() {
 
                               <Link
                                 href={`/learn/${less.id}`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  router.push(`/learn/${less.id}`);
-                                }}
                                 className="px-3.5 py-1.5 bg-[#6C5CE7] hover:bg-[#5A4AD1] text-white font-black text-xs rounded-lg border border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1 transition-transform hover:scale-105 cursor-pointer select-none"
                               >
-                                <span className="pointer-events-none">{isDone ? 'Review' : 'Play'}</span>
-                                <ArrowRight className="w-3 h-3 pointer-events-none" />
+                                <span>{isDone ? 'Review' : 'Play'}</span>
+                                <ArrowRight className="w-3 h-3" />
                               </Link>
                             </div>
                           </div>

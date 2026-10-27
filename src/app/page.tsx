@@ -599,24 +599,16 @@ export default function HomePage() {
                       <div className="grid grid-cols-2 gap-2">
                         <Link
                           href={`/courses/${c.id}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/courses/${c.id}`);
-                          }}
                           className="btn-arcade btn-arcade-white py-2.5 px-3 text-center text-xs font-bold cursor-pointer select-none"
                         >
-                          <span className="pointer-events-none">Syllabus</span>
+                          <span>Syllabus</span>
                         </Link>
                         <Link
                           href={`/learn/${firstLessonId}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/learn/${firstLessonId}`);
-                          }}
                           className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
-                          <span className="pointer-events-none">Play</span>
-                          <ArrowRight className="w-3.5 h-3.5 pointer-events-none" />
+                          <span>Play</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     )}
@@ -667,7 +659,7 @@ export default function HomePage() {
                 RPG XP & Collectible Badges
               </h3>
               <p className="text-xs font-bold text-[#4A4A58] leading-relaxed">
-                Earn mastery experience points on every validated challenge. Mint verifiable Mastery Seals to showcase on your digital adventurer resume.
+                Earn mastery experience points on every validated challenge. Level up your adventurer rank and unlock advanced coding realms.
               </p>
             </div>
 
@@ -703,52 +695,54 @@ export default function HomePage() {
       {/* =========================================================================
           5. "PRACTICE YOUR CODING CHOPS" MINI-GAME ARENA
          ========================================================================= */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8 overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <span className="text-xs font-black uppercase tracking-wider text-[#00B894] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-300">
               Interactive Practice Arenas
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2 break-words">
               Practice Your Coding Chops
             </h2>
-            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1">
+            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1 max-w-xl break-words">
               Apply what you learn in playful, code-controlled game simulations.
             </p>
           </div>
 
           <Link
             href="/simulator"
-            className="btn-arcade btn-arcade-dark px-5 py-2.5 flex items-center gap-1.5 self-start md:self-auto"
+            className="btn-arcade btn-arcade-dark px-5 py-2.5 flex items-center gap-1.5 self-start md:self-auto shrink-0"
           >
             <span>Open Simulator Hub</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Practice Arena 1: Rover Rescue */}
-          <div className="bg-white rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-black text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-1 rounded-lg border border-[#1E1E24]">
-                Stage 3 • Loop Lab
-              </span>
-              <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
-                +150 XP
-              </span>
-            </div>
-            <h3 className="text-2xl font-black text-[#1E1E24]">
-              Rescue Exploration Rover Arya
-            </h3>
-            <p className="text-xs font-bold text-gray-500 leading-relaxed">
-              Program an autonomous exploration rover through an infected research labyrinth. Collect power cells, evade hazardous debris, and reach the extraction beacon before battery failure.
-            </p>
-            <div className="p-3 rounded-xl bg-[#1E1E24] text-emerald-300 font-mono text-xs">
-              <code>for step in range(3):<br />&nbsp;&nbsp;rover.move_right()<br />rover.collect()</code>
+          <div className="bg-white rounded-3xl border-2 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-xs font-mono font-black text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-1 rounded-lg border border-[#1E1E24]">
+                  Stage 3 • Loop Lab
+                </span>
+                <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
+                  +150 XP
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-[#1E1E24] leading-tight break-words">
+                Rescue Exploration Rover Arya
+              </h3>
+              <p className="text-xs font-bold text-gray-500 leading-relaxed break-words">
+                Program an autonomous exploration rover through an infected research labyrinth. Collect power cells, evade hazardous debris, and reach the extraction beacon before battery failure.
+              </p>
+              <div className="p-3 rounded-xl bg-[#1E1E24] text-emerald-300 font-mono text-xs overflow-x-auto max-w-full">
+                <code className="whitespace-pre block">for step in range(3):&#10;  rover.move_right()&#10;rover.collect()</code>
+              </div>
             </div>
             <Link
               href="/simulator?mission=mission-rescue-robot"
-              className="w-full btn-arcade btn-arcade-purple py-2.5 px-4 flex items-center justify-center gap-1.5"
+              className="w-full btn-arcade btn-arcade-purple py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2"
             >
               <span>Launch Rover Arena</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -756,27 +750,29 @@ export default function HomePage() {
           </div>
 
           {/* Practice Arena 2: Hazard Filter */}
-          <div className="bg-white rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-[#1E1E24]">
-                Stage 4 • Decision Forest
-              </span>
-              <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
-                +150 XP
-              </span>
-            </div>
-            <h3 className="text-2xl font-black text-[#1E1E24]">
-              Decontaminate Bio-Data Stream
-            </h3>
-            <p className="text-xs font-bold text-gray-500 leading-relaxed">
-              Radiation has scrambled incoming biological sensor packets. Write conditional loops to inspect sensor arrays, routing clean samples into the cold vault while burning corrupted cells.
-            </p>
-            <div className="p-3 rounded-xl bg-[#1E1E24] text-amber-300 font-mono text-xs">
-              <code>for cell in incoming_stream:<br />&nbsp;&nbsp;if cell &gt; 0:<br />&nbsp;&nbsp;&nbsp;&nbsp;vault.append(cell)</code>
+          <div className="bg-white rounded-3xl border-2 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-xs font-mono font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-[#1E1E24]">
+                  Stage 4 • Decision Forest
+                </span>
+                <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
+                  +150 XP
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-[#1E1E24] leading-tight break-words">
+                Decontaminate Bio-Data Stream
+              </h3>
+              <p className="text-xs font-bold text-gray-500 leading-relaxed break-words">
+                Radiation has scrambled incoming biological sensor packets. Write conditional loops to inspect sensor arrays, routing clean samples into the cold vault while burning corrupted cells.
+              </p>
+              <div className="p-3 rounded-xl bg-[#1E1E24] text-amber-300 font-mono text-xs overflow-x-auto max-w-full">
+                <code className="whitespace-pre block">for cell in incoming_stream:&#10;  if cell &gt; 0:&#10;    vault.append(cell)</code>
+              </div>
             </div>
             <Link
               href="/simulator?mission=mission-hazard-filter"
-              className="w-full btn-arcade btn-arcade-gold py-2.5 px-4 flex items-center justify-center gap-1.5"
+              className="w-full btn-arcade btn-arcade-gold py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2"
             >
               <span>Launch Hazard Arena</span>
               <ArrowRight className="w-3.5 h-3.5" />

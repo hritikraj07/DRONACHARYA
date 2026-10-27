@@ -121,8 +121,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="hover:text-[#020617] hover:underline transition-colors">
-                  Capstone Projects
+                <Link href="/dungeon" className="hover:text-[#020617] hover:underline transition-colors">
+                  Code Dungeon
                 </Link>
               </li>
               <li>

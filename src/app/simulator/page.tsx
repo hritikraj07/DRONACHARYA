@@ -163,6 +163,11 @@ function SimulatorContent() {
   const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
   const [isBattleChallengeOpen, setIsBattleChallengeOpen] = useState(false);
   const [isMentorOpen, setIsMentorOpen] = useState(false);
+  const [proactiveTrigger, setProactiveTrigger] = useState<{
+    type: 'collision' | 'error' | 'battery' | 'syntax';
+    message: string;
+    line?: number;
+  } | null>(null);
   const [battleCode, setBattleCode] = useState(
     `# Battle Challenge: Booster Protocol
 # The rover activated an auxiliary capacitor!
@@ -287,6 +292,33 @@ def boosted_rescue(cells: list) -> list:
           // Deduct a heart on collision/failure
           deductHeart();
           setTerminalSubTab('diagnostics');
+
+          // Proactively alert Acharya AI Socratic Mentor
+          if (result.hitObstacle) {
+            setProactiveTrigger({
+              type: 'collision',
+              message: `Rover Arya collided with a damaged blast door barrier at (${result.finalX}, ${result.finalY})!`,
+            });
+            setIsMentorOpen(true);
+          } else if (result.depleted) {
+            setProactiveTrigger({
+              type: 'battery',
+              message: `Arya's battery depleted at (${result.finalX}, ${result.finalY}) before reaching Emergency Beacon (5, 5).`,
+            });
+            setIsMentorOpen(true);
+          } else if (result.outOfBounds) {
+            setProactiveTrigger({
+              type: 'error',
+              message: `Rover stepped outside the facility perimeter boundary at (${result.finalX}, ${result.finalY}).`,
+            });
+            setIsMentorOpen(true);
+          } else if (!result.reachedTarget) {
+            setProactiveTrigger({
+              type: 'syntax',
+              message: `Rover Arya halted at (${result.finalX}, ${result.finalY}), short of destination (5, 5).`,
+            });
+            setIsMentorOpen(true);
+          }
         }
       }
     };
@@ -348,6 +380,18 @@ def boosted_rescue(cells: list) -> list:
         } else {
           deductHeart();
           setTerminalSubTab('diagnostics');
+
+          const failedTest = result.testResults?.find((t) => !t.passed);
+          setProactiveTrigger({
+            type: 'error',
+            message:
+              result.stderr ||
+              result.diagnosticExplanation ||
+              (failedTest
+                ? `Test failed: ${failedTest.description}. Expected ${failedTest.expected}.`
+                : 'Cell filter protocol failed to quarantine contaminated cells.'),
+          });
+          setIsMentorOpen(true);
         }
       }
     };
@@ -430,6 +474,21 @@ def boosted_rescue(cells: list) -> list:
             }`}
           >
             Quest 2: Filter Cells
+          </Link>
+          <button
+            onClick={() => setIsMentorOpen(true)}
+            className="btn-arcade text-xs px-3 py-1.5 bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#6C5CE7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer"
+            title="Open Acharya Socratic AI Mentor"
+          >
+            <Sparkles className="w-3.5 h-3.5 fill-[#FFD214]" />
+            <span>Acharya AI</span>
+          </button>
+          <Link
+            href="/learn/py-less-1-1"
+            className="btn-arcade text-xs px-3 py-1.5 bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#D97706] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer"
+            title="Launch Rover Arya's Python Odyssey RPG Arena"
+          >
+            <span>🚀 Python Odyssey</span>
           </Link>
           <Link
             href="/dungeon"
@@ -584,6 +643,14 @@ for step in range(4):
                 )}
               </div>
             )}
+
+            <button
+              onClick={() => setIsMentorOpen(true)}
+              className="w-full mt-3 py-2 px-3 rounded-xl bg-[#6C5CE7] hover:bg-[#5848c2] text-white text-xs font-black flex items-center justify-center gap-2 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5"
+            >
+              <Sparkles className="w-3.5 h-3.5 fill-[#FFD214]" />
+              <span>Consult Acharya Socratic AI</span>
+            </button>
           </div>
         </div>
 
@@ -666,6 +733,16 @@ for step in range(4):
                     <span>Run Code &amp; Test Arena</span>
                   </>
                 )}
+              </button>
+
+              <button
+                onClick={() => setIsMentorOpen(true)}
+                type="button"
+                className="btn-arcade btn-arcade-yellow py-2.5 px-3.5 text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
+                title="Consult Acharya Socratic AI Mentor"
+              >
+                <Sparkles className="w-3.5 h-3.5 fill-current" />
+                <span className="hidden sm:inline">Ask Acharya</span>
               </button>
             </div>
           </div>
@@ -942,6 +1019,26 @@ for step in range(4):
       <AcharyaDrawer
         isOpen={isMentorOpen}
         onClose={() => setIsMentorOpen(false)}
+        contextCode={code}
+        contextError={consoleLogs.filter((l) => l.includes('ERROR') || l.includes('COLLISION') || l.includes('Crash') || l.includes('depleted') || l.includes('Error')).join('\n')}
+        activeMissionTitle={currentMission.title}
+        missionGoal={currentMission.instructions.join(' ')}
+        language="python"
+        simulatorState={{
+          roverPos: robotSimResult ? [robotSimResult.finalX, robotSimResult.finalY] : [0, 0],
+          targetPos: [5, 5],
+          battery: robotSimResult ? robotSimResult.finalBattery : 100,
+          status: robotSimResult?.hitObstacle
+            ? 'crashed_obstacle'
+            : robotSimResult?.depleted
+            ? 'battery_depleted'
+            : robotSimResult?.success
+            ? 'success'
+            : 'incomplete_goal',
+          lastCollisionCoord: robotSimResult?.hitObstacle ? [robotSimResult.finalX, robotSimResult.finalY] : undefined,
+        }}
+        proactiveTrigger={proactiveTrigger}
+        onClearProactiveTrigger={() => setProactiveTrigger(null)}
       />
     </div>
   );

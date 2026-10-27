@@ -145,23 +145,15 @@ export default function CoursesPage() {
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
                   href="/learn/html-less-1-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push('/learn/html-less-1-1');
-                  }}
-                  className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5 cursor-pointer select-none"
+                  className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span className="pointer-events-none">Start HTML Quest →</span>
+                  <span>Start HTML Quest →</span>
                 </Link>
                 <Link
                   href="/learn/py-less-1-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push('/learn/py-less-1-1');
-                  }}
-                  className="btn-arcade btn-arcade-white px-5 py-2.5 flex items-center gap-1.5 cursor-pointer select-none"
+                  className="btn-arcade btn-arcade-white px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span className="pointer-events-none">Play Python Quest →</span>
+                  <span>Play Python Quest →</span>
                 </Link>
               </div>
             </div>
@@ -251,24 +243,16 @@ export default function CoursesPage() {
                       <div className="grid grid-cols-2 gap-2">
                         <Link
                           href={`/courses/${c.id}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/courses/${c.id}`);
-                          }}
                           className="btn-arcade btn-arcade-white py-2.5 px-3 text-center text-xs font-bold cursor-pointer select-none"
                         >
-                          <span className="pointer-events-none">Syllabus</span>
+                          <span>Syllabus</span>
                         </Link>
                         <Link
                           href={`/learn/${firstLessonId}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/learn/${firstLessonId}`);
-                          }}
                           className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
-                          <span className="pointer-events-none">Play</span>
-                          <ArrowRight className="w-3.5 h-3.5 pointer-events-none" />
+                          <span>Play</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     )}

@@ -1,4 +1,4 @@
-// Mastery Seals & Achievements Gallery
+// Quest Badges & Achievements Gallery
 'use client';
 
 import React from 'react';
@@ -27,15 +27,15 @@ export default function AchievementsPage() {
             <span>Proof of Skill Gallery</span>
           </div>
           <h1 className="font-black text-3xl sm:text-4xl text-[#1E1E24]">
-            Mastery Seals & Badges
+            Quest Badges & Milestones
           </h1>
           <p className="text-sm text-[#4A4A58] font-bold mt-1">
-            Unlike superficial checkboxes, Dronacharya seals are cryptographically minted upon passing rigorous automated unit tests.
+            Unlike superficial checkboxes, Dronacharya badges are verified upon passing rigorous automated unit tests.
           </p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] text-right">
-          <div className="text-[10px] text-[#4A4A58] font-black uppercase tracking-wider">Seals Unlocked</div>
+          <div className="text-[10px] text-[#4A4A58] font-black uppercase tracking-wider">Badges Unlocked</div>
           <div className="font-black text-2xl text-[#6C5CE7]">
             {state.seals.filter((s) => s.isUnlocked).length} / {state.seals.length}
           </div>

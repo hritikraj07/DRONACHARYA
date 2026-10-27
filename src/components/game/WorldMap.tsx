@@ -279,14 +279,14 @@ function RegionIllustration({ type }: { type: WorldRegion['iconType'] }) {
 
 export function WorldMap() {
   const router = useRouter();
-  const [selectedRegion, setSelectedRegion] = useState<WorldRegion | null>(WORLD_REGIONS[2]); // Default to Loop Lab
+  const [selectedRegion, setSelectedRegion] = useState<WorldRegion | null>(null);
 
   return (
     <div className="w-full">
       {/* World Map Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white border-2 border-[#1E1E24] rounded-2xl p-6 shadow-[4px_4px_0px_#1E1E24]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white border border-slate-200 rounded-2xl p-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE] border-2 border-[#1E1E24] text-xs font-black text-[#6C5CE7] mb-2 shadow-[2px_2px_0px_#1E1E24]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE] border border-[#6C5CE7]/25 text-xs font-black text-[#6C5CE7] mb-2">
             <Compass className="w-3.5 h-3.5" />
             <span>Interactive World Map</span>
           </div>
@@ -300,7 +300,7 @@ export function WorldMap() {
 
         {/* Global Progress Pill */}
         <div className="flex items-center gap-3 shrink-0">
-          <div className="bg-[#FAF6EE] border-2 border-[#1E1E24] rounded-xl px-4 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+          <div className="bg-[#FAF6EE] border border-slate-200 rounded-xl px-4 py-2.5 text-center">
             <span className="text-[10px] font-black uppercase tracking-wider text-[#7E7E8F] block">
               Quests Completed
             </span>
@@ -309,7 +309,7 @@ export function WorldMap() {
             </span>
           </div>
 
-          <div className="bg-[#FEF3C7] border-2 border-[#1E1E24] rounded-xl px-4 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
+          <div className="bg-[#FEF3C7] border border-amber-200 rounded-xl px-4 py-2.5 text-center">
             <span className="text-[10px] font-black uppercase tracking-wider text-[#D97706] block">
               Total XP Earned
             </span>
@@ -331,17 +331,17 @@ export function WorldMap() {
             <div
               key={region.id}
               onClick={() => setSelectedRegion(region)}
-              className={`relative rounded-2xl border-2 border-[#1E1E24] p-5 transition-all cursor-pointer flex flex-col justify-between ${
+              className={`relative rounded-2xl border p-5 transition-all cursor-pointer flex flex-col justify-between ${
                 isActive
-                  ? 'bg-white shadow-[5px_5px_0px_#6C5CE7] hover:translate-x-[-2px] hover:translate-y-[-2px]'
+                  ? 'bg-white border-[#6C5CE7] ring-1 ring-[#6C5CE7]/30 hover:border-[#5843D8]'
                   : isCompleted
-                  ? 'bg-[#F0FDF4] shadow-[4px_4px_0px_#10B981] hover:translate-x-[-2px] hover:translate-y-[-2px]'
-                  : 'bg-[#F2ECE0]/70 opacity-80 shadow-[3px_3px_0px_#1E1E24] hover:opacity-100'
+                  ? 'bg-[#F0FDF4] border-emerald-200 hover:border-emerald-300'
+                  : 'bg-slate-50 border-slate-200 opacity-80 hover:opacity-100 hover:border-slate-300'
               }`}
             >
               {/* Active Player Pin Indicator */}
               {isActive && region.id === 'loop-lab' && (
-                <div className="absolute -top-3.5 right-4 z-20 flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#6C5CE7] text-white text-[10px] font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] animate-bobble">
+                <div className="absolute -top-3.5 right-4 z-20 flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#6C5CE7] text-white text-[10px] font-black border border-white animate-bobble">
                   <span className="w-2 h-2 rounded-full bg-[#FBBF24] animate-ping" />
                   <span>YOU ARE HERE</span>
                 </div>
@@ -350,22 +350,22 @@ export function WorldMap() {
               <div>
                 {/* Header: Stage Number & Status Pill */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#1E1E24] bg-white text-[#1E1E24]">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-slate-200 bg-white text-slate-700">
                     Stage {region.stageNumber}
                   </span>
 
                   {isCompleted ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#10B981] bg-white px-2 py-0.5 rounded-full border border-[#1E1E24]">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#10B981] bg-white px-2 py-0.5 rounded-full border border-emerald-200">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Cleared</span>
                     </span>
                   ) : isActive ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded-full border border-[#1E1E24]">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded-full border border-indigo-200">
                       <Play className="w-3 h-3 fill-[#6C5CE7]" />
                       <span>Playable</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#7E7E8F] bg-[#E8E1D2] px-2 py-0.5 rounded-full border border-[#1E1E24]">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#7E7E8F] bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
                       <Lock className="w-3 h-3" />
                       <span>Locked</span>
                     </span>
@@ -373,7 +373,7 @@ export function WorldMap() {
                 </div>
 
                 {/* Illustrated Landmark Icon */}
-                <div className="w-16 h-16 rounded-2xl border-2 border-[#1E1E24] flex items-center justify-center mb-3 bg-white shadow-[2px_2px_0px_#1E1E24]">
+                <div className="w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center mb-3 bg-white">
                   <RegionIllustration type={region.iconType} />
                 </div>
 
@@ -391,8 +391,8 @@ export function WorldMap() {
               </div>
 
               {/* Bottom Card Footer */}
-              <div className="mt-4 pt-3 border-t-2 border-[#1E1E24]/15 flex items-center justify-between">
-                <span className="text-xs font-black text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded-md border border-[#1E1E24]">
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                   +{region.xpReward} XP
                 </span>
 
@@ -400,7 +400,7 @@ export function WorldMap() {
                   <Link
                     href={`/simulator?mission=${region.missionId}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="btn-game-purple text-xs py-1 px-3 shadow-[2px_2px_0px_#1E1E24]"
+                    className="btn-game-purple text-xs py-1 px-3"
                   >
                     <span>Launch</span>
                     <ArrowRight className="w-3 h-3" />
@@ -420,25 +420,25 @@ export function WorldMap() {
         })}
       </div>
 
-      {/* Selected Region Codex Modal / Drawer */}
+      {/* Selected Region Codex Modal / Drawer (Only displays when user clicks a region) */}
       {selectedRegion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E24]/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-xl bg-white border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-6 sm:p-8 animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="relative w-full max-w-xl bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 animate-in zoom-in-95">
             {/* Close button */}
             <button
               onClick={() => setSelectedRegion(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#1E1E24] bg-[#F2ECE0] text-[#1E1E24] hover:bg-[#FEE2E2] transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-slate-200 bg-slate-100 text-[#1E1E24] hover:bg-slate-200 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* Modal Header */}
             <div className="flex items-start gap-4 mb-5">
-              <div className="w-16 h-16 rounded-2xl border-2 border-[#1E1E24] flex items-center justify-center shrink-0 bg-[#FAF6EE] shadow-[3px_3px_0px_#1E1E24]">
+              <div className="w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center shrink-0 bg-[#FAF6EE]">
                 <RegionIllustration type={selectedRegion.iconType} />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#1E1E24] bg-[#EDE9FE] text-[#6C5CE7]">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-indigo-200 bg-[#EDE9FE] text-[#6C5CE7]">
                   Stage {selectedRegion.stageNumber} • {selectedRegion.concept}
                 </span>
                 <h2 className="font-serif font-black text-2xl text-[#1E1E24] mt-1">
@@ -451,7 +451,7 @@ export function WorldMap() {
             </div>
 
             {/* Story Lore */}
-            <div className="bg-[#FAF6EE] border-2 border-[#1E1E24] rounded-xl p-4 mb-5 shadow-[2px_2px_0px_#1E1E24]">
+            <div className="bg-[#FAF6EE] border border-slate-200 rounded-xl p-4 mb-5">
               <span className="text-[10px] font-black uppercase tracking-wider text-[#D97706] block mb-1">
                 Mission Lore & Background
               </span>
@@ -479,7 +479,7 @@ export function WorldMap() {
             </div>
 
             {/* Action Bar */}
-            <div className="flex items-center justify-between pt-4 border-t-2 border-[#1E1E24]/20">
+            <div className="flex items-center justify-between pt-4 border-t border-slate-200">
               <button
                 onClick={() => setSelectedRegion(null)}
                 className="btn-game-white text-xs py-2 px-4"

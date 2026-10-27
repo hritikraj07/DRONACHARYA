@@ -513,9 +513,13 @@ export function CosmicInteractiveBg() {
       ctx.restore();
     };
 
-    // UPGRADED RETRO PERSPECTIVE GRID FLOOR (Without the three bottom boxes)
+    // 3D Mouse Parallax State
+    let mouseParallaxX = 0;
+    let mouseParallaxY = 0;
+
+    // UPGRADED RETRO PERSPECTIVE GRID FLOOR (3D Parallax Perspective, without bottom boxes)
     const drawBottomGrid = () => {
-      const horizonY = height * 0.82;
+      const horizonY = height * 0.82 + mouseParallaxY * 15;
       const floorH = height - horizonY;
       if (floorH <= 0) return;
 
@@ -553,12 +557,12 @@ export function CosmicInteractiveBg() {
         ctx.stroke();
       }
 
-      // 3. Finer Receding Perspective Lines spreading toward the viewer
-      const vanishingX = width * 0.5;
+      // 3. Finer Receding Perspective Lines spreading toward the viewer with 3D tilt
+      const vanishingX = width * 0.5 + mouseParallaxX * 60;
       const numVert = 26;
       for (let i = -numVert; i <= numVert; i++) {
         const factor = i / numVert;
-        const bottomX = vanishingX + factor * (width * 0.8);
+        const bottomX = width * 0.5 + factor * (width * 0.85) + mouseParallaxX * 25;
         const topX = vanishingX + i * 16;
         const centerDistance = Math.abs(factor);
         const alpha = 0.08 + 0.25 * (1 - centerDistance * 0.6);
@@ -580,8 +584,8 @@ export function CosmicInteractiveBg() {
       ctx.imageSmoothingEnabled = false;
 
       // Bottom-Left Floating Platform
-      const blX = 30;
-      const blY = height * 0.78;
+      const blX = 30 + mouseParallaxX * 8;
+      const blY = height * 0.78 + mouseParallaxY * 6;
       ctx.fillStyle = 'rgba(26, 32, 53, 0.75)';
       ctx.fillRect(blX, blY, 90, 16);
       ctx.fillRect(blX + 12, blY + 16, 66, 12);
@@ -591,8 +595,8 @@ export function CosmicInteractiveBg() {
       ctx.fillRect(blX, blY + 3, 90, 2);
 
       // Bottom-Right Floating Platform
-      const brX = width - 120;
-      const brY = height * 0.8;
+      const brX = width - 120 + mouseParallaxX * 8;
+      const brY = height * 0.8 + mouseParallaxY * 6;
       ctx.fillStyle = 'rgba(26, 32, 53, 0.75)';
       ctx.fillRect(brX, brY, 85, 16);
       ctx.fillRect(brX + 10, brY + 16, 60, 12);
@@ -609,17 +613,28 @@ export function CosmicInteractiveBg() {
     const render = () => {
       tick++;
 
+      // Update smooth 3D mouse parallax tilt
+      if (mouseX > 0 && mouseY > 0 && !prefersReducedMotion) {
+        const targetPX = (mouseX - width * 0.5) / (width * 0.5);
+        const targetPY = (mouseY - height * 0.5) / (height * 0.5);
+        mouseParallaxX += (targetPX - mouseParallaxX) * 0.05;
+        mouseParallaxY += (targetPY - mouseParallaxY) * 0.05;
+      } else {
+        mouseParallaxX += (0 - mouseParallaxX) * 0.05;
+        mouseParallaxY += (0 - mouseParallaxY) * 0.05;
+      }
+
       // 1. Rich Deep Midnight Foundation with Subtle Gradients (#080B14, #10172A)
       ctx.fillStyle = '#080B14';
       ctx.fillRect(0, 0, width, height);
 
-      // Atmospheric Nebula Light (Electric Purple + Neon Cyan)
+      // Atmospheric Nebula Light with 3D Parallax offset
       const nebulaLeft = ctx.createRadialGradient(
-        width * 0.15,
-        height * 0.25,
+        width * 0.15 - mouseParallaxX * 25,
+        height * 0.25 - mouseParallaxY * 20,
         40,
-        width * 0.15,
-        height * 0.25,
+        width * 0.15 - mouseParallaxX * 25,
+        height * 0.25 - mouseParallaxY * 20,
         width * 0.55
       );
       nebulaLeft.addColorStop(0, 'rgba(33, 212, 253, 0.08)');
@@ -629,11 +644,11 @@ export function CosmicInteractiveBg() {
       ctx.fillRect(0, 0, width, height);
 
       const nebulaRight = ctx.createRadialGradient(
-        width * 0.85,
-        height * 0.35,
+        width * 0.85 - mouseParallaxX * 25,
+        height * 0.35 - mouseParallaxY * 20,
         50,
-        width * 0.85,
-        height * 0.35,
+        width * 0.85 - mouseParallaxX * 25,
+        height * 0.35 - mouseParallaxY * 20,
         width * 0.55
       );
       nebulaRight.addColorStop(0, 'rgba(114, 87, 255, 0.1)');
@@ -642,13 +657,13 @@ export function CosmicInteractiveBg() {
       ctx.fillStyle = nebulaRight;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Draw Upgraded Perspective Grid Floor (No three bottom boxes!)
+      // 2. Draw Upgraded Perspective Grid Floor with 3D Parallax
       drawBottomGrid();
 
       // 3. Draw Corner Platform Elements
       drawPixelPlatforms();
 
-      // 4. Draw Twinkling Stars with subtle parallax
+      // 4. Draw Twinkling Stars with 3D parallax depth
       stars.forEach((star) => {
         if (!prefersReducedMotion) {
           star.twinklePhase += star.twinkleSpeed;
@@ -656,12 +671,8 @@ export function CosmicInteractiveBg() {
         const currentOpacity =
           star.opacity * (0.65 + 0.35 * Math.sin(star.twinklePhase));
 
-        let px = star.x;
-        let py = star.y;
-        if (mouseX > 0 && !prefersReducedMotion) {
-          px += (mouseX - width / 2) * 0.007;
-          py += (mouseY - height / 2) * 0.007;
-        }
+        let px = star.x + (star.size * 1.5) * mouseParallaxX * 10;
+        let py = star.y + (star.size * 1.5) * mouseParallaxY * 10;
 
         ctx.fillStyle = star.color;
         ctx.globalAlpha = Math.max(0.12, Math.min(1, currentOpacity));

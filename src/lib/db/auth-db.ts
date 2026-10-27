@@ -23,19 +23,19 @@ const USERS_DB_KEY = 'dronacharya_database_users_v2';
 const CURRENT_SESSION_KEY = 'dronacharya_active_session_v2';
 
 export const AVAILABLE_CLASSES = [
-  'First-Year College / University',
-  'Class 11 - 12 (High School)',
-  'Class 9 - 10 (Secondary School)',
-  'Self-Learner / Beginner',
+  'Class 9',
+  'Class 10',
+  'Class 11',
+  'Class 12 / 12th Pass',
 ];
 
 export const AVAILABLE_SUBJECTS = [
   {
     id: 'python-basics',
-    name: 'Python',
+    name: 'Python Programming',
     category: 'Programming',
     icon: 'Terminal',
-    tagline: 'Learn loops, logic, and practical coding step-by-step',
+    tagline: 'Interactive 2D Robot Rescue Game with Loops & Logic',
     isAvailable: true,
   },
   {
@@ -43,33 +43,32 @@ export const AVAILABLE_SUBJECTS = [
     name: 'C Programming',
     category: 'Programming',
     icon: 'Code2',
-    tagline: 'Learn programming fundamentals, variables, and memory',
+    tagline: 'Pointer Maze & Memory Game',
+    isAvailable: false,
+  },
+  {
+    id: 'java-programming',
+    name: 'Java Programming',
+    category: 'Programming',
+    icon: 'Coffee',
+    tagline: 'Object-Oriented Dungeon Quest',
+    isAvailable: false,
+  },
+  {
+    id: 'cpp-programming',
+    name: 'C++ Programming',
+    category: 'Programming',
+    icon: 'Cpu',
+    tagline: 'Game Engine Math & Memory Trials',
     isAvailable: false,
   },
   {
     id: 'web-development',
-    name: 'Web Development',
+    name: 'JavaScript & Web Dev',
     category: 'Web',
     icon: 'Globe',
-    tagline: 'Build websites with HTML, CSS, and modern JavaScript',
+    tagline: 'Interactive DOM Canvas & Web Puzzles',
     isAvailable: false,
-  },
-  {
-    id: 'ai-basics',
-    name: 'AI Basics',
-    category: 'Artificial Intelligence',
-    icon: 'Cpu',
-    tagline: 'Understand how machine learning and AI models work',
-    isAvailable: false,
-  },
-  {
-    id: 'custom-topic',
-    name: 'Custom Topic',
-    category: 'Your Choice',
-    icon: 'Sparkles',
-    tagline: 'Enter any topic or subject you want to learn',
-    isAvailable: true,
-    isCustom: true,
   },
 ];
 
@@ -106,7 +105,7 @@ export function getActiveSession(): RegisteredUser | null {
   }
 }
 
-// Set active session
+// Set active session & broadcast immediately to TopNav and all components
 export function setActiveSession(user: RegisteredUser | null) {
   if (typeof window === 'undefined') return;
   try {
@@ -115,6 +114,9 @@ export function setActiveSession(user: RegisteredUser | null) {
     } else {
       localStorage.removeItem(CURRENT_SESSION_KEY);
     }
+    // Broadcast event so TopNav updates instantly without needing a full reload
+    window.dispatchEvent(new Event('dronacharya_session_change'));
+    window.dispatchEvent(new Event('storage'));
   } catch (e) {
     console.warn('Error setting session:', e);
   }

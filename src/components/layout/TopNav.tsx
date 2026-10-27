@@ -45,12 +45,25 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const [selectedSubject, setSelectedSubject] = useState('');
 
   useEffect(() => {
-    const session = getActiveSession();
-    setCurrentUser(session);
-    if (session) {
-      setSelectedClass(session.studentClass);
-      setSelectedSubject(session.targetSubject);
-    }
+    const syncUser = () => {
+      const session = getActiveSession();
+      setCurrentUser(session);
+      if (session) {
+        setSelectedClass(session.studentClass);
+        setSelectedSubject(session.targetSubject);
+      }
+    };
+    syncUser();
+    window.addEventListener('dronacharya_session_change', syncUser);
+    window.addEventListener('storage', syncUser);
+    window.addEventListener('focus', syncUser);
+    const interval = setInterval(syncUser, 500);
+    return () => {
+      window.removeEventListener('dronacharya_session_change', syncUser);
+      window.removeEventListener('storage', syncUser);
+      window.removeEventListener('focus', syncUser);
+      clearInterval(interval);
+    };
   }, [pathname]);
 
   const handleLogout = () => {
@@ -146,6 +159,14 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {currentUser ? (
               <>
+                {/* User Identity Pill */}
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#E9DFC9] border border-[#B49A65]/50 text-xs text-[#252820]">
+                  <div className="w-5 h-5 rounded-full bg-[#354B3A] text-white flex items-center justify-center font-bold text-[10px]">
+                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'S'}
+                  </div>
+                  <span className="font-semibold max-w-[90px] sm:max-w-[120px] truncate">{currentUser.name}</span>
+                </div>
+
                 {/* Game Hearts/Lives */}
                 <div
                   className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#FAF4F0] border border-[#A65F43]/40 text-xs font-bold text-[#A65F43]"
@@ -274,54 +295,44 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
             <form onSubmit={handleSaveSwitch} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-[#252820] mb-1">
-                  Education Level
+                <label className="block font-semibold text-[#252820] mb-1.5">
+                  Class Standard (Kept separately, up to 12th Pass):
                 </label>
-                <select
-                  value={selectedClass}
-                  onChange={(e) => setSelectedClass(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#D8CFC0] rounded bg-white focus:outline-none focus:border-[#354B3A]"
-                >
+                <div className="space-y-1.5">
                   {AVAILABLE_CLASSES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <div
+                      key={c}
+                      onClick={() => setSelectedClass(c)}
+                      className={`p-2.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between ${
+                        selectedClass === c
+                          ? 'bg-[#E9DFC9] border-[#354B3A] font-bold text-[#252820]'
+                          : 'bg-[#FAF8F5] border-[#D8CFC0] hover:bg-white text-[#575A51]'
+                      }`}
+                    >
+                      <span>{c}</span>
+                      {selectedClass === c && <span className="text-[#354B3A]">✓ Active</span>}
+                    </div>
                   ))}
-                </select>
+                </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-[#252820] mb-1">
-                  Choose a Topic
+                <label className="block font-semibold text-[#252820] mb-1.5">
+                  Programming Language (Dropdown Menu):
                 </label>
-                <div className="space-y-2 mt-2">
-                  {AVAILABLE_SUBJECTS.map((s) => (
-                    <div
-                      key={s.id}
-                      onClick={() => setSelectedSubject(s.id)}
-                      className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center justify-between ${
-                        selectedSubject === s.id
-                          ? 'bg-[#E9DFC9] border-[#354B3A] ring-1 ring-[#354B3A] font-semibold'
-                          : 'bg-white border-[#D8CFC0] hover:bg-[#FDFBF7]'
-                      }`}
-                    >
-                      <div>
-                        <div className="text-sm text-[#252820] flex items-center gap-2">
-                          <span>{s.name}</span>
-                          {s.isAvailable && (
-                            <span className="text-[10px] bg-[#354B3A] text-white px-2 py-0.5 rounded font-normal">
-                              Ready
-                            </span>
-                          )}
-                          {!s.isAvailable && !s.isCustom && (
-                            <span className="text-[10px] bg-[#D8CFC0] text-[#575A51] px-2 py-0.5 rounded font-normal">
-                              Track Preview
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-[#7E8276] font-normal">{s.tagline}</div>
-                      </div>
-                      <span className="text-xs text-[#354B3A]">{selectedSubject === s.id ? '✓ Selected' : ''}</span>
-                    </div>
-                  ))}
+                <div className="relative">
+                  <select
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#354B3A] rounded-xl bg-white text-xs font-bold text-[#252820] focus:outline-none cursor-pointer pr-10"
+                  >
+                    {AVAILABLE_SUBJECTS.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} — {s.tagline}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-[#354B3A] absolute right-3.5 top-3 pointer-events-none" />
                 </div>
               </div>
 

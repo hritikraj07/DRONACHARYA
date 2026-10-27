@@ -21,7 +21,9 @@ import {
 import { getRankFromXp, calculateAwardedXp } from './gamification';
 import { calculateUpdatedBKT } from './bkt';
 
-const STORAGE_KEY = 'dronacharya_gurukul_state_v1';
+import { getActiveSession } from './db/auth-db';
+
+const STORAGE_KEY = 'dronacharya_gurukul_state_v2';
 
 export interface AppState {
   user: UserProfile;
@@ -34,18 +36,56 @@ export interface AppState {
   minutesSpentToday: number;
 }
 
-const DEFAULT_STATE: AppState = {
-  user: {
-    id: 'usr-student-01',
-    email: 'aarav.sharma@gurukul.edu',
-    username: 'aarav-sharma',
-    fullName: 'Aarav Sharma',
+function getInitialUser(): UserProfile {
+  const session = getActiveSession();
+  if (session) {
+    return {
+      id: session.id,
+      email: session.email,
+      username: session.email.split('@')[0],
+      fullName: session.name,
+      avatarUrl: '',
+      bio: `Scholar enrolled in ${session.studentClass}. Currently mastering ${session.targetSubject}.`,
+      role: 'student',
+      preferredLanguage: session.preferredLanguage || 'hinglish',
+      totalXp: session.totalXp,
+      currentStreak: session.currentStreak,
+      graceFreezesAvailable: 1,
+      lastActiveDate: '2026-10-27',
+      rank: session.rank,
+      targetTrack: session.targetSubject,
+    };
+  }
+  return {
+    id: '',
+    email: '',
+    username: '',
+    fullName: '',
     avatarUrl: '',
-    bio: 'Dedicated learner exploring computational algorithms, systems caching, and dynamic programming.',
+    bio: '',
     role: 'student',
     preferredLanguage: 'hinglish',
-    totalXp: 340,
-    currentStreak: 5,
+    totalXp: 0,
+    currentStreak: 0,
+    graceFreezesAvailable: 1,
+    lastActiveDate: '2026-10-27',
+    rank: 'Sadhaka',
+    targetTrack: 'python-algorithms',
+  };
+}
+
+const DEFAULT_STATE: AppState = {
+  user: {
+    id: '',
+    email: '',
+    username: '',
+    fullName: '',
+    avatarUrl: '',
+    bio: '',
+    role: 'student',
+    preferredLanguage: 'hinglish',
+    totalXp: 0,
+    currentStreak: 0,
     graceFreezesAvailable: 1,
     lastActiveDate: '2026-10-27',
     rank: 'Sadhaka',
@@ -53,15 +93,15 @@ const DEFAULT_STATE: AppState = {
   },
   skills: INITIAL_SKILLS.map((s) => ({
     ...s,
-    masteryProbability: 0.25,
+    masteryProbability: 0.1,
     attemptsCount: 0,
   })),
   learningPaths: INITIAL_LEARNING_PATHS,
   seals: INITIAL_SEALS,
   capstones: INITIAL_CAPSTONES,
   squad: INITIAL_SQUADS[0],
-  isOnboarded: true,
-  minutesSpentToday: 25,
+  isOnboarded: false,
+  minutesSpentToday: 0,
 };
 
 // Global event listeners for cross-component reactive updates
@@ -74,12 +114,17 @@ function notify() {
 
 let memoryState: AppState = DEFAULT_STATE;
 
-// Hydrate from localStorage on client load
+// Hydrate from localStorage and session on client load
 if (typeof window !== 'undefined') {
   try {
+    const sessionUser = getInitialUser();
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       memoryState = { ...DEFAULT_STATE, ...JSON.parse(saved) };
+    }
+    if (sessionUser.id) {
+      memoryState.user = sessionUser;
+      memoryState.isOnboarded = true;
     }
   } catch (e) {
     console.warn('Failed to load state from localStorage:', e);

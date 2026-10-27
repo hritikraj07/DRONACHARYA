@@ -36,13 +36,21 @@
   }
 }
 
-body {
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
-  margin: 0;
-  padding: 0;
   -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
 }
 
 h1, h2, h3, .font-serif {
@@ -53,12 +61,10 @@ code, pre, .font-mono {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Indian-Inspired Visual Accents */
-.jaali-pattern {
-  background-color: var(--color-bg-primary);
-  background-image: radial-gradient(var(--color-text-primary) 0.75px, transparent 0.75px);
-  background-size: 24px 24px;
-  background-position: 0 0;
+/* Fluid, warm canvas without distracting dotted side margins */
+.gurukul-canvas {
+  background: linear-gradient(180deg, #F6F1E7 0%, #F0EAE1 100%);
+  width: 100%;
 }
 
 .manuscript-divider {
@@ -158,12 +164,12 @@ code, pre, .font-mono {
   background-color: var(--color-bg-secondary);
   border: 1px solid #D8CFC0;
   border-radius: var(--radius-md);
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .card-ivory {
   background-color: #FFFFFF;
   border: 1px solid #D8CFC0;
   border-radius: var(--radius-md);
-  padding: 1.5rem;
+  padding: 1.25rem;
 }

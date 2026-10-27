@@ -276,7 +276,7 @@ export const INITIAL_SQUADS: GurukulSquad[] = [
     joinCode: 'KASHI7',
     description: 'Focused on systems programming, high-performance data structures, and competitive problem-solving.',
     members: [
-      { userId: 'u-1', username: 'aarav-sharma', fullName: 'Aarav Sharma', role: 'leader', contributionXp: 840 },
+      { userId: 'u-1', username: 'kavya-reddy', fullName: 'Kavya Reddy', role: 'leader', contributionXp: 840 },
       { userId: 'u-2', username: 'priya-patel', fullName: 'Priya Patel', role: 'member', contributionXp: 520 },
       { userId: 'u-3', username: 'rohit-v', fullName: 'Rohit Verma', role: 'member', contributionXp: 380 },
     ],

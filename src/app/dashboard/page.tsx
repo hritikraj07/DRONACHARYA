@@ -1,10 +1,12 @@
 // Student Dashboard: The Gurukul Courtyard
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useDronacharya } from '@/lib/store';
 import { getRankFromXp } from '@/lib/gamification';
+import { getActiveSession, RegisteredUser, AVAILABLE_SUBJECTS } from '@/lib/db/auth-db';
 import {
   Compass,
   ArrowRight,
@@ -21,15 +23,31 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { state } = useDronacharya();
-  const { rank, title, epithet, nextRankMinXp, progressToNext } = getRankFromXp(state.user.totalXp);
+  const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
+
+  useEffect(() => {
+    const session = getActiveSession();
+    if (!session) {
+      router.push('/');
+    } else {
+      setCurrentUser(session);
+    }
+  }, [router]);
+
+  const effectiveXp = currentUser ? currentUser.totalXp : state.user.totalXp;
+  const { rank, title, epithet, nextRankMinXp, progressToNext } = getRankFromXp(effectiveXp);
 
   const activePath = state.learningPaths[0];
   const nextMission = activePath?.missions.find((m) => !m.isCompleted) || activePath?.missions[0];
   const unlockedSeals = state.seals.filter((s) => s.isUnlocked);
 
+  const activeSubjectObj =
+    AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div className="w-full px-4 sm:px-8 py-8">
       {/* Student Courtyard Header */}
       <div className="bg-[#E9DFC9] border border-[#D8CFC0] rounded-xl p-6 sm:p-8 mb-8 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -40,10 +58,10 @@ export default function DashboardPage() {
               <span className="font-serif italic">{epithet}</span>
             </div>
             <h1 className="font-serif font-bold text-3xl sm:text-4xl text-[#252820]">
-              Welcome, {state.user.fullName}
+              Welcome, {currentUser?.name || state.user.fullName || 'Scholar'}
             </h1>
             <p className="text-xs sm:text-sm text-[#575A51] mt-1 max-w-xl">
-              Track: <strong>{activePath.title}</strong> • Consistency and deliberate practice form the arrow of mastery.
+              Subject: <strong>{activeSubjectObj.name}</strong> • Class: <strong>{currentUser?.studentClass || 'Standard'}</strong>
             </p>
           </div>
 

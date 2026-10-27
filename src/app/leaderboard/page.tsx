@@ -10,7 +10,7 @@ export default function LeaderboardPage() {
 
   const cohortStudents = [
     { rank: 1, name: 'Ananya Deshmukh', username: 'ananya-d', xp: 4820, streak: 21, sealsCount: 5, guild: 'Pune Systems Guild' },
-    { rank: 2, name: 'Aarav Sharma (You)', username: state.user.username, xp: state.user.totalXp, streak: state.user.currentStreak, sealsCount: state.seals.filter(s => s.isUnlocked).length, guild: 'Kashi Algorithmic Guild' },
+    { rank: 2, name: `${state.user.fullName || 'You'} (You)`, username: state.user.username || 'scholar', xp: state.user.totalXp, streak: state.user.currentStreak, sealsCount: state.seals.filter(s => s.isUnlocked).length, guild: 'Kashi Algorithmic Guild' },
     { rank: 3, name: 'Priya Patel', username: 'priya-p', xp: 2140, streak: 12, sealsCount: 3, guild: 'Kashi Algorithmic Guild' },
     { rank: 4, name: 'Karthik Raman', username: 'karthik-r', xp: 1890, streak: 9, sealsCount: 2, guild: 'Bengaluru Core Guild' },
     { rank: 5, name: 'Rohit Verma', username: 'rohit-v', xp: 1420, streak: 7, sealsCount: 2, guild: 'Kashi Algorithmic Guild' },

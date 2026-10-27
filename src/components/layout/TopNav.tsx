@@ -177,24 +177,32 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
         <div className="w-full px-3 sm:px-6 h-14 flex items-center justify-between flex-nowrap gap-2 overflow-visible">
           {/* LEFT: Brand Logo & Title */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-nowrap">
-            <Link href="/" className="flex items-center gap-2 shrink-0 group">
-              <img
-                src="/logo.png"
-                alt="Dronacharya Logo"
-                className="w-8 h-8 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 transition-transform shrink-0 bg-[#FAF6EE]"
-              />
+            <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
+              <div className="relative">
+                <img
+                  src="/logo.png"
+                  alt="Dronacharya Logo"
+                  className="w-9 h-9 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 group-hover:scale-105 transition-all shrink-0 bg-white"
+                />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#10B981] border border-[#1E1E24]" />
+              </div>
               <div className="flex flex-col shrink-0">
-                <span className="font-serif font-black text-xs sm:text-base tracking-tight leading-none flex items-center gap-1.5 text-[#1E1E24]">
-                  DRONACHARYA ⋆˙⟡
-                </span>
-                <span className="text-[8px] sm:text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
-                  Coding Adventure
-                </span>
+                <div className="flex items-center gap-1 leading-none">
+                  <span className="font-serif font-black text-sm sm:text-base tracking-tight text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors">
+                    DRONACHARYA
+                  </span>
+                  <span className="text-amber-500 font-bold text-xs sm:text-sm">⋆˙⟡</span>
+                </div>
+                <div className="mt-0.5">
+                  <span className="text-[9px] font-black tracking-wider uppercase text-[#B45309] bg-[#FEF3C7] px-1.5 py-0.2 rounded-md border border-[#F59E0B]/30 inline-block shadow-2xs">
+                    Coding Adventure
+                  </span>
+                </div>
               </div>
             </Link>
 
-            {/* Current Course Selector Pill (Hidden on Home Page) */}
-            {!isHomePage && (
+            {/* Current Course Selector Pill (Only visible AFTER signing in, and not on home page) */}
+            {!isHomePage && !!currentUser && (
               <button
                 onClick={handleOpenSwitchModal}
                 className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-50 text-xs font-bold border border-slate-200 text-slate-800 transition-colors cursor-pointer shrink-0"
@@ -311,15 +319,17 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   <span>{currentUser.totalXp} XP</span>
                 </div>
 
-                {/* AI Mentor Guidance */}
-                <button
-                  onClick={onOpenMentor}
-                  className="btn-arcade btn-arcade-purple text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
-                  title="Open AI Mentor Guidance"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
-                  <span className="hidden lg:inline">Mentor AI</span>
-                </button>
+                {/* AI Mentor Guidance (Hidden on Home Page only) */}
+                {!isHomePage && (
+                  <button
+                    onClick={onOpenMentor}
+                    className="btn-arcade btn-arcade-purple text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
+                    title="Open AI Mentor Guidance"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
+                    <span className="hidden lg:inline">Mentor AI</span>
+                  </button>
+                )}
 
                 {/* Sign Out Button */}
                 <button
@@ -359,15 +369,17 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   <span>Sign Up</span>
                 </Link>
 
-                {/* AI Mentor Button */}
-                <button
-                  onClick={onOpenMentor}
-                  className="btn-arcade btn-arcade-purple text-xs py-1.5 px-2.5 sm:px-3 flex items-center gap-1 shrink-0"
-                  title="Open AI Mentor Guidance"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
-                  <span className="hidden lg:inline">Mentor AI</span>
-                </button>
+                {/* AI Mentor Button (Hidden on Home Page only) */}
+                {!isHomePage && (
+                  <button
+                    onClick={onOpenMentor}
+                    className="btn-arcade btn-arcade-purple text-xs py-1.5 px-2.5 sm:px-3 flex items-center gap-1 shrink-0"
+                    title="Open AI Mentor Guidance"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
+                    <span className="hidden lg:inline">Mentor AI</span>
+                  </button>
+                )}
 
                 {/* Mobile / Tablet Menu Toggle Button */}
                 <button
@@ -385,8 +397,8 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
         {/* Mobile / Tablet Navigation Drawer */}
         {mobileMenuOpen && (
           <div className="xl:hidden border-t border-slate-200 bg-[#FAF6EE] px-4 pt-3 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-150">
-            {/* Subject Switch Action (Hidden on Home Page) */}
-            {!isHomePage && (
+            {/* Subject Switch Action (Only visible after signing in, and not on home page) */}
+            {!isHomePage && !!currentUser && (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

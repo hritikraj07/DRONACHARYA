@@ -347,21 +347,7 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Feature Bullets */}
-              <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-bold text-[#4A4A58]">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#00B894]" />
-                  <span>100% Free Sandbox</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#6C5CE7]" />
-                  <span>Zero Installs (In-Browser)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFD214]" />
-                  <span>Socratic AI Mentorship</span>
-                </div>
-              </div>
+
             </div>
 
             {/* Right Column: In-Browser Interactive Code Studio */}

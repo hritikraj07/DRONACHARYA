@@ -86,11 +86,11 @@ html, body {
 /* 1. When high-fidelity custom React cursor is active, hide system cursor to reveal retro mascot */
 html.custom-cursor-active,
 html.custom-cursor-active body,
-html.custom-cursor-active body *:not(input):not(textarea):not([contenteditable="true"]) {
+html.custom-cursor-active body *:not(input):not(textarea):not([contenteditable="true"]):not(pre):not(code):not(pre *):not(code *):not(samp):not(kbd) {
   cursor: none !important;
 }
 
-/* Allow native text selection cursor in textboxes & code */
+/* Allow native text selection cursor in textboxes, code blocks, and terminal console */
 html.custom-cursor-active input[type="text"],
 html.custom-cursor-active input[type="email"],
 html.custom-cursor-active input[type="password"],
@@ -98,7 +98,13 @@ html.custom-cursor-active input[type="search"],
 html.custom-cursor-active input[type="number"],
 html.custom-cursor-active input[type="url"],
 html.custom-cursor-active textarea,
-html.custom-cursor-active [contenteditable="true"] {
+html.custom-cursor-active [contenteditable="true"],
+html.custom-cursor-active pre,
+html.custom-cursor-active code,
+html.custom-cursor-active pre *,
+html.custom-cursor-active code *,
+html.custom-cursor-active samp,
+html.custom-cursor-active kbd {
   cursor: text !important;
 }
 

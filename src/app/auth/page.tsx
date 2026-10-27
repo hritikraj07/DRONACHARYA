@@ -11,6 +11,7 @@ import {
   createGuestSession,
   setActiveSession,
   AVAILABLE_SUBJECTS,
+  AVAILABLE_CLASSES,
 } from '@/lib/db/auth-db';
 import {
   ArrowRight,
@@ -23,6 +24,8 @@ import {
   Mail,
   User,
   Zap,
+  GraduationCap,
+  ChevronDown,
 } from 'lucide-react';
 
 export default function AuthPage() {
@@ -35,6 +38,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [studentClass, setStudentClass] = useState('Class 10');
   const [selectedSubject, setSelectedSubject] = useState('html');
 
   // UI Status
@@ -137,7 +141,7 @@ export default function AuthPage() {
       name: fullName.trim(),
       email: cleanEmail,
       password,
-      studentClass: 'Class 10',
+      studentClass: studentClass || 'Class 10',
       targetSubject: selectedSubject,
     });
     setIsSubmitting(false);
@@ -403,6 +407,33 @@ export default function AuthPage() {
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
+              </div>
+            </div>
+
+            {/* Student Class Selection Field */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-black text-[#1E1E24] flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                  <span>Student Class / Grade</span>
+                </label>
+                <span className="text-[10px] text-gray-500 font-bold">Curriculum Level</span>
+              </div>
+              <div className="relative">
+                <select
+                  value={studentClass}
+                  onChange={(e) => setStudentClass(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs sm:text-sm font-bold text-[#1E1E24] focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white transition-colors cursor-pointer appearance-none shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  {AVAILABLE_CLASSES.map((cls) => (
+                    <option key={cls} value={cls}>
+                      {cls}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-700">
+                  <ChevronDown className="w-4 h-4" />
+                </div>
               </div>
             </div>
 

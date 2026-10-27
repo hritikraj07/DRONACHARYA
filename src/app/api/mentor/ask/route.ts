@@ -37,14 +37,12 @@ interface MentorAskRequestBody {
   context?: MentorContext;
 }
 
-const SYSTEM_INSTRUCTION = `You are an expert interactive AI Mentor. Never give generic, textbook, or vague responses. Analyze the exact problem statement and the user's current attempt/code provided in the context. Diagnose the exact issue, specific bottlenecks or knowledge gaps, explain why it is happening, and provide tailored, actionable, direct working solutions rather than generic definitions.
-
-Formatting & Style Guidelines:
-1. Be concise, direct, and empathetic. Address the learner as an apprentice or coder.
-2. If the user's code has a bug, bottleneck, or syntax error, pinpoint the exact line and explain why it is failing.
-3. Always supply the exact, working code snippet inside markdown code blocks (e.g. \`\`\`python ... \`\`\`) with comments explaining the critical fix.
-4. If explaining concepts, ground them directly in the user's active problem and code attempt rather than generic dictionary definitions.
-5. Use clean markdown with clear headings, bullet points, and code formatting so the solution is effortless to read and execute.`;
+const SYSTEM_INSTRUCTION = `You are an expert interactive AI Mentor.
+Rules:
+1. Be ultra-concise, direct, and actionable. Avoid greetings, formalities, or lengthy introductory preambles.
+2. Directly diagnose the exact bottleneck, syntax error, or logical bug in the user's active problem and code attempt.
+3. Immediately provide the exact working code solution inside standard markdown code blocks (e.g. \`\`\`python ... \`\`\`) with minimal, clear comments explaining the fix.
+4. Keep explanations laser-focused under 3-4 sentences total so the coder can immediately resume.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -169,47 +167,62 @@ ${query}`;
     // Initialize Google Gemini SDK client
     const ai = new GoogleGenAI({ apiKey });
 
-    // Primary model: gemini-2.5-flash with strict System Instruction
-    let response;
+    // Primary model: gemini-2.5-flash with ultra-low latency streaming
+    let streamResult;
     let activeModel = 'gemini-2.5-flash';
 
+    const modelConfig = {
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0.2, // Low temperature for deterministic coding solutions
+      maxOutputTokens: 800,
+      thinkingConfig: { thinkingBudget: 0 },
+    };
+
     try {
-      response = await ai.models.generateContent({
+      streamResult = await ai.models.generateContentStream({
         model: activeModel,
         contents,
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-          temperature: 0.2, // Low temperature for high accuracy and deterministic coding solutions
-        },
+        config: modelConfig,
       });
     } catch (modelErr: any) {
       // If gemini-2.5-flash is not available for this key, fall back to recommended next-gen model
       const msg = modelErr?.message || '';
       if (msg.includes('not found') || msg.includes('no longer available') || msg.includes('404')) {
         activeModel = 'gemini-3.8-flash';
-        response = await ai.models.generateContent({
+        streamResult = await ai.models.generateContentStream({
           model: activeModel,
           contents,
-          config: {
-            systemInstruction: SYSTEM_INSTRUCTION,
-            temperature: 0.2,
-          },
+          config: modelConfig,
         });
       } else {
         throw modelErr;
       }
     }
 
-    const replyText = response?.text || 'I analyzed your problem, but could not produce a text response. Please check your prompt.';
+    // Wrap the resulting chunks in a ReadableStream with TextEncoder
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of streamResult) {
+            const text = chunk.text;
+            if (text) {
+              controller.enqueue(encoder.encode(text));
+            }
+          }
+          controller.close();
+        } catch (streamErr) {
+          console.error('Error during streaming chunks in /api/mentor/ask:', streamErr);
+          controller.error(streamErr);
+        }
+      },
+    });
 
-    return NextResponse.json({
-      success: true,
-      reply: replyText,
-      response: replyText,
-      data: {
-        reply: replyText,
-        model: 'gemini-2.5-flash',
-        timestamp: new Date().toISOString(),
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Model-Used': activeModel,
       },
     });
   } catch (err: any) {

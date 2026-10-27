@@ -74,6 +74,8 @@ export function DungeonAcharyaConsole({
       content: m.text,
     }));
 
+    let assistantMsgIndex = -1;
+
     try {
       const result = await askMentorAI({
         message: promptText,
@@ -88,14 +90,26 @@ export function DungeonAcharyaConsole({
           consoleOutput: logs.slice(-10).join('\n'),
           errorLog: diagnostic ? `Dungeon State: ${diagnostic.state}. ${diagnostic.summary}` : '',
         },
+        onFirstToken: () => {
+          setIsThinking(false);
+          setChatMessages((prev) => {
+            assistantMsgIndex = prev.length;
+            return [...prev, { sender: 'acharya', text: '' }];
+          });
+        },
+        onChunk: (_chunk, accumulated) => {
+          setChatMessages((prev) => {
+            if (assistantMsgIndex === -1) {
+              assistantMsgIndex = prev.length - 1;
+            }
+            return prev.map((msg, idx) =>
+              idx === assistantMsgIndex ? { ...msg, text: accumulated } : msg
+            );
+          });
+        },
       });
 
-      if (result.success && result.reply) {
-        setChatMessages((prev) => [
-          ...prev,
-          { sender: 'acharya', text: result.reply },
-        ]);
-      } else {
+      if (!result.success) {
         setChatMessages((prev) => [
           ...prev,
           {

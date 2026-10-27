@@ -51,9 +51,14 @@ export interface MentorContext {
 }
 
 export interface AskMentorPayload {
-  message: string;
+  message?: string;
+  user_query?: string;
   history?: MentorHistoryItem[];
   context?: MentorContext;
+  problem_context?: string | MentorContext;
+  user_attempt?: string;
+  onChunk?: (chunk: string, accumulated: string) => void;
+  onFirstToken?: () => void;
 }
 
 export interface AskMentorResult {
@@ -65,7 +70,7 @@ export interface AskMentorResult {
 }
 
 /**
- * Send inquiry and live workspace context to POST /api/mentor/ask
+ * Send inquiry and live workspace context to POST /api/mentor/ask with streaming reader
  */
 export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorResult> {
   const settings = getStoredAISettings();
@@ -77,35 +82,72 @@ export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorR
         'Content-Type': 'application/json',
         ...(settings.apiKey ? { 'x-custom-api-key': settings.apiKey } : {}),
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        message: payload.message || payload.user_query,
+        user_query: payload.user_query || payload.message,
+        history: payload.history,
+        context: payload.context,
+        problem_context: payload.problem_context || payload.context,
+        user_attempt: payload.user_attempt || payload.context?.code,
+      }),
     });
 
-    const data = await res.json().catch(() => null);
-
-    if (res.ok && data?.success && data?.data) {
-      return {
-        success: true,
-        reply: data.data.reply,
-        model: data.data.model || 'gemini-2.5-flash',
-      };
-    }
-
-    // Handle authentication / configuration error
-    if (res.status === 401 || data?.isConfigError) {
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      if (res.status === 401 || data?.isConfigError) {
+        return {
+          success: false,
+          reply: '',
+          error:
+            data?.error ||
+            'GEMINI_API_KEY is missing. Please set GEMINI_API_KEY=your_key in your `.env.local` file, or enter your key in the AI Settings dialog (⚙️) in the top-right of the mentor drawer.',
+          isConfigError: true,
+        };
+      }
       return {
         success: false,
         reply: '',
-        error:
-          data?.error ||
-          'GEMINI_API_KEY is missing. Please set GEMINI_API_KEY=your_key in your `.env.local` file, or enter your key in the AI Settings dialog (⚙️) in the top-right of the mentor drawer.',
-        isConfigError: true,
+        error: data?.error || `API returned status ${res.status}: Failed to get solution from AI Mentor.`,
       };
     }
 
+    // Stream reader using response.body.getReader() and TextDecoder
+    if (res.body) {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = '';
+      let isFirst = true;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = decoder.decode(value, { stream: true });
+        if (!text) continue;
+
+        if (isFirst) {
+          isFirst = false;
+          payload.onFirstToken?.();
+        }
+
+        accumulated += text;
+        payload.onChunk?.(text, accumulated);
+      }
+
+      const modelUsed = res.headers.get('X-Model-Used') || 'gemini-2.5-flash';
+      return {
+        success: true,
+        reply: accumulated,
+        model: modelUsed,
+      };
+    }
+
+    // Fallback if buffered
+    const data = await res.json().catch(() => null);
     return {
-      success: false,
-      reply: '',
-      error: data?.error || `API returned status ${res.status}: Failed to get solution from AI Mentor.`,
+      success: true,
+      reply: data?.reply || data?.data?.reply || '',
+      model: data?.data?.model || 'gemini-2.5-flash',
     };
   } catch (err: any) {
     console.error('Network request to /api/mentor/ask failed:', err);

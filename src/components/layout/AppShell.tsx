@@ -34,7 +34,7 @@ export function AppShell({ children }: AppShellProps) {
         <img
           src="/adventure-hero-bg.jpg"
           alt=""
-          className="w-full h-full object-cover object-top opacity-30 sm:opacity-35 filter saturate-110"
+          className="w-full h-full object-cover object-top opacity-45 sm:opacity-50 filter saturate-125 transition-opacity"
         />
 
         {/* Ambient Warm Gradient Tint & Vignette Overlay */}
@@ -42,7 +42,7 @@ export function AppShell({ children }: AppShellProps) {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(circle at 50% 30%, rgba(250, 246, 238, 0.4) 0%, rgba(250, 246, 238, 0.7) 50%, rgba(250, 246, 238, 0.94) 100%)',
+              'radial-gradient(circle at 50% 30%, rgba(250, 246, 238, 0.2) 0%, rgba(250, 246, 238, 0.5) 50%, rgba(250, 246, 238, 0.85) 100%)',
           }}
         />
       </div>

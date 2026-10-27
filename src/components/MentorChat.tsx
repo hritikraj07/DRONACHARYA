@@ -107,11 +107,10 @@ export function MentorChat({
         }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
         const errorText =
-          data.error || 'Failed to generate solution. Please check your GEMINI_API_KEY.';
+          errorData?.error || `Server error (${res.status}): Failed to generate solution. Please check your GEMINI_API_KEY.`;
         setErrorMessage(errorText);
         setMessages((prev) => [
           ...prev,
@@ -123,17 +122,49 @@ export function MentorChat({
             isError: true,
           },
         ]);
-      } else {
-        const reply = data.reply || data.response || data.data?.reply || 'Solution generated.';
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `a-${Date.now()}`,
-            role: 'assistant',
-            content: reply,
-            timestamp: 'Just now',
-          },
-        ]);
+        return;
+      }
+
+      if (!res.body) {
+        throw new Error('No readable stream body returned by /api/mentor/ask');
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedText = '';
+      const assistantMsgId = `a-${Date.now()}`;
+      let firstTokenReceived = false;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        accumulatedText += chunk;
+
+        if (!firstTokenReceived) {
+          firstTokenReceived = true;
+          // Dismiss the loading/thinking skeleton as soon as the first token arrives
+          setIsLoading(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: assistantMsgId,
+              role: 'assistant',
+              content: accumulatedText,
+              timestamp: 'Just now',
+            },
+          ]);
+        } else {
+          // Append chunks to the message bubble in real time
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMsgId ? { ...msg, content: accumulatedText } : msg
+            )
+          );
+        }
       }
     } catch (err: any) {
       const netErr = `Network error connecting to Mentor AI API: ${err?.message || 'Server unreachable'}`;

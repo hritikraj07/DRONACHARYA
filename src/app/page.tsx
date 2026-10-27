@@ -633,7 +633,7 @@ export default function HomePage() {
       {/* =========================================================================
           4. "LEVEL UP YOUR LEARNING" GAMIFICATION GRID
          ========================================================================= */}
-      <section className="w-full bg-white border-y-2 border-[#1E1E24] py-16 px-4 sm:px-6 lg:px-8">
+      <section className="w-full bg-white/80 backdrop-blur-xs border-y-2 border-[#1E1E24] py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
             <div className="mb-4 select-none relative z-10">
@@ -784,7 +784,7 @@ export default function HomePage() {
       {/* =========================================================================
           FINAL CTA BANNER
          ========================================================================= */}
-      <section className="w-full bg-[#FAF6EE] border-t-2 border-[#1E1E24] py-16 px-4 sm:px-6">
+      <section className="w-full bg-[#FAF6EE]/75 backdrop-blur-xs border-t-2 border-[#1E1E24] py-16 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black">
             <Sparkles className="w-3.5 h-3.5" />
@@ -834,7 +834,7 @@ export default function HomePage() {
           AUTHENTICATION MODAL (Guest Demo + Supabase Login/Signup)
          ========================================================================= */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E24]/35 backdrop-blur-xs">
           <div className="relative w-full max-w-lg bg-white border-3 border-[#1E1E24] rounded-3xl shadow-[8px_8px_0px_#1E1E24] p-6 sm:p-8 animate-in zoom-in-95">
             <button
               onClick={() => setIsAuthModalOpen(false)}

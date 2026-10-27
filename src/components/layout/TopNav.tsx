@@ -172,11 +172,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 w-full transition-colors ${
-          isAuthPage
-            ? 'bg-[#090A0F]/90 backdrop-blur-md border-b border-white/10 text-white'
-            : 'bg-[#FAF6EE]/95 backdrop-blur-md border-b border-slate-200'
-        }`}
+        className="sticky top-0 z-40 w-full bg-[#FAF6EE]/95 backdrop-blur-md border-b border-slate-200 text-[#1E1E24] transition-colors"
       >
         <div className="w-full px-3 sm:px-6 h-14 flex items-center justify-between flex-nowrap gap-2 overflow-visible">
           {/* LEFT: Brand Logo & Title */}
@@ -188,11 +184,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 className="w-8 h-8 rounded-xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] group-hover:rotate-6 transition-transform shrink-0 bg-[#FAF6EE]"
               />
               <div className="flex flex-col shrink-0">
-                <span
-                  className={`font-serif font-black text-xs sm:text-base tracking-tight leading-none flex items-center gap-1.5 ${
-                    isAuthPage ? 'text-white' : 'text-[#1E1E24]'
-                  }`}
-                >
+                <span className="font-serif font-black text-xs sm:text-base tracking-tight leading-none flex items-center gap-1.5 text-[#1E1E24]">
                   DRONACHARYA ⋆˙⟡
                 </span>
                 <span className="text-[8px] sm:text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">

@@ -160,6 +160,8 @@ export function AcharyaDrawer({
       content: m.content,
     }));
 
+    const assistantMsgId = `a-${Date.now()}`;
+
     try {
       const res = await askMentorAI({
         message: userQuestion,
@@ -173,17 +175,28 @@ export function AcharyaDrawer({
           simulationState: simulatorState,
           testResults,
         },
+        onFirstToken: () => {
+          setIsThinking(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: assistantMsgId,
+              role: 'assistant',
+              content: '',
+              timestamp: 'Just now',
+            },
+          ]);
+        },
+        onChunk: (_chunk, accumulated) => {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMsgId ? { ...m, content: accumulated } : m
+            )
+          );
+        },
       });
 
-      if (res.success && res.reply) {
-        const assistantMsg: ChatMessage = {
-          id: `a-${Date.now()}`,
-          role: 'assistant',
-          content: res.reply,
-          timestamp: 'Just now',
-        };
-        setMessages((prev) => [...prev, assistantMsg]);
-      } else {
+      if (!res.success) {
         const errorText = res.error || 'Failed to generate solution. Please check your Gemini API key.';
         setApiErrorMessage(errorText);
         setMessages((prev) => [

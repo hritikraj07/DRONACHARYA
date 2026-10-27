@@ -1,7 +1,8 @@
 // Dronacharya Global Navigation Header
+// Zero-overlapping, fully responsive layout with compact HUD, overflow protection, and quick-action drawer
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -14,7 +15,6 @@ import {
 } from '@/lib/db/auth-db';
 import {
   Compass,
-  Code2,
   FolderGit2,
   Award,
   Users,
@@ -29,6 +29,7 @@ import {
   Heart,
   Gamepad2,
   ChevronRight,
+  MoreHorizontal,
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -41,6 +42,8 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [switchModalOpen, setSwitchModalOpen] = useState(false);
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   // Subject switch modal state
   const [selectedClass, setSelectedClass] = useState('');
@@ -68,6 +71,23 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     };
   }, [pathname]);
 
+  // Close "More" dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+        setMoreDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close menus on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMoreDropdownOpen(false);
+  }, [pathname]);
+
   const handleLogout = () => {
     setActiveSession(null);
     setCurrentUser(null);
@@ -83,7 +103,6 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     if (updated) {
       setCurrentUser(updated);
       setSwitchModalOpen(false);
-      // Reload or refresh to load the new subject's game
       router.refresh();
     }
   };
@@ -91,184 +110,257 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const activeSubjectObj =
     AVAILABLE_SUBJECTS.find((s) => s.id === currentUser?.targetSubject) || AVAILABLE_SUBJECTS[0];
 
-  const navLinks = [
+  // Core high-frequency desktop links (compact footprint)
+  const primaryNavLinks = [
     { name: 'Courses', href: '/courses', icon: BookOpen },
-    { name: 'World Map', href: '/paths', icon: Compass },
+    { name: 'Roadmap', href: '/paths', icon: Compass },
     { name: 'Missions', href: '/simulator', icon: Gamepad2 },
-    { name: 'Quest Hub', href: '/dashboard', icon: Target },
-    { name: 'Mastery Seals', href: '/achievements', icon: Award },
     { name: 'Projects', href: '/projects', icon: FolderGit2 },
   ];
 
+  // Secondary links housed in clean "More" dropdown
+  const secondaryNavLinks = [
+    { name: 'Quest Hub', href: '/dashboard', icon: Target },
+    { name: 'Mastery Seals', href: '/achievements', icon: Award },
+    { name: 'Leaderboard', href: '/leaderboard', icon: Flame },
+    { name: 'Squads', href: '/squads', icon: Users },
+  ];
+
+  const allNavLinks = [...primaryNavLinks, ...secondaryNavLinks];
   const isAuthPage = pathname === '/auth';
 
   return (
     <>
-      <header className={`sticky top-0 z-40 w-full transition-colors ${
-        isAuthPage
-          ? 'bg-[#090A0F]/85 backdrop-blur-md border-b-2 border-white/10 text-white'
-          : 'bg-[#FAF6EE]/95 backdrop-blur-md border-b-2 border-[#1E1E24] shadow-xs'
-      }`}>
-        <div className="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* Brand Mark & Title */}
-          <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-            <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="w-9 h-9 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-lg font-bold border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-[1px_1px_0px_#1E1E24] transition-all">
+      <header
+        className={`sticky top-0 z-40 w-full transition-colors ${
+          isAuthPage
+            ? 'bg-[#090A0F]/85 backdrop-blur-md border-b-2 border-white/10 text-white'
+            : 'bg-[#FAF6EE]/95 backdrop-blur-md border-b-2 border-[#1E1E24] shadow-xs'
+        }`}
+      >
+        <div className="w-full px-3 sm:px-6 h-16 flex items-center justify-between flex-nowrap gap-2 sm:gap-4 overflow-visible">
+          {/* LEFT: Brand Logo & Title */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-nowrap">
+            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+              <div className="w-9 h-9 rounded-xl bg-[#6C5CE7] text-white flex items-center justify-center font-serif text-lg font-bold border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-[1px_1px_0px_#1E1E24] transition-all shrink-0">
                 द्रो
               </div>
-              <div className="flex flex-col">
-                <span className={`font-serif font-black text-base sm:text-lg tracking-tight leading-none flex items-center gap-1.5 ${
-                  isAuthPage ? 'text-white' : 'text-[#1E1E24]'
-                }`}>
+              <div className="flex flex-col shrink-0">
+                <span
+                  className={`font-serif font-black text-sm sm:text-base tracking-tight leading-none flex items-center gap-1.5 ${
+                    isAuthPage ? 'text-white' : 'text-[#1E1E24]'
+                  }`}
+                >
                   DRONACHARYA
-                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
                 </span>
-                <span className="text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
+                <span className="text-[8px] sm:text-[9px] tracking-widest uppercase text-[#FBBF24] font-black mt-0.5">
                   Coding Adventure
                 </span>
               </div>
             </Link>
 
-            {/* Current Active Learning Course Pill with Change Action */}
+            {/* Current Course Selector Pill (Shown on desktop >= 1200px) */}
             {currentUser && (
               <button
                 onClick={() => setSwitchModalOpen(true)}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#FFFFFF] hover:bg-[#F2ECE0] text-xs font-bold border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[#1E1E24] transition-all cursor-pointer"
-                title="Click to Switch Learning Topic"
+                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#FFFFFF] hover:bg-[#F2ECE0] text-xs font-bold border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[#1E1E24] transition-all cursor-pointer shrink-0"
+                title="Switch Learning Course"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7]" />
-                <span className="truncate max-w-[180px]">{activeSubjectObj.name}</span>
-                <ChevronDown className="w-3 h-3 text-[#7E7E8F]" />
+                <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
+                <span className="truncate max-w-[130px]">{activeSubjectObj.name}</span>
+                <ChevronDown className="w-3 h-3 text-[#7E7E8F] shrink-0" />
               </button>
-            )}
-
-            {/* Desktop Navigation Links */}
-            {currentUser && (
-              <nav className="hidden xl:flex items-center gap-1.5">
-                {navLinks.map((link) => {
-                  const Icon = link.icon;
-                  const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border-2 ${
-                        isActive
-                          ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
-                          : 'border-transparent text-[#4A4A58] hover:text-[#1E1E24] hover:bg-[#F2ECE0] hover:border-[#1E1E24]'
-                      }`}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      <span>{link.name}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
             )}
           </div>
 
-          {/* Right Status Controls / Player HUD */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* CENTER: Desktop Primary Navigation Links (Only visible on wide desktop to prevent any overlap) */}
+          {currentUser && (
+            <nav className="hidden xl:flex items-center gap-1 flex-nowrap shrink-0">
+              {primaryNavLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border-2 shrink-0 ${
+                      isActive
+                        ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                        : 'border-transparent text-[#4A4A58] hover:text-[#1E1E24] hover:bg-[#F2ECE0] hover:border-[#1E1E24]'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{link.name}</span>
+                  </Link>
+                );
+              })}
+
+              {/* "More" Dropdown Menu */}
+              <div className="relative" ref={moreRef}>
+                <button
+                  onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
+                  className="px-2 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border-2 border-transparent text-[#4A4A58] hover:text-[#1E1E24] hover:bg-[#F2ECE0] hover:border-[#1E1E24] shrink-0 cursor-pointer"
+                  title="More Sections"
+                >
+                  <MoreHorizontal className="w-4 h-4 shrink-0" />
+                  <span>More</span>
+                  <ChevronDown className="w-3 h-3 shrink-0" />
+                </button>
+
+                {moreDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-[#1E1E24] rounded-xl shadow-[4px_4px_0px_#1E1E24] py-1.5 z-50 animate-in fade-in-50 zoom-in-95 duration-100">
+                    {secondaryNavLinks.map((link) => {
+                      const Icon = link.icon;
+                      const isActive = pathname === link.href;
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setMoreDropdownOpen(false)}
+                          className={`flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-[#FAF6EE] transition-colors ${
+                            isActive ? 'text-[#6C5CE7] bg-[#EDE9FE]' : 'text-[#1E1E24]'
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                          <span>{link.name}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </nav>
+          )}
+
+          {/* RIGHT: Player HUD Status Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap">
             {currentUser ? (
               <>
-                {/* Game Hearts/Lives */}
+                {/* Game Hearts Remaining */}
                 <div
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEE2E2] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#EF4444]"
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-[#FEE2E2] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#EF4444] shrink-0"
                   title="Player Hearts Remaining"
                 >
-                  <Heart className="w-3.5 h-3.5 fill-[#EF4444]" />
+                  <Heart className="w-3.5 h-3.5 fill-[#EF4444] shrink-0" />
                   <span>{currentUser.hearts ?? 3}</span>
                 </div>
 
-                {/* Daily Streak Indicator */}
+                {/* Daily Streak (hidden on small mobile screens to keep HUD clean) */}
                 <div
-                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#D97706]"
+                  className="hidden sm:flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#D97706] shrink-0"
                   title={`${currentUser.currentStreak} Day Quest Streak`}
                 >
-                  <Flame className="w-3.5 h-3.5 fill-[#F59E0B]" />
+                  <Flame className="w-3.5 h-3.5 fill-[#F59E0B] shrink-0" />
                   <span>{currentUser.currentStreak}d</span>
                 </div>
 
-                {/* XP & Level Badge */}
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#FBBF24] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#1E1E24]">
-                  <Sparkles className="w-3.5 h-3.5 text-[#1E1E24]" />
+                {/* XP & Level Badge (hidden on narrow screens to prevent crowding) */}
+                <div className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FBBF24] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#1E1E24] shrink-0">
+                  <Sparkles className="w-3.5 h-3.5 text-[#1E1E24] shrink-0" />
                   <span>{currentUser.totalXp} XP</span>
                   <span className="opacity-40">•</span>
                   <span>Lv.{currentUser.level || 1}</span>
                 </div>
 
-                {/* AI Mentor Trigger Button */}
+                {/* AI Mentor Button */}
                 <button
                   onClick={onOpenMentor}
-                  className="btn-game-purple text-xs py-1.5 px-3"
+                  className="btn-game-purple text-xs py-1 px-2 sm:px-2.5 flex items-center gap-1 shrink-0"
                   title="Open AI Mentor Guidance"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#FBBF24]" />
-                  <span className="hidden md:inline">Mentor AI</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
+                  <span className="hidden lg:inline">Mentor AI</span>
                 </button>
 
-                {/* Logout Action */}
+                {/* Sign Out Button */}
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 rounded-lg border-2 border-transparent hover:border-[#1E1E24] hover:bg-[#FEE2E2] text-[#7E7E8F] hover:text-[#EF4444] transition-all"
+                  className="p-1 rounded-lg border-2 border-transparent hover:border-[#1E1E24] hover:bg-[#FEE2E2] text-[#7E7E8F] hover:text-[#EF4444] transition-all shrink-0 cursor-pointer"
                   title="Sign Out"
                   aria-label="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
 
-                {/* Mobile Menu Toggle */}
+                {/* Mobile & Tablet Menu Toggle Button (visible below xl: 1280px) */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="xl:hidden p-1.5 rounded-lg border-2 border-[#1E1E24] bg-white shadow-[2px_2px_0px_#1E1E24] text-[#1E1E24]"
+                  className="xl:hidden p-1.5 rounded-lg border-2 border-[#1E1E24] bg-white shadow-[2px_2px_0px_#1E1E24] text-[#1E1E24] shrink-0 cursor-pointer hover:bg-[#FAF6EE]"
                   aria-label="Toggle Navigation Menu"
                 >
-                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5 text-[#1E1E24]" />}
+                  {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
                 </button>
               </>
             ) : (
-              <Link href="/auth" className="btn-game-yellow text-xs py-2 px-4">
+              <Link href="/auth" className="btn-game-yellow text-xs py-1.5 px-3 flex items-center gap-1 shrink-0">
                 <span>Start Adventure</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
               </Link>
             )}
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Mobile / Tablet Navigation Drawer */}
         {mobileMenuOpen && currentUser && (
-          <div className="xl:hidden border-t border-[#D8CFC0] bg-[#F6F1E7] px-4 pt-3 pb-4 space-y-2">
+          <div className="xl:hidden border-t-2 border-[#1E1E24] bg-[#FAF6EE] px-4 pt-3 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-150">
+            {/* Subject Switch Action */}
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 setSwitchModalOpen(true);
               }}
-              className="w-full text-left p-2.5 rounded bg-[#E9DFC9] border border-[#B49A65] text-xs font-medium flex items-center justify-between"
+              className="w-full text-left p-3 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-bold flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-[#354B3A]" />
-                <span>Subject: <strong>{activeSubjectObj.name}</strong></span>
+                <BookOpen className="w-4 h-4 text-[#6C5CE7]" />
+                <span>
+                  Course: <strong>{activeSubjectObj.name}</strong>
+                </span>
               </div>
-              <span className="text-[10px] text-[#A65F43] font-bold">Switch</span>
+              <span className="text-[10px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded">
+                Switch
+              </span>
             </button>
 
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded text-xs font-medium ${
-                    isActive ? 'bg-[#354B3A] text-[#F6F1E7]' : 'text-[#575A51] hover:bg-[#E9DFC9]'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
+            {/* Quick Stats on Mobile */}
+            <div className="grid grid-cols-3 gap-2 text-center text-xs font-black">
+              <div className="bg-[#FEE2E2] p-2 rounded-lg border-2 border-[#1E1E24]">
+                <div className="text-[10px] text-gray-500 font-bold">LIVES</div>
+                <div className="text-[#EF4444]">{currentUser.hearts ?? 3} / 3</div>
+              </div>
+              <div className="bg-[#FEF3C7] p-2 rounded-lg border-2 border-[#1E1E24]">
+                <div className="text-[10px] text-gray-500 font-bold">STREAK</div>
+                <div className="text-[#D97706]">{currentUser.currentStreak}d Active</div>
+              </div>
+              <div className="bg-[#FBBF24] p-2 rounded-lg border-2 border-[#1E1E24]">
+                <div className="text-[10px] text-gray-700 font-bold">XP / LVL</div>
+                <div className="text-[#1E1E24]">{currentUser.totalXp} XP (L{currentUser.level || 1})</div>
+              </div>
+            </div>
+
+            {/* Navigation Links Grid */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {allNavLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-xs font-bold transition-all ${
+                      isActive
+                        ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                        : 'bg-white text-[#1E1E24] border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:bg-[#FAF6EE]'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span>{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </header>
@@ -277,30 +369,30 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
       {switchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-[#252820]/40 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
             onClick={() => setSwitchModalOpen(false)}
           />
-          <div className="relative w-full max-w-lg bg-[#F6F1E7] border-2 border-[#354B3A] rounded-xl shadow-2xl p-6 z-10 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-[#D8CFC0] pb-3 mb-4">
+          <div className="relative w-full max-w-lg bg-white border-2 border-[#1E1E24] rounded-2xl shadow-[8px_8px_0px_#1E1E24] p-6 z-10 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#1E1E24]/10 pb-3 mb-4">
               <div>
-                <span className="text-[10px] text-[#A65F43] uppercase tracking-wider font-semibold">
-                  Personalized Learning
+                <span className="text-[10px] text-[#6C5CE7] uppercase tracking-wider font-black">
+                  Personalized Learning Path
                 </span>
-                <h3 className="font-serif font-bold text-xl text-[#252820]">
+                <h3 className="font-serif font-black text-xl text-[#1E1E24]">
                   What do you want to learn?
                 </h3>
               </div>
               <button
                 onClick={() => setSwitchModalOpen(false)}
-                className="p-1 rounded hover:bg-[#D8CFC0]"
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-500"
               >
-                <X className="w-5 h-5 text-[#575A51]" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSaveSwitch} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-[#252820] mb-1.5">
+                <label className="block font-black text-[#1E1E24] mb-1.5">
                   Class Standard (Kept separately, up to 12th Pass):
                 </label>
                 <div className="space-y-1.5">
@@ -308,28 +400,28 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                     <div
                       key={c}
                       onClick={() => setSelectedClass(c)}
-                      className={`p-2.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between ${
+                      className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
                         selectedClass === c
-                          ? 'bg-[#E9DFC9] border-[#354B3A] font-bold text-[#252820]'
-                          : 'bg-[#FAF8F5] border-[#D8CFC0] hover:bg-white text-[#575A51]'
+                          ? 'bg-[#EDE9FE] border-[#6C5CE7] font-black text-[#6C5CE7] shadow-[2px_2px_0px_#6C5CE7]'
+                          : 'bg-[#FAF6EE] border-[#1E1E24] hover:bg-white text-[#1E1E24]'
                       }`}
                     >
                       <span>{c}</span>
-                      {selectedClass === c && <span className="text-[#354B3A]">✓ Active</span>}
+                      {selectedClass === c && <span className="text-[#6C5CE7]">✓ Active</span>}
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-[#252820] mb-1.5">
+                <label className="block font-black text-[#1E1E24] mb-1.5">
                   Programming Language (Dropdown Menu):
                 </label>
                 <div className="relative">
                   <select
                     value={selectedSubject}
                     onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#354B3A] rounded-xl bg-white text-xs font-bold text-[#252820] focus:outline-none cursor-pointer pr-10"
+                    className="w-full appearance-none px-3.5 py-2.5 border-2 border-[#1E1E24] rounded-xl bg-white text-xs font-bold text-[#1E1E24] focus:outline-none cursor-pointer pr-10 shadow-[2px_2px_0px_#1E1E24]"
                   >
                     {AVAILABLE_SUBJECTS.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -337,21 +429,21 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 text-[#354B3A] absolute right-3.5 top-3 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-[#1E1E24] absolute right-3.5 top-3 pointer-events-none" />
                 </div>
               </div>
 
-              <div className="mt-6 pt-3 border-t border-[#D8CFC0] flex items-center justify-between">
+              <div className="mt-6 pt-3 border-t border-[#1E1E24]/10 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setSwitchModalOpen(false)}
-                  className="btn-secondary text-xs py-2 px-4"
+                  className="btn-game-yellow text-xs py-2 px-4"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary text-xs py-2 px-5"
+                  className="btn-game-purple text-xs py-2 px-5"
                 >
                   Save & Update
                 </button>

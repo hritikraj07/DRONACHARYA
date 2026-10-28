@@ -242,7 +242,7 @@ if __name__ == '__main__':
 
 export const INITIAL_SQUADS: GurukulSquad[] = [
   {
-    id: 'squad-beginners',
+    id: 'cca4c95a-133f-4059-8fd2-6010bae0cf9f',
     name: 'Python Learners Club',
     joinCode: 'PY2026',
     description: 'A friendly group of learners mastering programming step by step.',
@@ -254,5 +254,33 @@ export const INITIAL_SQUADS: GurukulSquad[] = [
     weeklyGoal: 'Complete Rescue the Robot challenge',
     activeChallenge: 'Robot Grid Navigation',
     progressPercentage: 75,
+  },
+  {
+    id: '3921b30b-aeb8-4a61-ae8e-3254ca56dd12',
+    name: 'Pune Systems Guild',
+    joinCode: 'PUNE01',
+    description: 'Hardcore systems engineers and algorithmic solvers.',
+    members: [
+      { userId: 'u-3', username: 'ananya-d', fullName: 'Ananya Deshmukh', role: 'leader', contributionXp: 2500 },
+      { userId: 'u-4', username: 'karthik-r', fullName: 'Karthik Raman', role: 'member', contributionXp: 2320 },
+    ],
+    collectiveXp: 4820,
+    weeklyGoal: 'Complete Rescue the Robot challenge',
+    activeChallenge: 'Robot Grid Navigation',
+    progressPercentage: 90,
+  },
+  {
+    id: 'ac5f5ac7-91aa-4426-b64b-11f1c643bb6f',
+    name: 'Kashi Algorithmic Guild',
+    joinCode: 'KASHI7',
+    description: 'Competitive programming and data structures guild.',
+    members: [
+      { userId: 'u-5', username: 'vcchg', fullName: 'vcchg', role: 'leader', contributionXp: 1140 },
+      { userId: 'u-6', username: 'rohit-v', fullName: 'Rohit Verma', role: 'member', contributionXp: 1000 },
+    ],
+    collectiveXp: 2140,
+    weeklyGoal: 'Complete Rescue the Robot challenge',
+    activeChallenge: 'Robot Grid Navigation',
+    progressPercentage: 60,
   },
 ];

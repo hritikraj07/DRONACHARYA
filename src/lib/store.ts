@@ -295,12 +295,151 @@ export function useDronacharya() {
     return score;
   };
 
-  // Join squad
-  const joinSquad = (joinCode: string) => {
-    if (joinCode.toUpperCase() === 'KASHI7') {
-      return { success: true, squad: state.squad };
+  // Helper to get all custom squads from localStorage
+  const getCustomSquads = (): GurukulSquad[] => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = localStorage.getItem('dronacharya_custom_squads_v1');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
     }
-    return { success: false, message: 'Invalid squad join code' };
+  };
+
+  // Join squad by code (handles PY2026, PUNE01, KASHI7, and custom codes)
+  const joinSquad = (joinCode: string) => {
+    const cleanCode = (joinCode || '').trim().toUpperCase();
+    if (!cleanCode) {
+      return { success: false, message: 'Please enter a guild join code' };
+    }
+
+    const customSquads = getCustomSquads();
+    const allSquads = [...INITIAL_SQUADS, ...customSquads];
+    const targetSquad = allSquads.find((s) => s.joinCode.toUpperCase() === cleanCode);
+
+    if (targetSquad) {
+      const userId = state.user.id || 'scholar';
+      const username = state.user.username || 'scholar';
+      const fullName = state.user.fullName || 'Scholar';
+      const isMember = targetSquad.members.some(
+        (m) => m.userId === userId || m.username === username
+      );
+
+      const updatedMembers = isMember
+        ? targetSquad.members
+        : [
+            ...targetSquad.members,
+            {
+              userId,
+              username,
+              fullName,
+              role: 'member' as const,
+              contributionXp: Math.min(state.user.totalXp, 250),
+            },
+          ];
+
+      const updatedSquad: GurukulSquad = {
+        ...targetSquad,
+        members: updatedMembers,
+      };
+
+      persistState({
+        ...state,
+        squad: updatedSquad,
+      });
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('dronacharya_session_change'));
+        window.dispatchEvent(new Event('storage'));
+      }
+
+      return { success: true, squad: updatedSquad };
+    }
+
+    return {
+      success: false,
+      message: `Guild join code "${cleanCode}" not found. Try PY2026, KASHI7, or PUNE01.`,
+    };
+  };
+
+  // Create a new guild
+  const createSquad = (data: {
+    name: string;
+    description: string;
+    weeklyGoal?: string;
+    joinCode?: string;
+  }) => {
+    const name = data.name.trim();
+    if (!name) {
+      return { success: false, message: 'Please provide a guild name' };
+    }
+
+    const joinCode = (
+      data.joinCode ||
+      name.substring(0, 4).toUpperCase() + Math.floor(10 + Math.random() * 90)
+    )
+      .trim()
+      .toUpperCase();
+
+    const userId = state.user.id || 'scholar';
+    const username = state.user.username || 'scholar';
+    const fullName = state.user.fullName || 'Guild Lead';
+
+    const newSquad: GurukulSquad = {
+      id: `squad-${Date.now()}`,
+      name,
+      joinCode,
+      description:
+        data.description.trim() ||
+        'A dedicated cohort guild tackling programming challenges together.',
+      members: [
+        {
+          userId,
+          username,
+          fullName,
+          role: 'leader',
+          contributionXp: state.user.totalXp || 100,
+        },
+      ],
+      collectiveXp: state.user.totalXp || 100,
+      weeklyGoal: data.weeklyGoal?.trim() || 'Complete Rescue the Robot challenge',
+      activeChallenge: 'Robot Grid Navigation',
+      progressPercentage: 25,
+    };
+
+    const customSquads = getCustomSquads();
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(
+          'dronacharya_custom_squads_v1',
+          JSON.stringify([...customSquads, newSquad])
+        );
+      } catch {}
+    }
+
+    persistState({
+      ...state,
+      squad: newSquad,
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('dronacharya_session_change'));
+      window.dispatchEvent(new Event('storage'));
+    }
+
+    return { success: true, squad: newSquad };
+  };
+
+  // Set active squad directly
+  const setSquad = (squad: GurukulSquad) => {
+    persistState({
+      ...state,
+      squad,
+    });
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('dronacharya_session_change'));
+      window.dispatchEvent(new Event('storage'));
+    }
   };
 
   // Complete Code Dungeon Floor
@@ -361,6 +500,8 @@ export function useDronacharya() {
     submitProject,
     completeDungeonFloor,
     joinSquad,
+    createSquad,
+    setSquad,
     resetDemoState,
   };
 }

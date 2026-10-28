@@ -2,9 +2,10 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useDronacharya } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
-import { getActiveSession, getGuestSession } from '@/lib/db/auth-db';
+import { getActiveSession } from '@/lib/db/auth-db';
 import { Award, TrendingUp, Flame } from 'lucide-react';
 
 interface LeaderboardViewRow {
@@ -40,6 +41,7 @@ export default function LeaderboardPage() {
   const { state } = useDronacharya();
   const [students, setStudents] = useState<TableLeaderboardStudent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
 
   const fetchLeaderboardData = useCallback(async () => {
     try {
@@ -60,6 +62,7 @@ export default function LeaderboardPage() {
       // 2. Identify session status
       const activeSession = getActiveSession();
       const isLoggedIn = !!activeSession && activeSession.id !== 'guest';
+      setIsUserLoggedIn(isLoggedIn);
 
       // 3. Map live rows from Supabase
       let mappedStudents: TableLeaderboardStudent[] = rawLeaderboard.map((row, idx) => {
@@ -89,7 +92,7 @@ export default function LeaderboardPage() {
         };
       });
 
-      // 4. Handle Current User or Dynamic Guest Explorer Entry
+      // 4. Handle Logged-In User Entry ONLY (Guest users are NOT added to community leaderboard)
       if (isLoggedIn) {
         const userAlreadyInDb = mappedStudents.some((s) => s.isCurrentUser);
         if (!userAlreadyInDb) {
@@ -106,34 +109,6 @@ export default function LeaderboardPage() {
             isCurrentUser: true,
           });
         }
-      } else {
-        // Visitor is a Guest Explorer: compute stats from local storage & store
-        const guestSession = getGuestSession();
-        const guestXp = Math.max(guestSession?.totalXp || 0, state.user?.totalXp || 0);
-        const guestStreak = Math.max(
-          guestSession?.currentStreak || 0,
-          state.user?.currentStreak || 0,
-          1
-        );
-        const guestBadges = Math.max(
-          guestSession?.unlockedSeals?.length || 0,
-          state.seals?.filter((s) => s.isUnlocked).length || 0
-        );
-        const guestGuild = state.squad?.name || defaultGuildName;
-
-        const guestRow: TableLeaderboardStudent = {
-          id: 'guest-explorer-dynamic',
-          rank: 1,
-          name: 'Guest Explorer (You)',
-          username: 'guest_explorer',
-          guild: guestGuild,
-          streak: guestStreak,
-          badges: guestBadges,
-          xp: guestXp,
-          isCurrentUser: true,
-        };
-
-        mappedStudents.push(guestRow);
       }
 
       // 5. Sort all rows by mastery XP descending, then consistency streak
@@ -189,6 +164,23 @@ export default function LeaderboardPage() {
           </p>
         </div>
       </div>
+
+      {!isUserLoggedIn && !isLoading && (
+        <div className="mb-6 p-4 rounded-2xl bg-amber-50/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] text-xs font-bold text-[#1E1E24] flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">⚔️</span>
+            <span>
+              <strong>Browsing community realm standings.</strong> Log in to record your quest XP and earn a spot on the Adventure Leaderboard!
+            </span>
+          </div>
+          <Link
+            href="/auth"
+            className="btn-arcade btn-arcade-gold px-3.5 py-1.5 text-xs font-black shadow-[2px_2px_0px_#1E1E24]"
+          >
+            Log In / Sign Up →
+          </Link>
+        </div>
+      )}
 
       <div className="rounded-2xl border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] overflow-hidden bg-white">
         <table className="w-full text-left border-collapse text-xs">

@@ -15,28 +15,16 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
-  Sparkles,
   Clock,
   Flame,
   Target,
-  Send,
-  HelpCircle,
-  Copy,
-  Check,
-  ExternalLink,
   Terminal,
   Compass,
   Play,
-  RotateCcw,
-  Bot,
-  Zap,
-  FolderGit2,
   FolderCode,
-  ShieldCheck,
   X,
-  ChevronRight,
 } from 'lucide-react';
-import { COURSES_CATALOG, Course } from '@/lib/data/course-system';
+import { COURSES_CATALOG } from '@/lib/data/course-system';
 import { getLearnerProgress } from '@/lib/curriculum/progression-engine';
 import { getActiveSession, RegisteredUser } from '@/lib/db/auth-db';
 
@@ -172,13 +160,6 @@ function PythonDashboardContent() {
   const [completedProjects, setCompletedProjects] = useState<string[]>([]);
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
 
-  // AI Mentor Panel State
-  const [mentorQuery, setMentorQuery] = useState('');
-  const [isAskingMentor, setIsAskingMentor] = useState(false);
-  const [mentorResponse, setMentorResponse] = useState<string | null>(null);
-  const [mentorError, setMentorError] = useState<string | null>(null);
-  const [copiedCode, setCopiedCode] = useState(false);
-
   // Sync state on mount and on storage events
   useEffect(() => {
     const syncProgress = () => {
@@ -250,7 +231,7 @@ function PythonDashboardContent() {
   );
 
   // SVG Progress Ring calculations
-  const ringRadius = 42;
+  const ringRadius = 40;
   const ringCircumference = 2 * Math.PI * ringRadius;
   const ringStrokeOffset =
     ringCircumference - (calculatedPercent / 100) * ringCircumference;
@@ -261,54 +242,14 @@ function PythonDashboardContent() {
     pythonLessons[0] ||
     'py-less-1-1';
 
-  // Handle AI Mentor submit action
-  const handleAskMentor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!mentorQuery.trim()) return;
-
-    setIsAskingMentor(true);
-    setMentorError(null);
-    setMentorResponse(null);
-
-    const question = mentorQuery.trim();
-
-    try {
-      const res = await fetch('/api/mentor/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_query: question,
-          problem_context: {
-            missionTitle: 'Python Course Learning Dashboard',
-            topicTitle: 'Python Fundamentals & Problem Solving',
-            problemStatement: 'Student asking for conceptual guidance or debugging help on Python.',
-            language: 'python',
-          },
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.success && data.solution) {
-        setMentorResponse(data.solution);
-      } else if (data.fallback_response) {
-        setMentorResponse(data.fallback_response);
-      } else {
-        // Fallback intelligent response for common queries without API key
-        setMentorResponse(generateLocalPythonMentorAdvice(question));
-      }
-    } catch (err) {
-      setMentorResponse(generateLocalPythonMentorAdvice(question));
-    } finally {
-      setIsAskingMentor(false);
-    }
-  };
-
-  const copyResponseCode = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
+  // Prerequisite unlocks:
+  // Card 1 (Basics) is always open.
+  // Card 2 (Missions) requires previous (Basics) completed.
+  const isCard1Complete = completedLessonsCount >= totalLessonsCount && totalLessonsCount > 0;
+  // Card 3 (Projects) requires previous (Missions) completed.
+  const isCard2Complete = isCard1Complete && completedMissionsCount >= totalMissionsCount && totalMissionsCount > 0;
+  // Card 4 (Certification) requires previous (Projects) completed.
+  const isCard3Complete = isCard2Complete && completedProjectsCount >= totalProjectsCount && totalProjectsCount > 0;
 
   return (
     <div className="w-full flex flex-col items-center min-h-screen text-[#1E1E24] pb-20 overflow-x-hidden">
@@ -363,7 +304,7 @@ function PythonDashboardContent() {
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-10">
         {/* =========================================================================
-            A. PYTHON COURSE HERO
+            A. PYTHON COURSE HERO (Version removed & Progress Bar brought here)
            ========================================================================= */}
         <section className="relative w-full rounded-3xl border-3 border-[#1E1E24] bg-white p-6 sm:p-8 lg:p-10 shadow-[8px_8px_0px_#1E1E24] overflow-hidden">
           {/* Subtle Ambient Decorative Gradients */}
@@ -371,11 +312,11 @@ function PythonDashboardContent() {
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Column: Course Logo, Title & Tagline */}
-            <div className="lg:col-span-8 space-y-4">
-              {/* Badge Row */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Badge Row (Python version removed as requested) */}
               <div className="flex flex-wrap items-center gap-2">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#306998] text-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[11px] font-pixel">
-                  <span>🐍 PYTHON 3.12</span>
+                  <span>🐍 PYTHON</span>
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                   ● Beginner Friendly
@@ -439,36 +380,125 @@ function PythonDashboardContent() {
               </div>
             </div>
 
-            {/* Right Column: Visual Mascot & Quick Stat Pill */}
-            <div className="lg:col-span-4 flex flex-col items-center justify-center">
-              <div className="relative p-5 rounded-3xl bg-[#FAF6EE] border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] text-center w-full max-w-xs space-y-3">
-                {/* Python Logo Emblem */}
-                <div className="mx-auto w-24 h-24 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex items-center justify-center p-2.5">
-                  <img
-                    src="/logo-title.png"
-                    alt="Python Adventure Logo"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="font-serif font-black text-base text-[#1E1E24]">
-                    Gurukul Python Track
-                  </h3>
-                  <p className="text-[11px] font-bold text-gray-500">
-                    Deterministic 8-Chapter Path
-                  </p>
-                </div>
-
-                <div className="pt-2 border-t-2 border-[#1E1E24]/10 flex items-center justify-around text-xs font-mono font-bold">
-                  <div>
-                    <span className="block text-gray-400 text-[10px]">TOTAL XP</span>
-                    <span className="text-emerald-700 font-black">+1,200 XP</span>
+            {/* Right Column: Course Progress Panel (Relocated into Hero, Python version removed) */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center w-full">
+              <div className="p-5 sm:p-6 rounded-3xl bg-[#FAF6EE] border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4 w-full">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3 border-b-2 border-[#1E1E24]/10">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-purple-100 border-2 border-[#1E1E24] flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
+                      <Flame className="w-4 h-4 text-[#6C5CE7] fill-current" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif font-black text-sm text-[#1E1E24]">
+                        Course Progress
+                      </h3>
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+                        Python Mastery Track
+                      </span>
+                    </div>
                   </div>
-                  <div className="w-px h-6 bg-gray-200" />
-                  <div>
-                    <span className="block text-gray-400 text-[10px]">RUNTIME</span>
-                    <span className="text-[#306998] font-black">CPython 3.12</span>
+
+                  <span className="text-xs font-pixel font-bold px-2.5 py-1 rounded-md bg-white border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] text-[#1E1E24]">
+                    {calculatedPercent}%
+                  </span>
+                </div>
+
+                {/* Circular Progress Ring & Status */}
+                <div className="flex items-center gap-4 py-1">
+                  <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={ringRadius}
+                        className="text-slate-200"
+                        strokeWidth="9"
+                        stroke="currentColor"
+                        fill="transparent"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={ringRadius}
+                        className="text-[#6C5CE7] transition-all duration-700 ease-out"
+                        strokeWidth="9"
+                        strokeDasharray={ringCircumference}
+                        strokeDashoffset={ringStrokeOffset}
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="transparent"
+                      />
+                    </svg>
+                    <div className="absolute flex flex-col items-center justify-center text-center">
+                      <span className="font-serif font-black text-base text-[#1E1E24] leading-none">
+                        {calculatedPercent}%
+                      </span>
+                      <span className="text-[8px] font-bold text-gray-400 uppercase mt-0.5">
+                        Done
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Encouraging message / Streak message */}
+                  <div className="space-y-1 min-w-0 flex-1">
+                    {calculatedPercent === 0 ? (
+                      <p className="text-[11px] font-bold text-gray-600 leading-snug">
+                        🚀 Complete your first quest to earn XP and fill your mastery ring!
+                      </p>
+                    ) : calculatedPercent >= 100 ? (
+                      <p className="text-[11px] font-bold text-emerald-700 leading-snug">
+                        🏆 Outstanding! You have mastered all active Python quests.
+                      </p>
+                    ) : (
+                      <p className="text-[11px] font-bold text-[#6C5CE7] leading-snug">
+                        🔥 Great momentum! Keep solving missions to unlock new ranks.
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-gray-500 font-bold">
+                      <span>Rank:</span>
+                      <span className="text-[#1E1E24] font-black">
+                        {currentUser?.rank || 'Sadhaka'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Horizontal Progress Bar */}
+                <div className="space-y-1">
+                  <div className="w-full h-2.5 rounded-full bg-white border-2 border-[#1E1E24] overflow-hidden p-0.5">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#6C5CE7] via-[#A29BFE] to-[#FFD214] transition-all duration-500"
+                      style={{ width: `${Math.max(4, calculatedPercent)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Detailed Breakdown Counters Grid */}
+                <div className="grid grid-cols-3 gap-2 pt-1 border-t-2 border-[#1E1E24]/10 text-center">
+                  <div className="p-2 rounded-xl bg-white border border-[#1E1E24]/20 shadow-[1px_1px_0px_#1E1E24]">
+                    <span className="block text-[9px] font-bold text-gray-400 uppercase">
+                      Lessons
+                    </span>
+                    <span className="font-mono text-xs font-black text-[#1E1E24]">
+                      {completedLessonsCount}/{totalLessonsCount}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white border border-[#1E1E24]/20 shadow-[1px_1px_0px_#1E1E24]">
+                    <span className="block text-[9px] font-bold text-gray-400 uppercase">
+                      Missions
+                    </span>
+                    <span className="font-mono text-xs font-black text-emerald-700">
+                      {completedMissionsCount}/{totalMissionsCount}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white border border-[#1E1E24]/20 shadow-[1px_1px_0px_#1E1E24]">
+                    <span className="block text-[9px] font-bold text-gray-400 uppercase">
+                      Projects
+                    </span>
+                    <span className="font-mono text-xs font-black text-[#6C5CE7]">
+                      {completedProjectsCount}/{totalProjectsCount}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -477,7 +507,7 @@ function PythonDashboardContent() {
         </section>
 
         {/* =========================================================================
-            B. CHOOSE YOUR PATH (4 Numbered Pathway Cards)
+            B. CHOOSE YOUR PATH (Cards 2, 3, 4 require previous to unlock)
            ========================================================================= */}
         <section className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -497,7 +527,7 @@ function PythonDashboardContent() {
 
           {/* 4 Cards Grid (Horizontal on Desktop, Responsive Wrap on Tablet & Mobile) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* CARD 1: Learn Basics */}
+            {/* CARD 1: Learn Basics (Always Unlocked) */}
             <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
@@ -525,16 +555,16 @@ function PythonDashboardContent() {
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
                 <Link
-                  href="/learn/py-less-1-1"
+                  href={`/learn/${nextLessonId}`}
                   className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                 >
-                  <span>Start Learning</span>
+                  <span>{completedLessonsCount > 0 ? 'Resume Learning' : 'Start Learning'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            {/* CARD 2: Play Missions */}
+            {/* CARD 2: Play Missions (Locked until Previous Step 1 Completed) */}
             <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
@@ -561,17 +591,29 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                <a
-                  href="#featured-missions"
-                  className="btn-arcade btn-arcade-white w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                >
-                  <span>View Missions</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                {isCard1Complete ? (
+                  <a
+                    href="#featured-missions"
+                    className="btn-arcade btn-arcade-white w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    <span>View Missions</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                    title="Complete previous to unlock this"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Complete previous to unlock this</span>
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* CARD 3: Build Projects */}
+            {/* CARD 3: Build Projects (Locked until Previous Step 2 Completed) */}
             <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
@@ -598,31 +640,43 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                <button
-                  type="button"
-                  onClick={() => setIsProjectsModalOpen(true)}
-                  className="btn-arcade btn-arcade-purple w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                >
-                  <span>View Projects</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                {isCard2Complete ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsProjectsModalOpen(true)}
+                    className="btn-arcade btn-arcade-purple w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    <span>View Projects</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                    title="Complete previous to unlock this"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Complete previous to unlock this</span>
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* CARD 4: Get Certified */}
-            <div className="p-5 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/60 shadow-[4px_4px_0px_#A0A0B0] flex flex-col justify-between opacity-90">
+            {/* CARD 4: Get Certified (Locked until Previous Step 3 Completed) */}
+            <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="w-8 h-8 rounded-xl bg-amber-100 border-2 border-[#1E1E24]/60 text-amber-900 font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]/40">
+                  <span className="w-8 h-8 rounded-xl bg-amber-100 border-2 border-[#1E1E24] text-amber-900 font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
                     04
                   </span>
-                  <div className="w-9 h-9 rounded-xl bg-white border-2 border-[#1E1E24]/60 flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]/40">
+                  <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
                     <Award className="w-4 h-4 text-amber-500" />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <h3 className="font-serif font-black text-lg text-[#1E1E24]/80">
+                  <h3 className="font-serif font-black text-lg text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors">
                     Get Certified
                   </h3>
                   <span className="text-[10px] font-black uppercase text-amber-700 tracking-wider block">
@@ -630,408 +684,137 @@ function PythonDashboardContent() {
                   </span>
                 </div>
 
-                <p className="text-xs font-bold text-gray-500 leading-relaxed">
+                <p className="text-xs font-bold text-gray-600 leading-relaxed">
                   Complete all curriculum chapters, pass the comprehensive Python mastery examination, and earn your verified Dronacharya Certificate.
                 </p>
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                <button
-                  disabled
-                  type="button"
-                  className="w-full py-2.5 px-3 rounded-xl bg-slate-200 border-2 border-slate-400 text-slate-500 text-xs font-black flex items-center justify-center gap-1.5 cursor-not-allowed select-none"
-                  title="Certification path currently in accreditation"
-                >
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>Coming Soon</span>
-                </button>
+                {isCard3Complete ? (
+                  <button
+                    type="button"
+                    className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    <span>Start Certification</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                    title="Complete previous to unlock this"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Complete previous to unlock this</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
         </section>
 
         {/* =========================================================================
-            MAIN WORKSPACE: TWO COLUMNS (Content Left, Sidebar Right)
+            C. FEATURED PYTHON MISSIONS (Full Width Section; Quote & AI Mentor cards removed)
            ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* =======================================================================
-              LEFT COLUMN (8 COLS): FEATURED MISSIONS & DRONACHARYA QUOTE
-             ======================================================================= */}
-          <div className="lg:col-span-8 space-y-8">
-            {/* D. FEATURED PYTHON MISSIONS */}
-            <section id="featured-missions" className="space-y-4 scroll-mt-28">
-              <div className="flex items-center justify-between flex-wrap gap-2 border-b-2 border-[#1E1E24] pb-3">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-serif font-black text-[#1E1E24] flex items-center gap-2">
-                    <Target className="w-5 h-5 text-[#6C5CE7]" />
-                    <span>Featured Python Missions</span>
-                  </h2>
-                  <p className="text-xs font-bold text-gray-500 mt-0.5">
-                    Launch in-browser sandbox simulations with immediate assertion tests.
-                  </p>
-                </div>
-
-                <Link
-                  href="/simulator"
-                  className="text-xs font-black text-[#6C5CE7] hover:underline flex items-center gap-1 group"
-                >
-                  <span>View All Missions</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-
-              {/* Mission Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {FEATURED_MISSIONS.map((m) => {
-                  const Icon = m.icon;
-                  const isDone = completedMissions.includes(m.missionId);
-
-                  return (
-                    <div
-                      key={m.id}
-                      className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex flex-col justify-between gap-4 hover:-translate-y-1 hover:shadow-[6px_6px_0px_#1E1E24] transition-all group"
-                    >
-                      <div className="space-y-3">
-                        {/* Top meta row */}
-                        <div className="flex items-center justify-between gap-2">
-                          <span
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-pixel border-2 border-[#1E1E24] ${
-                              m.difficulty === 'Easy'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-amber-100 text-amber-800'
-                            }`}
-                          >
-                            {m.difficulty}
-                          </span>
-
-                          <div className="flex items-center gap-1 text-[11px] font-mono text-gray-500 font-bold">
-                            <Clock className="w-3 h-3" />
-                            <span>{m.estimatedTime}</span>
-                          </div>
-                        </div>
-
-                        {/* Title and Icon */}
-                        <div className="flex items-start gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_#1E1E24]">
-                            <Icon className="w-4 h-4 text-[#306998]" />
-                          </div>
-                          <div>
-                            <h3 className="font-serif font-black text-sm text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors leading-tight">
-                              {m.title}
-                            </h3>
-                            <span className="text-[10px] font-mono text-gray-500 font-bold">
-                              +{m.xpReward} XP
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <p className="text-xs font-bold text-gray-600 line-clamp-3 leading-relaxed">
-                          {m.description}
-                        </p>
-                      </div>
-
-                      {/* Launch Button */}
-                      <div className="pt-3 border-t-2 border-[#1E1E24]/10">
-                        <Link
-                          href={`/simulator?mission=${m.missionId}`}
-                          className={`btn-arcade w-full py-2 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24] ${
-                            isDone ? 'btn-arcade-white' : 'btn-arcade-gold'
-                          }`}
-                        >
-                          {isDone ? (
-                            <>
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Replay Mission</span>
-                            </>
-                          ) : (
-                            <>
-                              <Play className="w-3.5 h-3.5 fill-current" />
-                              <span>Launch Mission</span>
-                            </>
-                          )}
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* F. DRONACHARYA QUOTE PANEL */}
-            <section className="p-6 sm:p-7 rounded-2xl bg-[#FAF6EE] border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex items-center gap-4 relative overflow-hidden">
-              <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6 text-amber-500 fill-amber-400" />
-              </div>
-
-              <div className="space-y-1 min-w-0 flex-1">
-                <blockquote className="font-serif font-black text-base sm:text-lg text-[#1E1E24] leading-snug">
-                  “The more you practice, the stronger you become.”
-                </blockquote>
-                <p className="text-xs font-bold text-gray-600 tracking-wider uppercase font-mono">
-                  — Dronacharya
-                </p>
-              </div>
-
-              <div className="hidden sm:block shrink-0 opacity-40">
-                <img src="/logo.png" alt="" className="w-12 h-12 object-contain" />
-              </div>
-            </section>
-          </div>
-
-          {/* =======================================================================
-              RIGHT COLUMN (4 COLS): COURSE PROGRESS PANEL & AI MENTOR PANEL
-             ======================================================================= */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* C. COURSE PROGRESS PANEL */}
-            <div className="p-5 sm:p-6 rounded-3xl bg-white border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-5">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b-2 border-[#1E1E24]/10">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-purple-100 border-2 border-[#1E1E24] flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
-                    <Flame className="w-4 h-4 text-[#6C5CE7] fill-current" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif font-black text-sm text-[#1E1E24]">
-                      Course Progress
-                    </h3>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
-                      Python Mastery Track
-                    </span>
-                  </div>
-                </div>
-
-                <span className="text-xs font-pixel font-bold px-2.5 py-1 rounded-md bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] text-[#1E1E24]">
-                  {calculatedPercent}%
-                </span>
-              </div>
-
-              {/* Circular Progress Ring & Core Status */}
-              <div className="flex items-center gap-4 py-1">
-                <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    {/* Background Ring */}
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r={ringRadius}
-                      className="text-slate-100"
-                      strokeWidth="9"
-                      stroke="currentColor"
-                      fill="transparent"
-                    />
-                    {/* Foreground Animated Progress Ring */}
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r={ringRadius}
-                      className="text-[#6C5CE7] transition-all duration-700 ease-out"
-                      strokeWidth="9"
-                      strokeDasharray={ringCircumference}
-                      strokeDashoffset={ringStrokeOffset}
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="transparent"
-                    />
-                  </svg>
-                  <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="font-serif font-black text-lg text-[#1E1E24] leading-none">
-                      {calculatedPercent}%
-                    </span>
-                    <span className="text-[9px] font-bold text-gray-400 uppercase mt-0.5">
-                      Done
-                    </span>
-                  </div>
-                </div>
-
-                {/* Encouraging message / Streak message */}
-                <div className="space-y-1.5 min-w-0 flex-1">
-                  {calculatedPercent === 0 ? (
-                    <p className="text-xs font-bold text-gray-600 leading-relaxed">
-                      🚀 Ready to begin? Complete your first quest to earn +50 XP and start
-                      filling your mastery ring!
-                    </p>
-                  ) : calculatedPercent >= 100 ? (
-                    <p className="text-xs font-bold text-emerald-700 leading-relaxed">
-                      🏆 Outstanding accomplishment! You have completed all active Python
-                      curriculum quests.
-                    </p>
-                  ) : (
-                    <p className="text-xs font-bold text-[#6C5CE7] leading-relaxed">
-                      🔥 Great momentum! Keep solving missions to unlock the Vidvan rank and
-                      complete the course.
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-gray-500 font-bold">
-                    <span>Rank:</span>
-                    <span className="text-[#1E1E24]">{currentUser?.rank || 'Sadhaka'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Horizontal Progress Bar */}
-              <div className="space-y-1">
-                <div className="w-full h-3 rounded-full bg-slate-100 border-2 border-[#1E1E24] overflow-hidden p-0.5">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#6C5CE7] via-[#A29BFE] to-[#FFD214] transition-all duration-500"
-                    style={{ width: `${Math.max(4, calculatedPercent)}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Detailed Breakdown Counters */}
-              <div className="space-y-2 pt-2 border-t-2 border-[#1E1E24]/10 text-xs font-bold">
-                {/* Lessons Row */}
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[#FAF6EE] border border-[#1E1E24]/20">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-3.5 h-3.5 text-[#306998]" />
-                    <span>Lessons Completed</span>
-                  </div>
-                  <span className="font-mono text-[#1E1E24]">
-                    {completedLessonsCount} / {totalLessonsCount}
-                  </span>
-                </div>
-
-                {/* Missions Row */}
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[#FAF6EE] border border-[#1E1E24]/20">
-                  <div className="flex items-center gap-2">
-                    <Gamepad2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Missions Solved</span>
-                  </div>
-                  <span className="font-mono text-[#1E1E24]">
-                    {completedMissionsCount} / {totalMissionsCount}
-                  </span>
-                </div>
-
-                {/* Projects Row */}
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[#FAF6EE] border border-[#1E1E24]/20">
-                  <div className="flex items-center gap-2">
-                    <Code2 className="w-3.5 h-3.5 text-[#6C5CE7]" />
-                    <span>Projects Built</span>
-                  </div>
-                  <span className="font-mono text-[#1E1E24]">
-                    {completedProjectsCount} / {totalProjectsCount}
-                  </span>
-                </div>
-              </div>
-
-              {/* Resume Quest Action */}
-              <Link
-                href={`/learn/${nextLessonId}`}
-                className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-              >
-                <span>Continue Learning Next</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+        <section id="featured-missions" className="space-y-5 scroll-mt-28">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b-2 border-[#1E1E24] pb-3">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-serif font-black text-[#1E1E24] flex items-center gap-2">
+                <Target className="w-5 h-5 text-[#6C5CE7]" />
+                <span>Featured Python Missions</span>
+              </h2>
+              <p className="text-xs font-bold text-gray-500 mt-0.5">
+                Launch in-browser sandbox simulations with immediate assertion tests.
+              </p>
             </div>
 
-            {/* E. AI MENTOR PANEL (Ask Your AI Mentor) */}
-            <div className="p-5 sm:p-6 rounded-3xl bg-white border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4">
-              {/* Header with Mentor Avatar */}
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#EDE9FE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24] shrink-0 overflow-hidden">
-                  <img
-                    src="/logo.png"
-                    alt="Acharya Mentor"
-                    className="w-9 h-9 object-contain"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-serif font-black text-base text-[#1E1E24]">
-                      Ask Your AI Mentor
-                    </h3>
-                    <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400" />
+            <Link
+              href="/simulator"
+              className="text-xs font-black text-[#6C5CE7] hover:underline flex items-center gap-1 group"
+            >
+              <span>View All Missions</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Mission Cards Grid (3 Columns full width) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {FEATURED_MISSIONS.map((m) => {
+              const Icon = m.icon;
+              const isDone = completedMissions.includes(m.missionId);
+
+              return (
+                <div
+                  key={m.id}
+                  className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex flex-col justify-between gap-4 hover:-translate-y-1 hover:shadow-[6px_6px_0px_#1E1E24] transition-all group"
+                >
+                  <div className="space-y-3">
+                    {/* Top meta row */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-pixel border-2 border-[#1E1E24] ${
+                          m.difficulty === 'Easy'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {m.difficulty}
+                      </span>
+
+                      <div className="flex items-center gap-1 text-[11px] font-mono text-gray-500 font-bold">
+                        <Clock className="w-3 h-3" />
+                        <span>{m.estimatedTime}</span>
+                      </div>
+                    </div>
+
+                    {/* Title and Icon */}
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_#1E1E24]">
+                        <Icon className="w-4 h-4 text-[#306998]" />
+                      </div>
+                      <div>
+                        <h3 className="font-serif font-black text-sm text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors leading-tight">
+                          {m.title}
+                        </h3>
+                        <span className="text-[10px] font-mono text-gray-500 font-bold">
+                          +{m.xpReward} XP
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-xs font-bold text-gray-600 line-clamp-3 leading-relaxed">
+                      {m.description}
+                    </p>
                   </div>
-                  <p className="text-xs font-bold text-gray-500 leading-snug mt-0.5">
-                    Stuck? Get hints, explanations or help — anytime!
-                  </p>
-                </div>
-              </div>
 
-              {/* Interactive Input Form */}
-              <form onSubmit={handleAskMentor} className="space-y-3">
-                <div className="relative">
-                  <textarea
-                    rows={3}
-                    value={mentorQuery}
-                    onChange={(e) => setMentorQuery(e.target.value)}
-                    placeholder="Ask a question about Python loops, functions, syntax, or debugging..."
-                    className="w-full p-3 rounded-xl border-2 border-[#1E1E24] bg-[#FAF6EE] text-xs font-bold text-[#1E1E24] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] resize-none shadow-[2px_2px_0px_#1E1E24]"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between gap-2">
-                  <button
-                    type="submit"
-                    disabled={isAskingMentor || !mentorQuery.trim()}
-                    className="btn-arcade btn-arcade-purple flex-1 py-2 text-xs font-black flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                  >
-                    {isAskingMentor ? (
-                      <>
-                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Contemplating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Ask Acharya</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // Open global Acharya drawer
-                      window.dispatchEvent(
-                        new CustomEvent('dronacharya_open_mentor', {
-                          detail: { question: mentorQuery },
-                        })
-                      );
-                    }}
-                    className="px-3 py-2 rounded-xl bg-slate-100 border-2 border-[#1E1E24] hover:bg-slate-200 text-xs font-bold text-[#1E1E24] shadow-[1.5px_1.5px_0px_#1E1E24] shrink-0"
-                    title="Open Full Screen AI Mentor Drawer"
-                  >
-                    Full View ↗
-                  </button>
-                </div>
-              </form>
-
-              {/* Live Mentor Response Area */}
-              {mentorResponse && (
-                <div className="p-3.5 rounded-2xl bg-[#FAF6EE] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2 text-xs animate-in fade-in duration-150">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-[#1E1E24]/10 text-[11px] font-bold text-[#6C5CE7]">
-                    <span className="flex items-center gap-1">
-                      <Bot className="w-3.5 h-3.5" />
-                      <span>Acharya Socratic Advice</span>
-                    </span>
-                    <button
-                      onClick={() => copyResponseCode(mentorResponse)}
-                      className="hover:text-[#1E1E24] flex items-center gap-1 cursor-pointer"
+                  {/* Launch Button */}
+                  <div className="pt-3 border-t-2 border-[#1E1E24]/10">
+                    <Link
+                      href={`/simulator?mission=${m.missionId}`}
+                      className={`btn-arcade w-full py-2 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24] ${
+                        isDone ? 'btn-arcade-white' : 'btn-arcade-gold'
+                      }`}
                     >
-                      {copiedCode ? (
+                      {isDone ? (
                         <>
-                          <Check className="w-3 h-3 text-emerald-600" />
-                          <span>Copied</span>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Replay Mission</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3 h-3" />
-                          <span>Copy</span>
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Launch Mission</span>
                         </>
                       )}
-                    </button>
-                  </div>
-
-                  <div className="font-sans font-bold text-gray-700 leading-relaxed whitespace-pre-wrap max-h-56 overflow-y-auto pr-1">
-                    {mentorResponse}
+                    </Link>
                   </div>
                 </div>
-              )}
-            </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
       </div>
 
       {/* =========================================================================
@@ -1133,65 +916,4 @@ function PythonDashboardContent() {
       )}
     </div>
   );
-}
-
-// Fallback intelligent Socratic guidance if API key is not configured
-function generateLocalPythonMentorAdvice(query: string): string {
-  const lower = query.toLowerCase();
-
-  if (lower.includes('loop') || lower.includes('for') || lower.includes('while')) {
-    return `In Python, loops repeat actions efficiently:
-
-\`\`\`python
-# For Loop (known number of iterations)
-for step in range(5):
-    print("Step:", step)
-
-# While Loop (until a condition is met)
-battery = 100
-while battery > 0:
-    battery -= 25
-    print("Battery level:", battery)
-\`\`\`
-
-💡 Tip: Remember that Python relies on clean 4-space indentation inside loop bodies!`;
-  }
-
-  if (lower.includes('function') || lower.includes('def') || lower.includes('return')) {
-    return `Functions in Python encapsulate reusable logic using the \`def\` keyword:
-
-\`\`\`python
-def calculate_xp(current_xp, quest_bonus):
-    total = current_xp + quest_bonus
-    return total
-
-new_score = calculate_xp(100, 50)
-print("Updated XP:", new_score)
-\`\`\`
-
-💡 Tip: Always use the \`return\` statement to output values from your functions so other code can consume them!`;
-  }
-
-  if (lower.includes('list') || lower.includes('array') || lower.includes('append')) {
-    return `Lists store ordered collections of items:
-
-\`\`\`python
-inventory = ["Wood Sword", "Health Potion"]
-inventory.append("Silicon Crystal")
-
-for item in inventory:
-    print("Adventurer Item:", item)
-\`\`\`
-
-💡 Tip: Access elements by index starting at 0: \`inventory[0]\` returns the first item!`;
-  }
-
-  return `Here is how to solve your Python problem:
-
-1. Break the problem into small sequential steps.
-2. Verify all syntax keywords (\`print\`, \`def\`, \`if\`, \`for\`) are lower-case.
-3. Check that your code indentation is aligned by exactly 4 spaces.
-4. Test with small sample values and print output using \`print()\` to inspect results.
-
-💡 For personalized live AI hints, ensure \`GEMINI_API_KEY\` is added to your \`.env.local\` file!`;
 }

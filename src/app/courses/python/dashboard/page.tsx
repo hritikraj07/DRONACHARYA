@@ -13,7 +13,6 @@ import {
   Award,
   Lock,
   ArrowRight,
-  ArrowLeft,
   CheckCircle2,
   Clock,
   Flame,
@@ -253,54 +252,6 @@ function PythonDashboardContent() {
 
   return (
     <div className="w-full flex flex-col items-center min-h-screen text-[#1E1E24] pb-20 overflow-x-hidden">
-      {/* =========================================================================
-          TOP BREADCRUMBS & NAVIGATION BAR
-         ========================================================================= */}
-      <div className="w-full border-b-2 border-[#1E1E24] bg-white/90 backdrop-blur-xs sticky top-14 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
-          {/* Breadcrumb Links */}
-          <div className="flex items-center gap-2 text-xs font-bold text-gray-500 flex-wrap">
-            <Link href="/" className="hover:text-[#6C5CE7] transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <Link href="/courses" className="hover:text-[#6C5CE7] transition-colors">
-              Courses
-            </Link>
-            <span>/</span>
-            <span className="text-[#1E1E24] font-black flex items-center gap-1">
-              <span>Python</span>
-              <span className="text-amber-500">⋆˙⟡</span>
-            </span>
-          </div>
-
-          {/* Quick Tab Switches */}
-          <div className="flex items-center gap-2 text-xs font-bold flex-nowrap shrink-0 overflow-x-auto">
-            <span className="px-3 py-1.5 rounded-lg bg-[#1E1E24] text-white shadow-[2px_2px_0px_#1E1E24]">
-              🎯 Dashboard
-            </span>
-            <Link
-              href="/courses/python"
-              className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:-translate-y-0.5 transition-all text-[#1E1E24]"
-            >
-              📜 Full Syllabus
-            </Link>
-            <Link
-              href="/dungeon"
-              className="px-3 py-1.5 rounded-lg bg-[#FAF6EE] hover:bg-purple-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:-translate-y-0.5 transition-all text-[#6C5CE7]"
-            >
-              ⚔️ Code Dungeon
-            </Link>
-            <Link
-              href="/courses"
-              className="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-[#1E1E24] transition-colors flex items-center gap-1"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>All Courses</span>
-            </Link>
-          </div>
-        </div>
-      </div>
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-10">
         {/* =========================================================================

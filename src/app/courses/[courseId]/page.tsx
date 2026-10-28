@@ -25,6 +25,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { getLearnerProgress } from '@/lib/curriculum/progression-engine';
+import { getActiveSession } from '@/lib/db/auth-db';
 
 export default function CourseDetailPage() {
   return (
@@ -48,6 +49,7 @@ function CourseDetailContent() {
   const course = findCourseBySlugOrId(rawId);
 
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   // Accordion state: Set of open chapter IDs (open all by default)
   const [openChapters, setOpenChapters] = useState<Record<string, boolean>>({});
 
@@ -56,6 +58,8 @@ function CourseDetailContent() {
       try {
         const p = getLearnerProgress();
         setCompletedLessonIds(p.completedLessonIds || []);
+        const s = getActiveSession();
+        setCurrentUser(s);
       } catch (e) {}
     }
   }, []);
@@ -160,13 +164,13 @@ function CourseDetailContent() {
                 href="/courses"
                 className="px-6 py-3 bg-[#1E1E24] text-white font-black text-xs rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#6C5CE7] transition-all hover:scale-105"
               >
-                ← Explore Active Quests
+                ← Explore Available Courses
               </Link>
               <Link
                 href="/courses/python/dashboard"
                 className="px-6 py-3 bg-[#FFD214] text-[#1E1E24] font-black text-xs rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] transition-all hover:scale-105"
               >
-                Play Python Now →
+                {currentUser ? 'Resume Python Quest →' : 'Play Python Now →'}
               </Link>
             </div>
           </div>

@@ -86,9 +86,9 @@ export function Footer() {
               </div>
             </Link>
 
-            {/* Made with pixel heart by Team Dronacharya */}
+            {/* Made with pixel heart by nhk */}
             <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#64748B]">
-              <span>Crafted with</span>
+              <span>made with</span>
               {/* Codédex Pixel Art Heart */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +114,7 @@ export function Footer() {
                 <rect x="14.1666" y="6.66699" width="1.66667" height="1.66667" fill="white" />
                 <rect x="12.5" y="5" width="1.66667" height="1.66667" fill="white" />
               </svg>
-              <span>by Team Dronacharya</span>
+              <span>by nhk</span>
             </div>
           </div>
 
@@ -204,27 +204,23 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/learn/py-less-1-1" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>Python Sanctuary</span>
-                    <span className="text-[10px] font-mono text-[#00B894] font-bold">Active Quest</span>
+                  <Link href="/courses/python/dashboard" className="hover:text-[#020617] hover:underline transition-colors font-medium">
+                    Python
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>HTML Web Forge</span>
-                    <span className="text-[10px] font-mono text-amber-500 font-bold">Coming Soon</span>
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors font-medium">
+                    HTML
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>CSS Stylist Peak</span>
-                    <span className="text-[10px] font-mono text-amber-500 font-bold">Coming Soon</span>
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors font-medium">
+                    CSS
                   </Link>
                 </li>
                 <li>
-                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors flex items-center justify-between">
-                    <span>JavaScript Nexus</span>
-                    <span className="text-[10px] font-mono text-amber-500 font-bold">Coming Soon</span>
+                  <Link href="/courses" className="hover:text-[#020617] hover:underline transition-colors font-medium">
+                    JavaScript
                   </Link>
                 </li>
               </ul>
@@ -270,16 +266,6 @@ export function Footer() {
             <div className="flex flex-wrap items-center gap-4">
               <span>© {currentYear} DRONACHARYA ⋆˙⟡ (The Digital Gurukul)</span>
               <span>•</span>
-              <span className="flex items-center gap-1.5 text-slate-700 font-bold">
-                <span>Crafted with</span>
-                <svg className="w-3.5 h-3.5 inline-block shrink-0" viewBox="0 0 16 16" fill="none">
-                  <path d="M2 5h2v-2h3v2h2v-2h3v2h2v4h-2v2h-2v2h-2v2h-2v-2h-2v-2h-2v-2h-2v-4z" fill="#FF4757" />
-                  <path d="M4 3h3v2H4V3zm5 0h3v2H9V3zM2 5h2v4H2V5zm12 0h2v4h-2V5zm-2 4h2v2h-2V9zm-2 2h2v2h-2v-2zm-2 2h2v2H8v-2zm-2-2h2v2H6v-2zm-2-2h2v2H4V9z" fill="#1E1E24" />
-                  <rect x="4" y="5" width="2" height="2" fill="#FFFFFF" />
-                </svg>
-                <span>by NHK</span>
-              </span>
-              <span>•</span>
               <Link href="/about" className="hover:text-[#020617] hover:underline transition-colors">
                 About
               </Link>
@@ -312,12 +298,12 @@ export function Footer() {
               <button
                 type="button"
                 onClick={() => setTeamModalType('linkedin')}
-                className="w-9 h-9 rounded-xl bg-white border-2 border-[#1E1E24] flex items-center justify-center text-[#1E1E24] hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2] shadow-[2px_2px_0px_#1E1E24] hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-white border-2 border-[#1E1E24] flex items-center justify-center text-[#1E1E24] hover:bg-[#FAF6EE] hover:text-[#6C5CE7] shadow-[2px_2px_0px_#1E1E24] hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
                 aria-label="View 4 Member LinkedIn Profiles"
                 title="View Team LinkedIn Profiles (4 Members)"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.79v8.37H6.46v-8.37M7.86 6.81a1.62 1.62 0 1 0 0 3.24 1.62 1.62 0 0 0 0-3.24z" />
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z" />
                 </svg>
               </button>
 

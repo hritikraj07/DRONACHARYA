@@ -321,11 +321,11 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 {currentUser ? (
                   <Link
-                    href={`/learn/${activeFirstLessonId}`}
+                    href={activeSubjectId === 'python' ? '/courses/python/dashboard' : `/learn/${activeFirstLessonId}`}
                     className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4 text-[#071426]" />
-                    <span>Continue Adventure 🚀</span>
+                    <span>Resume Adventure 🚀</span>
                   </Link>
                 ) : (
                   <button
@@ -576,13 +576,13 @@ export default function HomePage() {
 
                     {/* Action Buttons: Syllabus & Play → */}
                     {c.isComingSoon ? (
-                      <button
-                        disabled
-                        className="w-full btn-arcade btn-arcade-dark opacity-50 py-2.5 px-3 cursor-not-allowed flex items-center justify-center gap-1.5"
+                      <Link
+                        href={`/courses/${c.id}`}
+                        className="w-full btn-arcade btn-arcade-dark opacity-80 hover:opacity-100 py-2.5 px-3 flex items-center justify-center gap-1.5 cursor-pointer select-none transition-opacity"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>Coming Soon ⏳</span>
-                      </button>
+                      </Link>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
                         <Link
@@ -595,7 +595,7 @@ export default function HomePage() {
                           href={c.id === 'python' ? '/courses/python/dashboard' : `/learn/${firstLessonId}`}
                           className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
-                          <span>Play</span>
+                          <span>{currentUser ? 'Resume' : 'Play'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>

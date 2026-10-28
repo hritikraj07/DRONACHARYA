@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { COURSES_CATALOG, Course } from '@/lib/data/course-system';
 import { CourseCardBanner } from '@/components/course/CourseCardBanner';
+import { getActiveSession } from '@/lib/db/auth-db';
 import {
   BookOpen,
   Terminal,
@@ -30,12 +31,13 @@ import {
   GitBranch,
 } from 'lucide-react';
 
-type FilterTab = 'All' | 'Active' | 'HTML' | 'CSS' | 'JavaScript' | 'Python' | 'Coming Soon';
+type FilterTab = 'All' | 'Active' | 'Python' | 'HTML' | 'CSS' | 'JavaScript' | 'Coming Soon';
 
 export default function CoursesPage() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterTab>('All');
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -44,21 +46,25 @@ export default function CoursesPage() {
           localStorage.getItem('dronacharya_completed_lessons_v1') || '[]'
         );
         setCompletedLessonIds(saved);
+        const s = getActiveSession();
+        setCurrentUser(s);
       } catch (e) {}
     }
   }, []);
 
-  // Filter courses based on tab
-  const filteredCourses = COURSES_CATALOG.filter((c) => {
-    if (activeFilter === 'All') return true;
-    if (activeFilter === 'Active') return !c.isComingSoon;
-    if (activeFilter === 'Coming Soon') return c.isComingSoon;
-    if (activeFilter === 'HTML') return c.id === 'html';
-    if (activeFilter === 'CSS') return c.id === 'css';
-    if (activeFilter === 'JavaScript') return c.id === 'javascript';
-    if (activeFilter === 'Python') return c.id === 'python';
-    return true;
-  });
+  // Filter courses based on tab, with Python prioritized at the top
+  const filteredCourses = [...COURSES_CATALOG]
+    .sort((a, b) => (a.id === 'python' ? -1 : b.id === 'python' ? 1 : 0))
+    .filter((c) => {
+      if (activeFilter === 'All') return true;
+      if (activeFilter === 'Active') return !c.isComingSoon;
+      if (activeFilter === 'Coming Soon') return c.isComingSoon;
+      if (activeFilter === 'Python') return c.id === 'python';
+      if (activeFilter === 'HTML') return c.id === 'html';
+      if (activeFilter === 'CSS') return c.id === 'css';
+      if (activeFilter === 'JavaScript') return c.id === 'javascript';
+      return true;
+    });
 
   const activeCount = COURSES_CATALOG.filter((c) => !c.isComingSoon).length;
   const comingSoonCount = COURSES_CATALOG.filter((c) => c.isComingSoon).length;
@@ -100,10 +106,10 @@ export default function CoursesPage() {
             [
               'All',
               'Active',
+              'Python',
               'HTML',
               'CSS',
               'JavaScript',
-              'Python',
               'Coming Soon',
             ] as const
           ).map((filter) => {
@@ -118,10 +124,10 @@ export default function CoursesPage() {
               >
                 {filter === 'All' && 'All Tracks'}
                 {filter === 'Active' && 'Active Quests ⚔️'}
+                {filter === 'Python' && 'Python'}
                 {filter === 'HTML' && 'HTML'}
                 {filter === 'CSS' && 'CSS'}
                 {filter === 'JavaScript' && 'JavaScript'}
-                {filter === 'Python' && 'Python'}
                 {filter === 'Coming Soon' && 'Coming Soon ⏳'}
               </button>
             );
@@ -147,7 +153,7 @@ export default function CoursesPage() {
                   href="/courses/python/dashboard"
                   className="btn-arcade btn-arcade-gold px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Launch Python Dashboard →</span>
+                  <span>{currentUser ? 'Resume Python Dashboard →' : 'Launch Python Dashboard →'}</span>
                 </Link>
                 <Link
                   href="/dungeon"
@@ -232,13 +238,13 @@ export default function CoursesPage() {
 
                     {/* Action Buttons: Syllabus & Play → */}
                     {isComingSoon ? (
-                      <button
-                        disabled
-                        className="w-full btn-arcade btn-arcade-dark opacity-50 py-2.5 px-3 cursor-not-allowed flex items-center justify-center gap-1.5"
+                      <Link
+                        href={`/courses/${c.id}`}
+                        className="w-full btn-arcade btn-arcade-dark opacity-80 hover:opacity-100 py-2.5 px-3 flex items-center justify-center gap-1.5 cursor-pointer select-none transition-opacity"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>Coming Soon ⏳</span>
-                      </button>
+                      </Link>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
                         <Link
@@ -251,7 +257,7 @@ export default function CoursesPage() {
                           href={c.id === 'python' ? '/courses/python/dashboard' : `/learn/${firstLessonId}`}
                           className="btn-arcade btn-arcade-gold py-2.5 px-3 flex items-center justify-center gap-1 text-xs font-black cursor-pointer select-none"
                         >
-                          <span>Play</span>
+                          <span>{currentUser && completedCount > 0 ? 'Resume' : 'Play'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>

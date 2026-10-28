@@ -325,18 +325,6 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   <span>Sign Up</span>
                 </Link>
 
-                {/* AI Mentor Button (Hidden on Home Page only) */}
-                {!isHomePage && (
-                  <button
-                    onClick={onOpenMentor}
-                    className="btn-arcade btn-arcade-purple text-xs py-1.5 px-2.5 sm:px-3 flex items-center gap-1 shrink-0"
-                    title="Open AI Mentor Guidance"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
-                    <span className="hidden lg:inline">Mentor AI</span>
-                  </button>
-                )}
-
                 {/* Mobile / Tablet Menu Toggle Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -354,15 +354,11 @@ function PythonDashboardContent() {
               {/* Primary Call to Action Buttons */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
-                  href={`/learn/${nextLessonId}`}
+                  href="/courses/python/stage-1"
                   className="btn-arcade btn-arcade-gold px-6 py-3 text-xs sm:text-sm font-black flex items-center gap-2 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
                 >
                   <Play className="w-4 h-4 fill-current" />
-                  <span>
-                    {completedLessonsCount > 0
-                      ? 'Resume Quest (Lesson)'
-                      : 'Start Learning Basics →'}
-                  </span>
+                  <span>Play Stage 1 Now →</span>
                 </Link>
                 <Link
                   href="/dungeon"
@@ -555,10 +551,10 @@ function PythonDashboardContent() {
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
                 <Link
-                  href={`/learn/${nextLessonId}`}
+                  href="/courses/python/stage-1"
                   className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                 >
-                  <span>{completedLessonsCount > 0 ? 'Resume Learning' : 'Start Learning'}</span>
+                  <span>Play Stage 1 Now</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -715,7 +711,272 @@ function PythonDashboardContent() {
         </section>
 
         {/* =========================================================================
-            C. FEATURED PYTHON MISSIONS (Full Width Section; Quote & AI Mentor cards removed)
+            STAGE MAP: THE 5 STAGES OF PYTHON MASTERY
+           ========================================================================= */}
+        <section id="stage-map" className="space-y-5 scroll-mt-28">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b-2 border-[#1E1E24] pb-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#306998] text-white text-xs font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
+                <Compass className="w-3.5 h-3.5" />
+                <span>STAGE MAP</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-serif font-black text-[#1E1E24] mt-1.5 flex items-center gap-2">
+                <span>The 5 Stages of Python Mastery</span>
+                <span className="text-[#FFD214]">⋆˙⟡</span>
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm font-bold text-gray-500 max-w-md">
+              Journey through the Ancient Code Realm stage by stage. Stage 1 is now open for questing!
+            </p>
+          </div>
+
+          {/* 5 Stages Grid (Stage 1 available, Stages 2-5 locked & coming soon) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* STAGE 1: AVAILABLE */}
+            <div className="p-4 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all relative overflow-hidden group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-[#FFD214] border-2 border-[#1E1E24] text-[#1E1E24] font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
+                    01
+                  </span>
+                  <span className="text-[10px] font-pixel px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
+                    AVAILABLE
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block">
+                    🟢 Easy
+                  </span>
+                  <h3 className="font-serif font-black text-base text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors leading-tight">
+                    The First Command
+                  </h3>
+                </div>
+
+                <p className="text-xs font-bold text-gray-600 leading-relaxed">
+                  Enter the Ancient Code Realm, commune with the gate, predict outputs, reverse-engineer lost chants, and fix broken scripts.
+                </p>
+
+                {/* Concepts tags */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {['print()', 'Strings', 'Basic Syntax', 'Output Prediction', 'Debugging'].map((c) => (
+                    <span
+                      key={c}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#FAF6EE] text-[#1E1E24] font-bold border border-[#1E1E24]/20"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t-2 border-[#1E1E24]/10">
+                <Link
+                  href="/courses/python/stage-1"
+                  className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>PLAY NOW</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* STAGE 2: COMING SOON */}
+            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
+                    02
+                  </span>
+                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>COMING SOON</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
+                    Treasure Variables
+                  </h3>
+                </div>
+
+                <p className="text-xs font-bold text-gray-500 leading-relaxed">
+                  Variables and storing values in ancient memory slots.
+                </p>
+
+                {/* Concepts tags */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {['Variables', 'Storing Values'].map((c) => (
+                    <span
+                      key={c}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t-2 border-gray-200">
+                <button
+                  disabled
+                  type="button"
+                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
+                >
+                  <Lock className="w-3 h-3" />
+                  <span>COMING SOON</span>
+                </button>
+              </div>
+            </div>
+
+            {/* STAGE 3: COMING SOON */}
+            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
+                    03
+                  </span>
+                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>COMING SOON</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
+                    Fix the Code
+                  </h3>
+                </div>
+
+                <p className="text-xs font-bold text-gray-500 leading-relaxed">
+                  Deep syntax investigation and multi-layer debugging.
+                </p>
+
+                {/* Concepts tags */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {['Syntax', 'Debugging'].map((c) => (
+                    <span
+                      key={c}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t-2 border-gray-200">
+                <button
+                  disabled
+                  type="button"
+                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
+                >
+                  <Lock className="w-3 h-3" />
+                  <span>COMING SOON</span>
+                </button>
+              </div>
+            </div>
+
+            {/* STAGE 4: COMING SOON */}
+            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
+                    04
+                  </span>
+                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>COMING SOON</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
+                    Logic Gate
+                  </h3>
+                </div>
+
+                <p className="text-xs font-bold text-gray-500 leading-relaxed">
+                  Basic conditions, booleans, and decision-making branches.
+                </p>
+
+                {/* Concepts tags */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {['Basic Conditions', 'Decision-making'].map((c) => (
+                    <span
+                      key={c}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t-2 border-gray-200">
+                <button
+                  disabled
+                  type="button"
+                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
+                >
+                  <Lock className="w-3 h-3" />
+                  <span>COMING SOON</span>
+                </button>
+              </div>
+            </div>
+
+            {/* STAGE 5: COMING SOON */}
+            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
+                    05
+                  </span>
+                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>COMING SOON</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
+                    The First Boss
+                  </h3>
+                </div>
+
+                <p className="text-xs font-bold text-gray-500 leading-relaxed">
+                  A grand synthesis challenge combining all previously learned concepts.
+                </p>
+
+                {/* Concepts tags */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {['Synthesis', 'Boss Challenge'].map((c) => (
+                    <span
+                      key={c}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t-2 border-gray-200">
+                <button
+                  disabled
+                  type="button"
+                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
+                >
+                  <Lock className="w-3 h-3" />
+                  <span>COMING SOON</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            C. FEATURED PYTHON MISSIONS (Full Width Section)
            ========================================================================= */}
         <section id="featured-missions" className="space-y-5 scroll-mt-28">
           <div className="flex items-center justify-between flex-wrap gap-2 border-b-2 border-[#1E1E24] pb-3">

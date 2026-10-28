@@ -40,15 +40,20 @@ import confetti from 'canvas-confetti';
 import { runPythonCode } from '@/lib/simulator/python-interpreter';
 import { initPyodide, isPyodideLoaded } from '@/lib/simulator/dungeon-python-bridge';
 import { DungeonSound } from '@/lib/simulator/audio-synth';
-import { recordGameProgress, getActiveSession, RegisteredUser } from '@/lib/db/auth-db';
+import { getEffectiveUser, RegisteredUser } from '@/lib/db/auth-db';
+import {
+  recordPythonMissionCompletion,
+  getPythonCourseProgress,
+  PythonProgressData,
+} from '@/lib/curriculum/python-progress';
 
 export default function Stage1Page() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#1E1E24] flex flex-col items-center justify-center p-4 text-[#FAF6EE]">
-          <div className="w-12 h-12 border-4 border-[#FFD214] border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="font-pixel text-xs text-[#FFD214] tracking-widest">
+        <div className="min-h-screen bg-[#FAF6EE]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 text-[#1E1E24]">
+          <div className="w-12 h-12 border-4 border-[#6C5CE7] border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-pixel text-xs text-[#6C5CE7] tracking-widest">
             ENTERING ANCIENT CODE REALM...
           </p>
         </div>
@@ -311,6 +316,9 @@ function Stage1AdventureContent() {
   // Completion modal state
   const [showVictoryModal, setShowVictoryModal] = useState<boolean>(false);
   const [earnedXpTotal, setEarnedXpTotal] = useState<number>(0);
+  const [courseProgress, setCourseProgress] = useState<PythonProgressData>(() =>
+    getPythonCourseProgress()
+  );
 
   // Code editor textarea reference
   const editorRef = useRef<HTMLTextAreaElement>(null);
@@ -324,15 +332,16 @@ function Stage1AdventureContent() {
 
     // Sync session and progress
     const syncUser = () => {
-      const session = getActiveSession();
+      const session = getEffectiveUser();
       setCurrentUser(session);
+      setCourseProgress(getPythonCourseProgress());
 
       try {
         const savedMissions = localStorage.getItem('dronacharya_stage1_missions');
         if (savedMissions) {
           const parsed = JSON.parse(savedMissions);
           setCompletedMissions(parsed);
-          if (parsed.includes('stage1-mission-6-final-gate')) {
+          if (parsed.includes('stage1-mission-6-final-gatekeeper')) {
             setStage1Completed(true);
             setGateOpen(true);
             setRunesLit(true);
@@ -494,20 +503,12 @@ function Stage1AdventureContent() {
       );
       setCompletedMissions(newCompleted);
 
-      try {
-        localStorage.setItem(
-          'dronacharya_stage1_missions',
-          JSON.stringify(newCompleted)
-        );
-      } catch {}
-
-      // Award XP via centralized auth-db
-      recordGameProgress({
-        missionId: activeMission.missionKey,
-        earnedXp: activeMission.xpReward,
-        subject: 'python',
-        levelId: 'stage-1',
-      });
+      // Synchronize across unified Python course progression engine
+      const updatedProg = recordPythonMissionCompletion(
+        activeMission.missionKey,
+        activeMission.xpReward
+      );
+      setCourseProgress(updatedProg);
 
       // Special handling for Mission 6 (Final Gate Boss Challenge)
       if (activeMission.id === 6) {
@@ -535,60 +536,60 @@ function Stage1AdventureContent() {
     }
   };
 
-  // Calculate overall Stage 1 progress percent
-  const stage1ProgressPercent = Math.round(
-    (completedMissions.length / STAGE_1_MISSIONS.length) * 100
-  );
-
   return (
-    <div className="w-full min-h-screen bg-[#1E1E24] text-[#FAF6EE] flex flex-col items-center select-none pb-16 overflow-x-hidden">
+    <div className="w-full min-h-screen text-[#1E1E24] flex flex-col items-center select-none pb-16 overflow-x-hidden">
       {/* =======================================================================
-          TOP HUD & STAGE NAVIGATION BAR
+          TOP HUD & STAGE NAVIGATION BAR (Warm Translucent Homepage Neo-Brutalist)
          ======================================================================= */}
-      <header className="w-full bg-[#18181D] border-b-3 border-[#2A2A32] sticky top-0 z-40 shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+      <header
+        className="w-full border-b-3 border-[#1E1E24] sticky top-0 z-40 shadow-[0_4px_12px_rgba(30,30,36,0.08)]"
+        style={{
+          backgroundColor: 'rgba(250, 246, 238, 0.92)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
           {/* Back Button & Title */}
           <div className="flex items-center gap-3">
             <Link
               href="/courses/python/dashboard"
-              className="p-2 rounded-xl bg-[#262630] border-2 border-[#3A3A48] hover:bg-[#323240] hover:border-[#FFD214] transition-all text-[#FAF6EE] flex items-center gap-1.5 text-xs font-bold shadow-[2px_2px_0px_#000]"
-              title="Return to Python Stage Map & Dashboard"
+              className="p-2 rounded-xl bg-white border-2 border-[#1E1E24] hover:bg-[#FAF6EE] transition-all text-[#1E1E24] flex items-center gap-1.5 text-xs font-bold shadow-[2px_2px_0px_#1E1E24]"
+              title="Return to Python Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Stage Map</span>
+              <span className="hidden sm:inline">Dashboard</span>
             </Link>
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-pixel px-2 py-0.5 rounded bg-[#FFD214] text-[#1E1E24] font-black">
+                <span className="text-[10px] font-pixel px-2 py-0.5 rounded bg-[#FFD214] text-[#1E1E24] font-black border border-[#1E1E24]">
                   STAGE 1
                 </span>
-                <h1 className="font-serif font-black text-sm sm:text-base text-white tracking-wide flex items-center gap-1.5">
+                <h1 className="font-serif font-black text-sm sm:text-base text-[#1E1E24] tracking-wide flex items-center gap-1.5">
                   <span>Code Quest: The First Command</span>
-                  <span className="text-[#FFD214]">⋆˙⟡</span>
+                  <span className="text-[#6C5CE7]">⋆˙⟡</span>
                 </h1>
               </div>
-              <p className="text-[11px] font-bold text-gray-400 hidden sm:block">
+              <p className="text-[11px] font-bold text-gray-600 hidden sm:block">
                 Ancient Code Realm • Communicating through Python
               </p>
             </div>
           </div>
 
-          {/* Mission Indicator & HUD Controls */}
+          {/* Mission Indicator & Course Progress */}
           <div className="flex items-center gap-3">
-            {/* Progress Bar & Counters */}
-            <div className="hidden md:flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold">
-                <span className="text-gray-400">STAGE PROGRESS:</span>
-                <span className="text-[#FFD214]">{stage1ProgressPercent}%</span>
-                <span className="text-gray-500">
-                  ({completedMissions.length}/{STAGE_1_MISSIONS.length})
-                </span>
+            {/* Single Overall Course Progress Indicator */}
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono font-bold">
+                <span className="text-gray-600 hidden sm:inline">COURSE PROGRESS:</span>
+                <span className="text-gray-600 sm:hidden">PROGRESS:</span>
+                <span className="text-[#6C5CE7] font-black">{courseProgress.percent}%</span>
               </div>
-              <div className="w-36 h-2 rounded-full bg-[#2A2A35] border border-[#3A3A48] overflow-hidden">
+              <div className="w-24 sm:w-36 h-2 rounded-full bg-white border border-[#1E1E24] overflow-hidden p-0.5">
                 <div
-                  className="h-full bg-gradient-to-r from-[#6C5CE7] via-[#A29BFE] to-[#FFD214] transition-all duration-500"
-                  style={{ width: `${stage1ProgressPercent}%` }}
+                  className="h-full rounded-full bg-gradient-to-r from-[#6C5CE7] via-[#A29BFE] to-[#FFD214] transition-all duration-500"
+                  style={{ width: `${Math.max(4, courseProgress.percent)}%` }}
                 />
               </div>
             </div>
@@ -596,10 +597,10 @@ function Stage1AdventureContent() {
             {/* Audio Toggle */}
             <button
               onClick={handleToggleSound}
-              className={`p-2 rounded-xl border-2 transition-all cursor-pointer shadow-[2px_2px_0px_#000] ${
+              className={`p-2 rounded-xl border-2 transition-all cursor-pointer shadow-[2px_2px_0px_#1E1E24] ${
                 isMuted
-                  ? 'bg-rose-950/40 border-rose-800 text-rose-300'
-                  : 'bg-[#262630] border-[#3A3A48] text-[#FFD214] hover:bg-[#323240]'
+                  ? 'bg-rose-50 border-rose-400 text-rose-600'
+                  : 'bg-white border-[#1E1E24] text-[#1E1E24] hover:bg-[#FAF6EE]'
               }`}
               title={isMuted ? 'Unmute 8-bit Audio' : 'Mute Audio'}
             >
@@ -609,9 +610,9 @@ function Stage1AdventureContent() {
         </div>
 
         {/* Mission Selector Dots / Tabs */}
-        <div className="bg-[#121216] border-t border-[#262632] px-4 sm:px-6 lg:px-8 py-2">
+        <div className="bg-white/80 backdrop-blur-md border-t-2 border-[#1E1E24] px-4 sm:px-6 lg:px-8 py-2">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
-            <span className="text-[10px] font-pixel text-gray-400 uppercase tracking-wider shrink-0 mr-1">
+            <span className="text-[10px] font-pixel text-[#1E1E24] uppercase tracking-wider shrink-0 mr-1">
               Missions:
             </span>
 
@@ -624,19 +625,19 @@ function Stage1AdventureContent() {
                   <button
                     key={m.id}
                     onClick={() => setCurrentMissionIndex(idx)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-pixel font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap border ${
+                    className={`px-3 py-1 rounded-xl text-xs font-pixel font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap border-2 ${
                       isSelected
-                        ? 'bg-[#FFD214] text-[#1E1E24] border-[#1E1E24] shadow-[2px_2px_0px_#000] scale-105'
+                        ? 'bg-[#FFD214] text-[#1E1E24] border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] scale-105'
                         : isDone
-                        ? 'bg-emerald-950/60 text-emerald-300 border-emerald-700/80 hover:bg-emerald-900/60'
-                        : 'bg-[#22222C] text-gray-400 border-[#323240] hover:text-white hover:bg-[#2B2B38]'
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-600 hover:bg-emerald-200'
+                        : 'bg-white text-gray-700 border-[#1E1E24]/30 hover:border-[#1E1E24] hover:text-[#1E1E24]'
                     }`}
                   >
                     <span>{m.id}</span>
                     {isDone ? (
-                      <Check className="w-3 h-3 text-emerald-400 stroke-3" />
+                      <Check className="w-3 h-3 text-emerald-600 stroke-3" />
                     ) : (
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                     )}
                     <span className="hidden lg:inline text-[10px]">
                       {m.title.replace(/Mission \d+ — /, '')}
@@ -651,7 +652,7 @@ function Stage1AdventureContent() {
               <button
                 disabled={currentMissionIndex === 0}
                 onClick={() => setCurrentMissionIndex((i) => Math.max(0, i - 1))}
-                className="p-1 rounded bg-[#22222C] border border-[#323240] text-gray-300 disabled:opacity-30 hover:bg-[#2C2C3A] cursor-pointer"
+                className="p-1.5 rounded-lg bg-white border-2 border-[#1E1E24] text-[#1E1E24] disabled:opacity-30 hover:bg-slate-100 cursor-pointer shadow-[1px_1px_0px_#1E1E24]"
                 title="Previous Mission"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
@@ -663,7 +664,7 @@ function Stage1AdventureContent() {
                     Math.min(STAGE_1_MISSIONS.length - 1, i + 1)
                   )
                 }
-                className="p-1 rounded bg-[#22222C] border border-[#323240] text-gray-300 disabled:opacity-30 hover:bg-[#2C2C3A] cursor-pointer"
+                className="p-1.5 rounded-lg bg-white border-2 border-[#1E1E24] text-[#1E1E24] disabled:opacity-30 hover:bg-slate-100 cursor-pointer shadow-[1px_1px_0px_#1E1E24]"
                 title="Next Mission"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -682,18 +683,18 @@ function Stage1AdventureContent() {
            ===================================================================== */}
         <div className="lg:col-span-5 space-y-5">
           {/* 1. VISUAL 2D PIXEL-ART ADVENTURE CANVAS */}
-          <div className="relative rounded-3xl border-3 border-[#2A2A35] bg-[#121217] shadow-[6px_6px_0px_#0A0A0E] overflow-hidden">
+          <div className="relative rounded-3xl border-3 border-[#1E1E24] bg-[#121217] shadow-[6px_6px_0px_#1E1E24] overflow-hidden">
             {/* Canvas Header / Status Bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-[#1A1A22] border-b-2 border-[#2A2A35] text-xs font-mono">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-[#FAF6EE] border-b-2 border-[#1E1E24] text-xs font-mono text-[#1E1E24]">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                <span className="text-gray-300 font-bold">Ancient Gate of Logic</span>
+                <span className="text-[#1E1E24] font-black">Ancient Gate of Logic</span>
               </div>
               <span
-                className={`text-[10px] font-pixel px-2 py-0.5 rounded border ${
+                className={`text-[10px] font-pixel px-2 py-0.5 rounded border-2 ${
                   gateOpen
-                    ? 'bg-emerald-950 text-emerald-300 border-emerald-600'
-                    : 'bg-rose-950 text-rose-300 border-rose-800'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-600'
+                    : 'bg-amber-100 text-amber-800 border-amber-500'
                 }`}
               >
                 {gateOpen ? 'GATE UNLOCKED 🔓' : 'GATE SEALED 🔒'}
@@ -867,10 +868,17 @@ function Stage1AdventureContent() {
           </div>
 
           {/* 2. ACHARYA DRONACHARYA MENTOR & FEEDBACK PANEL */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#181820] border-2 border-[#2C2C3A] shadow-[4px_4px_0px_#0A0A0E] space-y-3">
+          <div
+            className="p-4 sm:p-5 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-3"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+            }}
+          >
             {/* Header with Avatar */}
             <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#282538] border-2 border-[#FFD214] flex items-center justify-center shrink-0 shadow-[2px_2px_0px_#000]">
+              <div className="w-12 h-12 rounded-2xl bg-[#FFD214] border-2 border-[#1E1E24] flex items-center justify-center shrink-0 shadow-[2px_2px_0px_#1E1E24]">
                 <img
                   src="/logo.png"
                   alt="Dronacharya"
@@ -880,49 +888,49 @@ function Stage1AdventureContent() {
 
               <div className="space-y-0.5 min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-serif font-black text-sm text-white">
+                  <h3 className="font-serif font-black text-sm text-[#1E1E24]">
                     Acharya Dronacharya
                   </h3>
-                  <span className="text-[10px] font-pixel px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-700">
+                  <span className="text-[10px] font-pixel px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-300">
                     AI Mentor
                   </span>
                 </div>
-                <p className="text-xs font-bold text-gray-400">
+                <p className="text-xs font-bold text-gray-500">
                   Guide of the Ancient Code Realm
                 </p>
               </div>
             </div>
 
             {/* Mentor Dialogue */}
-            <div className="p-3 rounded-xl bg-[#22222E] border border-[#343445] text-xs font-serif font-bold text-[#FAF6EE] leading-relaxed relative">
-              <span className="text-[#FFD214] text-base font-serif mr-1">“</span>
+            <div className="p-3.5 rounded-2xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs font-serif font-bold text-[#1E1E24] leading-relaxed relative shadow-[2px_2px_0px_#1E1E24]">
+              <span className="text-[#6C5CE7] text-base font-serif mr-1">“</span>
               <span>{activeMission.mentorDialogue}</span>
-              <span className="text-[#FFD214] text-base font-serif ml-1">”</span>
+              <span className="text-[#6C5CE7] text-base font-serif ml-1">”</span>
             </div>
 
             {/* Objective statement */}
-            <div className="flex items-start gap-2 pt-1 text-xs font-mono font-bold text-gray-300">
-              <Target className="w-4 h-4 text-[#FFD214] shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 pt-1 text-xs font-mono font-bold text-[#1E1E24]">
+              <Target className="w-4 h-4 text-[#6C5CE7] shrink-0 mt-0.5" />
               <span>{activeMission.objective}</span>
             </div>
 
             {/* Progressive Hint Reveal Box */}
             {showHintBox && (
-              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-600/70 text-xs text-amber-200 space-y-1 animate-in fade-in duration-150">
-                <div className="flex items-center justify-between text-[11px] font-bold text-amber-400 font-mono">
+              <div className="p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 space-y-1 shadow-[2px_2px_0px_#1E1E24] animate-in fade-in duration-150">
+                <div className="flex items-center justify-between text-[11px] font-bold text-amber-800 font-mono">
                   <span>
                     💡 HINT {hintLevel + 1} OF {activeMission.hints.length}:
                   </span>
                   {hintLevel < activeMission.hints.length - 1 && (
                     <button
                       onClick={handleGetHint}
-                      className="text-xs text-[#FFD214] hover:underline cursor-pointer"
+                      className="text-xs text-[#6C5CE7] font-black hover:underline cursor-pointer"
                     >
                       Next Hint →
                     </button>
                   )}
                 </div>
-                <p className="font-sans leading-relaxed">
+                <p className="font-sans leading-relaxed font-bold">
                   {activeMission.hints[hintLevel]}
                 </p>
               </div>
@@ -937,16 +945,16 @@ function Stage1AdventureContent() {
           {/* Mission Category Pill & XP Tag */}
           <div className="flex items-center justify-between flex-wrap gap-2 pb-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-pixel px-2.5 py-1 rounded-md bg-[#6C5CE7] text-white border border-[#8376EB]">
+              <span className="text-xs font-pixel px-2.5 py-1 rounded-md bg-[#6C5CE7] text-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
                 {activeMission.mechanicBadge}
               </span>
-              <span className="text-xs font-bold text-gray-400">
+              <span className="text-xs font-bold text-[#4A4A58]">
                 {activeMission.subtitle}
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#FFD214] bg-[#2A2A38] px-2.5 py-1 rounded-lg border border-[#3E3E52]">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#1E1E24] bg-[#FFD214] px-2.5 py-1 rounded-lg border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
+              <Sparkles className="w-3.5 h-3.5 fill-current" />
               <span>+{activeMission.xpReward} XP</span>
             </div>
           </div>
@@ -954,20 +962,22 @@ function Stage1AdventureContent() {
           {/* REVERSE TEACHING: TARGET OUTPUT CONSOLE (Dedicated for Reverse Missions 2 & 4) */}
           {activeMission.targetOutput &&
             activeMission.mechanic === 'reverse_teaching' && (
-              <div className="p-4 rounded-2xl bg-amber-950/30 border-2 border-amber-500/70 shadow-[3px_3px_0px_#000] space-y-2">
-                <div className="flex items-center justify-between text-xs font-pixel font-bold text-amber-300">
+              <div className="p-4 rounded-2xl bg-amber-50/95 border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] space-y-2">
+                <div className="flex items-center justify-between text-xs font-pixel font-bold text-amber-950">
                   <div className="flex items-center gap-1.5">
-                    <Target className="w-4 h-4 text-amber-400" />
+                    <Target className="w-4 h-4 text-[#6C5CE7]" />
                     <span>TARGET OUTPUT REQUIRED</span>
                   </div>
-                  <span className="text-[10px] text-amber-400/80">REVERSE CHALLENGE</span>
+                  <span className="text-[10px] bg-amber-200 text-amber-950 px-2 py-0.5 rounded border border-[#1E1E24]">
+                    REVERSE CHALLENGE
+                  </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-black/80 border border-amber-500/40 font-mono text-xs sm:text-sm font-bold text-amber-200 whitespace-pre-wrap">
+                <div className="p-3.5 rounded-xl bg-[#1E1E24] text-amber-300 border-2 border-[#1E1E24] font-mono text-xs sm:text-sm font-bold shadow-[2px_2px_0px_#1E1E24] whitespace-pre-wrap">
                   {activeMission.targetOutput}
                 </div>
 
-                <p className="text-[11px] font-bold text-gray-400">
+                <p className="text-xs font-bold text-amber-900">
                   Write the Python instruction in the editor below that creates this exact output.
                 </p>
               </div>
@@ -975,13 +985,19 @@ function Stage1AdventureContent() {
 
           {/* OUTPUT PREDICTION: INTERACTIVE CARDS (Dedicated for Mission 5) */}
           {activeMission.mechanic === 'output_prediction' && (
-            <div className="p-4 rounded-2xl bg-[#20202C] border-2 border-[#38384C] shadow-[3px_3px_0px_#000] space-y-3">
-              <div className="flex items-center gap-2 text-xs font-pixel font-bold text-[#FFD214]">
-                <Zap className="w-4 h-4" />
+            <div
+              className="p-4 rounded-2xl border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] space-y-3"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(16px)',
+              }}
+            >
+              <div className="flex items-center gap-2 text-xs font-pixel font-bold text-[#1E1E24]">
+                <Zap className="w-4 h-4 text-[#FFD214] fill-[#FFD214]" />
                 <span>PREDICT THE OUTPUT FIRST:</span>
               </div>
 
-              <p className="text-xs font-bold text-gray-300">
+              <p className="text-xs font-bold text-[#1E1E24]">
                 {activeMission.predictionQuestion}
               </p>
 
@@ -998,18 +1014,18 @@ function Stage1AdventureContent() {
                       }}
                       className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer flex items-start gap-2.5 ${
                         isChosen
-                          ? 'bg-[#2E284A] border-[#FFD214] text-white shadow-[2px_2px_0px_#FFD214]'
-                          : 'bg-[#181822] border-[#343445] text-gray-300 hover:border-gray-500'
+                          ? 'bg-purple-100 border-[#6C5CE7] text-[#1E1E24] shadow-[3px_3px_0px_#6C5CE7]'
+                          : 'bg-[#FAF6EE] border-[#1E1E24]/30 text-[#1E1E24] hover:border-[#1E1E24] hover:shadow-[2px_2px_0px_#1E1E24]'
                       }`}
                     >
                       <div
                         className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${
                           isChosen
-                            ? 'border-[#FFD214] bg-[#FFD214]'
-                            : 'border-gray-500 bg-transparent'
+                            ? 'border-[#6C5CE7] bg-[#6C5CE7]'
+                            : 'border-[#1E1E24] bg-white'
                         }`}
                       >
-                        {isChosen && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                        {isChosen && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
 
                       <div className="font-mono text-xs font-bold whitespace-pre-wrap leading-tight">
@@ -1022,10 +1038,10 @@ function Stage1AdventureContent() {
 
               {predictionSubmitted && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-sans leading-relaxed animate-in fade-in duration-150 ${
+                  className={`p-3 rounded-xl border-2 text-xs font-sans leading-relaxed shadow-[2px_2px_0px_#1E1E24] animate-in fade-in duration-150 ${
                     predictionCorrect
-                      ? 'bg-emerald-950/50 border-emerald-500 text-emerald-200'
-                      : 'bg-rose-950/50 border-rose-500 text-rose-200'
+                      ? 'bg-emerald-50 border-emerald-600 text-emerald-950'
+                      : 'bg-rose-50 border-rose-600 text-rose-950'
                   }`}
                 >
                   <div className="font-bold font-mono text-xs mb-1">
@@ -1038,22 +1054,22 @@ function Stage1AdventureContent() {
           )}
 
           {/* PYTHON CODE EDITOR */}
-          <div className="rounded-2xl border-2 border-[#38384C] bg-[#14141B] shadow-[4px_4px_0px_#0A0A0E] overflow-hidden">
+          <div className="rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] overflow-hidden bg-[#1E1E24]">
             {/* Editor Top Bar */}
-            <div className="px-4 py-2.5 bg-[#1B1B25] border-b border-[#2C2C3C] flex items-center justify-between text-xs font-mono">
+            <div className="px-4 py-2.5 bg-[#FAF6EE] border-b-2 border-[#1E1E24] flex items-center justify-between text-xs font-mono">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 border border-[#1E1E24]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border border-[#1E1E24]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-[#1E1E24]" />
                 </div>
-                <span className="text-gray-400 font-bold ml-1">gate_command.py</span>
+                <span className="text-[#1E1E24] font-bold ml-1 font-mono">gate_command.py</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleResetCode}
-                  className="px-2 py-1 rounded bg-[#262635] hover:bg-[#323245] text-gray-300 hover:text-white text-[11px] font-mono flex items-center gap-1 transition-colors cursor-pointer"
+                  className="btn-arcade btn-arcade-white px-2.5 py-1 text-[11px] font-mono flex items-center gap-1 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                   title="Reset code to initial challenge state"
                 >
                   <RotateCcw className="w-3 h-3" />
@@ -1061,19 +1077,19 @@ function Stage1AdventureContent() {
                 </button>
                 <button
                   onClick={handleGetHint}
-                  className="px-2 py-1 rounded bg-[#2A2318] hover:bg-[#3D3322] text-amber-300 text-[11px] font-mono flex items-center gap-1 transition-colors cursor-pointer border border-amber-600/40"
+                  className="btn-arcade btn-arcade-gold px-2.5 py-1 text-[11px] font-mono flex items-center gap-1 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                   title="Get Socratic hint"
                 >
-                  <Lightbulb className="w-3 h-3 text-[#FFD214]" />
+                  <Lightbulb className="w-3 h-3 fill-current" />
                   <span>Hint</span>
                 </button>
               </div>
             </div>
 
             {/* Code Input Area with line numbers */}
-            <div className="p-3 bg-[#111116] flex gap-3 text-xs sm:text-sm font-mono leading-relaxed">
+            <div className="p-3.5 bg-[#181822] flex gap-3 text-xs sm:text-sm font-mono leading-relaxed">
               {/* Line Numbers */}
-              <div className="select-none text-gray-600 text-right pr-2 border-r border-[#242432] space-y-0.5">
+              <div className="select-none text-emerald-400/50 text-right pr-2 border-r border-[#2C2C3C] space-y-0.5">
                 {code.split('\n').map((_, idx) => (
                   <div key={idx}>{idx + 1}</div>
                 ))}
@@ -1086,22 +1102,22 @@ function Stage1AdventureContent() {
                 onChange={(e) => setCode(e.target.value)}
                 onKeyDown={handleKeyDown}
                 rows={Math.max(4, code.split('\n').length)}
-                className="w-full bg-transparent text-[#FAF6EE] focus:outline-none resize-none font-mono selection:bg-[#6C5CE7] selection:text-white"
+                className="w-full bg-transparent text-[#FAF6EE] focus:outline-none resize-none font-mono selection:bg-[#6C5CE7] selection:text-white caret-[#FFD214]"
                 placeholder="# Write your Python code here..."
                 spellCheck={false}
               />
             </div>
 
             {/* Editor Action Bar with RUN CODE Button */}
-            <div className="px-4 py-2.5 bg-[#181822] border-t border-[#262635] flex items-center justify-between flex-wrap gap-2">
-              <span className="text-[11px] font-mono text-gray-500">
-                Shortcut: <kbd className="px-1.5 py-0.5 bg-[#252535] rounded text-gray-300">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-[#252535] rounded text-gray-300">Enter</kbd>
+            <div className="px-4 py-2.5 bg-[#FAF6EE] border-t-2 border-[#1E1E24] flex items-center justify-between flex-wrap gap-2">
+              <span className="text-[11px] font-mono font-bold text-[#4A4A58]">
+                Shortcut: <kbd className="px-1.5 py-0.5 bg-white border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] rounded text-[#1E1E24]">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-white border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] rounded text-[#1E1E24]">Enter</kbd>
               </span>
 
               <button
                 onClick={handleRunCode}
                 disabled={isRunning}
-                className="btn-arcade btn-arcade-gold px-5 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer shadow-[2px_2px_0px_#000] disabled:opacity-50"
+                className="btn-arcade btn-arcade-gold px-5 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer shadow-[3px_3px_0px_#1E1E24] disabled:opacity-50"
               >
                 {isRunning ? (
                   <>
@@ -1119,19 +1135,19 @@ function Stage1AdventureContent() {
           </div>
 
           {/* TERMINAL OUTPUT CONSOLE */}
-          <div className="rounded-2xl border-2 border-[#2C2C3C] bg-[#0E0E14] shadow-[4px_4px_0px_#0A0A0E] overflow-hidden">
-            <div className="px-4 py-2 bg-[#171720] border-b border-[#242432] flex items-center justify-between text-xs font-mono">
-              <div className="flex items-center gap-2 text-gray-400">
-                <Terminal className="w-3.5 h-3.5 text-[#38BDF8]" />
+          <div className="rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] overflow-hidden bg-[#121218]">
+            <div className="px-4 py-2.5 bg-[#FAF6EE] border-b-2 border-[#1E1E24] flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2 text-[#1E1E24]">
+                <Terminal className="w-3.5 h-3.5 text-[#6C5CE7]" />
                 <span className="font-bold">OUTPUT CONSOLE (stdout)</span>
               </div>
 
               {lastRunPassed !== null && (
                 <span
-                  className={`text-[10px] font-pixel px-2 py-0.5 rounded border ${
+                  className={`text-[10px] font-pixel px-2 py-0.5 rounded border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] ${
                     lastRunPassed
-                      ? 'bg-emerald-950 text-emerald-300 border-emerald-600'
-                      : 'bg-rose-950 text-rose-300 border-rose-800'
+                      ? 'bg-emerald-100 text-emerald-900'
+                      : 'bg-rose-100 text-rose-900'
                   }`}
                 >
                   {lastRunPassed ? 'PASSED ✅' : 'FAILED ❌'}
@@ -1140,20 +1156,20 @@ function Stage1AdventureContent() {
             </div>
 
             {/* Console Output Content */}
-            <div className="p-4 font-mono text-xs sm:text-sm min-h-[90px] max-h-48 overflow-y-auto space-y-2">
+            <div className="p-4 font-mono text-xs sm:text-sm min-h-[95px] max-h-48 overflow-y-auto space-y-2 bg-[#121218]">
               {stdout ? (
                 <pre className="text-emerald-400 font-bold whitespace-pre-wrap">
                   {stdout}
                 </pre>
               ) : !stderr && lastRunPassed === null ? (
-                <p className="text-gray-600 italic">
+                <p className="text-gray-500 italic">
                   Run your Python code to see output displayed here...
                 </p>
               ) : null}
 
               {/* Genuine Python Traceback / Stderr */}
               {stderr && (
-                <div className="p-2.5 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-300 whitespace-pre-wrap font-mono text-xs">
+                <div className="p-2.5 rounded-lg bg-rose-950/70 border border-rose-600 text-rose-200 whitespace-pre-wrap font-mono text-xs">
                   {stderr}
                 </div>
               )}
@@ -1161,16 +1177,16 @@ function Stage1AdventureContent() {
 
             {/* Success Feedback Banner */}
             {lastRunPassed && (
-              <div className="px-4 py-3 bg-emerald-950/60 border-t border-emerald-600/60 text-emerald-200 flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div className="px-4 py-3 bg-emerald-50 border-t-2 border-[#1E1E24] text-emerald-950 flex items-center justify-between flex-wrap gap-2 text-xs">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span className="font-bold">{activeMission.successMessage}</span>
                 </div>
 
                 {currentMissionIndex < STAGE_1_MISSIONS.length - 1 && (
                   <button
                     onClick={() => setCurrentMissionIndex((i) => i + 1)}
-                    className="btn-arcade btn-arcade-white px-3 py-1.5 text-xs font-black flex items-center gap-1 cursor-pointer shadow-[2px_2px_0px_#000]"
+                    className="btn-arcade btn-arcade-white px-3 py-1.5 text-xs font-black flex items-center gap-1 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                   >
                     <span>Next Mission</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1186,8 +1202,8 @@ function Stage1AdventureContent() {
           STAGE 1 VICTORY & COMPLETION MODAL
          ======================================================================= */}
       {showVictoryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl bg-[#FAF6EE] text-[#1E1E24] rounded-3xl border-4 border-[#1E1E24] shadow-[10px_10px_0px_#000] p-6 sm:p-8 space-y-6 text-center animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl bg-[#FAF6EE] text-[#1E1E24] rounded-3xl border-4 border-[#1E1E24] shadow-[10px_10px_0px_#1E1E24] p-6 sm:p-8 space-y-6 text-center animate-in zoom-in-95">
             {/* Header Badge & Icon */}
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-pixel font-bold">
@@ -1233,28 +1249,28 @@ function Stage1AdventureContent() {
                   ✓ Output Prediction
                 </span>
                 <span className="text-xs font-serif font-bold text-[#1E1E24]">
-                  Newline (\\n) Mechanics
+                  Newline (\n) Mechanics
                 </span>
               </div>
             </div>
 
             {/* XP Awarded Callout */}
-            <div className="p-4 rounded-2xl bg-amber-100 border-2 border-[#1E1E24] flex items-center justify-around">
+            <div className="p-4 rounded-2xl bg-amber-100 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex items-center justify-around">
               <div>
-                <span className="block text-[10px] font-mono text-gray-500 font-bold">TOTAL XP GAINED</span>
+                <span className="block text-[10px] font-mono text-gray-600 font-bold">TOTAL XP GAINED</span>
                 <span className="font-pixel text-lg sm:text-xl text-emerald-800 font-black">+350 XP</span>
               </div>
               <div className="w-px h-8 bg-gray-300" />
               <div>
-                <span className="block text-[10px] font-mono text-gray-500 font-bold">RANK UPDATED</span>
+                <span className="block text-[10px] font-mono text-gray-600 font-bold">RANK UPDATED</span>
                 <span className="font-serif text-sm font-black text-[#1E1E24]">Vidvan Apprentice</span>
               </div>
             </div>
 
             {/* Locked Stages Notice */}
-            <div className="p-3 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold text-gray-500 flex items-center justify-center gap-2">
-              <Lock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Stages 2–5 (Treasure Variables, Fix the Code, Logic Gate, Boss) are currently COMING SOON.</span>
+            <div className="p-3 rounded-xl bg-purple-50 border-2 border-[#6C5CE7]/30 text-xs font-bold text-[#1E1E24] flex items-center justify-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
+              <span>Great job! Explore interactive Missions and real Projects from your Python Dashboard.</span>
             </div>
 
             {/* Action Buttons */}
@@ -1263,7 +1279,7 @@ function Stage1AdventureContent() {
                 href="/courses/python/dashboard"
                 className="btn-arcade btn-arcade-gold flex-1 py-3 text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
               >
-                <span>Return to Stage Map</span>
+                <span>Return to Python Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 

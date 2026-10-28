@@ -28,10 +28,6 @@ import {
   ChevronDown,
   ShieldCheck,
   Cpu,
-  Trophy,
-  Play,
-  Gamepad2,
-  HelpCircle,
 } from 'lucide-react';
 
 export default function AuthPage() {
@@ -187,8 +183,8 @@ export default function AuthPage() {
 
   return (
     <div className="relative flex-1 flex flex-col justify-center items-center py-16 sm:py-24 px-4 sm:px-6 min-h-[calc(100vh-140px)] mb-16 sm:mb-24">
-      {/* Centered / Side-by-Side Flex Wrapper */}
-      <div className="relative z-10 w-full max-w-5xl flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-6 sm:gap-8">
+      {/* Centered Auth Card Wrapper */}
+      <div className="relative z-10 w-full max-w-xl flex flex-col items-center justify-center">
         {/* ========================================================
             MAIN AUTHENTICATION CARD (Translucent Frosted Glass)
            ======================================================== */}
@@ -702,94 +698,6 @@ export default function AuthPage() {
               <span>•</span>
               <span>Zero Local Setup Required</span>
             </div>
-          </div>
-        </div>
-
-        {/* ========================================================
-            RIGHT DESKTOP COMPANION: ACTIVE SECTOR MISSION TELEMETRY
-           ======================================================== */}
-        <div
-          className="hidden lg:flex flex-col w-80 shrink-0 p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] text-[#1E1E24] relative self-stretch justify-between transition-all"
-          style={{
-            backgroundColor: 'rgba(250, 246, 238, 0.68)',
-            backdropFilter: 'blur(24px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-          }}
-        >
-          {/* Top Tag & Radar Status */}
-          <div>
-            <div className="flex items-center justify-between text-[11px] font-mono font-black text-[#1E1E24] mb-4 border-b-2 border-[#1E1E24]/20 pb-2.5">
-              <span className="tracking-wider">[SECTOR.RADAR // 03]</span>
-              <span className="flex items-center gap-1.5 text-[#6C5CE7] font-black bg-[#6C5CE7]/10 px-2 py-0.5 rounded-md border border-[#6C5CE7]/30">
-                <span className="w-2 h-2 rounded-full bg-[#6C5CE7] animate-ping" />
-                ACTIVE
-              </span>
-            </div>
-
-            {/* Mission Lore Card */}
-            <div className="mb-4 bg-white/50 backdrop-blur-md p-3.5 rounded-2xl border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Gamepad2 className="w-4 h-4 text-rose-500" />
-                <h3 className="text-xs font-black uppercase tracking-wider text-[#1E1E24]">Rover Arya Rescue</h3>
-              </div>
-              <p className="text-[11px] text-[#4A4A58] font-bold leading-relaxed">
-                The Clockwork Citadel operates on infinite automated gear cycles. Guide Rover Arya through the hazard grid using Python for-loops!
-              </p>
-            </div>
-
-            {/* Telemetry Metrics */}
-            <div className="space-y-2.5 mb-4">
-              {/* Battery Cell */}
-              <div className="p-3 rounded-2xl bg-white/50 backdrop-blur-md border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
-                <div className="flex items-center justify-between text-[11px] font-bold text-gray-600 mb-1.5">
-                  <span>Battery Cell</span>
-                  <span className="font-mono font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
-                    100% Full
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-[#FAF6EE] rounded-full border border-[#1E1E24] overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full w-full" />
-                </div>
-              </div>
-
-              {/* Core Concept */}
-              <div className="p-3 rounded-2xl bg-white/50 backdrop-blur-md border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-between">
-                <span className="text-[11px] text-gray-600 font-bold">Core Concept:</span>
-                <span className="font-mono font-black text-[11px] text-[#6C5CE7] bg-[#6C5CE7]/10 px-2 py-0.5 rounded-md border border-[#6C5CE7]/30">
-                  for i in range(5):
-                </span>
-              </div>
-
-              {/* Mission Reward */}
-              <div className="p-3 rounded-2xl bg-white/50 backdrop-blur-md border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-between">
-                <span className="text-[11px] text-gray-600 font-bold">Mission Reward:</span>
-                <span className="font-black text-xs text-amber-800 flex items-center gap-1 bg-[#FFD214]/30 px-2 py-0.5 rounded-md border border-amber-400">
-                  <Trophy className="w-3.5 h-3.5 text-amber-600" />
-                  +150 XP
-                </span>
-              </div>
-            </div>
-
-            {/* Socratic AI Mentor Hint Box */}
-            <div className="p-3 rounded-2xl bg-purple-50/70 border-2 border-[#6C5CE7]/40 text-[11px] text-[#4A4A58] font-bold leading-relaxed mb-4">
-              <div className="flex items-center gap-1.5 text-[#6C5CE7] font-black text-xs mb-1">
-                <Sparkles className="w-3.5 h-3.5 text-[#6C5CE7]" />
-                <span>Acharya AI Socratic Mentor</span>
-              </div>
-              Ready to guide you without giving direct solutions. Learn by debugging!
-            </div>
-          </div>
-
-          {/* Quick Test Demo Button */}
-          <div className="pt-3 border-t-2 border-[#1E1E24]/20 mt-2">
-            <button
-              type="button"
-              onClick={() => handleLaunchGuestDemo('python')}
-              className="w-full btn-arcade btn-arcade-gold py-3 px-3 text-xs flex items-center justify-center gap-2 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Test Mission in Guest Mode</span>
-            </button>
           </div>
         </div>
       </div>

@@ -24,8 +24,12 @@ import {
   X,
 } from 'lucide-react';
 import { COURSES_CATALOG } from '@/lib/data/course-system';
-import { getLearnerProgress } from '@/lib/curriculum/progression-engine';
-import { getActiveSession, RegisteredUser } from '@/lib/db/auth-db';
+import { getEffectiveUser, RegisteredUser } from '@/lib/db/auth-db';
+import {
+  getPythonCourseProgress,
+  PythonProgressData,
+  ALL_PYTHON_LESSONS,
+} from '@/lib/curriculum/python-progress';
 
 export default function PythonDashboardPage() {
   return (
@@ -154,35 +158,17 @@ function PythonDashboardContent() {
 
   // User and progress state
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
-  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
-  const [completedMissions, setCompletedMissions] = useState<string[]>([]);
-  const [completedProjects, setCompletedProjects] = useState<string[]>([]);
+  const [progressData, setProgressData] = useState<PythonProgressData>(() =>
+    getPythonCourseProgress()
+  );
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
 
   // Sync state on mount and on storage events
   useEffect(() => {
     const syncProgress = () => {
-      const session = getActiveSession();
+      const session = getEffectiveUser();
       setCurrentUser(session);
-
-      try {
-        const prog = getLearnerProgress();
-        setCompletedLessonIds(prog.completedLessonIds || []);
-      } catch (e) {}
-
-      if (session?.completedMissions) {
-        setCompletedMissions(session.completedMissions);
-      } else {
-        try {
-          const rawM = localStorage.getItem('dronacharya_completed_missions');
-          if (rawM) setCompletedMissions(JSON.parse(rawM));
-        } catch (e) {}
-      }
-
-      try {
-        const rawP = localStorage.getItem('dronacharya_completed_projects');
-        if (rawP) setCompletedProjects(JSON.parse(rawP));
-      } catch (e) {}
+      setProgressData(getPythonCourseProgress());
     };
 
     syncProgress();
@@ -195,39 +181,20 @@ function PythonDashboardContent() {
     };
   }, []);
 
-  // Compute exact completion statistics
-  const pythonLessons: string[] = [];
-  pythonCourse.chapters.forEach((ch) => {
-    ch.lessons.forEach((l) => pythonLessons.push(l.id));
-  });
-
-  const totalLessonsCount = pythonLessons.length > 0 ? pythonLessons.length : 5;
-  const completedLessonsCount = pythonLessons.filter((id) =>
-    completedLessonIds.includes(id)
-  ).length;
-
-  const totalMissionsCount = 5; // 3 featured + 2 arena missions
-  const completedMissionsCount = completedMissions.filter(
-    (m) =>
-      m.includes('hello-python') ||
-      m.includes('calculator') ||
-      m.includes('todo-list') ||
-      m.includes('rescue-robot') ||
-      m.includes('hazard-filter')
-  ).length;
-
-  const totalProjectsCount = PYTHON_PROJECTS.length;
-  const completedProjectsCount = completedProjects.length;
-
-  // Weighted overall course progress
-  // 50% Lessons, 30% Missions, 20% Projects
-  const lessonRatio = completedLessonsCount / totalLessonsCount;
-  const missionRatio = completedMissionsCount / totalMissionsCount;
-  const projectRatio = completedProjectsCount / totalProjectsCount;
-  const calculatedPercent = Math.min(
-    100,
-    Math.round((lessonRatio * 0.5 + missionRatio * 0.3 + projectRatio * 0.2) * 100)
-  );
+  const {
+    totalLessonsCount,
+    completedLessonsCount,
+    totalMissionsCount,
+    completedMissionsCount,
+    totalProjectsCount,
+    completedProjectsCount,
+    totalActivitiesCount,
+    completedActivitiesCount,
+    percent: calculatedPercent,
+    completedLessonIds,
+    completedMissionKeys,
+    completedProjectIds,
+  } = progressData;
 
   // SVG Progress Ring calculations
   const ringRadius = 40;
@@ -237,18 +204,18 @@ function PythonDashboardContent() {
 
   // Next recommended lesson id
   const nextLessonId =
-    pythonLessons.find((id) => !completedLessonIds.includes(id)) ||
-    pythonLessons[0] ||
+    ALL_PYTHON_LESSONS.find((id) => !completedLessonIds.includes(id)) ||
+    ALL_PYTHON_LESSONS[0] ||
     'py-less-1-1';
 
   // Prerequisite unlocks:
   // Card 1 (Basics) is always open.
-  // Card 2 (Missions) requires previous (Basics) completed.
-  const isCard1Complete = completedLessonsCount >= totalLessonsCount && totalLessonsCount > 0;
+  // Card 2 (Missions) requires previous (Basics) completed or started.
+  const isCard1Complete = completedLessonsCount >= 1 || completedMissionsCount >= 1;
   // Card 3 (Projects) requires previous (Missions) completed.
-  const isCard2Complete = isCard1Complete && completedMissionsCount >= totalMissionsCount && totalMissionsCount > 0;
+  const isCard2Complete = isCard1Complete && completedMissionsCount >= 3;
   // Card 4 (Certification) requires previous (Projects) completed.
-  const isCard3Complete = isCard2Complete && completedProjectsCount >= totalProjectsCount && totalProjectsCount > 0;
+  const isCard3Complete = isCard2Complete && completedProjectsCount >= 2;
 
   return (
     <div className="w-full flex flex-col items-center min-h-screen text-[#1E1E24] pb-20 overflow-x-hidden">
@@ -257,7 +224,14 @@ function PythonDashboardContent() {
         {/* =========================================================================
             A. PYTHON COURSE HERO (Version removed & Progress Bar brought here)
            ========================================================================= */}
-        <section className="relative w-full rounded-3xl border-3 border-[#1E1E24] bg-white p-6 sm:p-8 lg:p-10 shadow-[8px_8px_0px_#1E1E24] overflow-hidden">
+        <section
+          className="relative w-full rounded-3xl border-3 border-[#1E1E24] p-6 sm:p-8 lg:p-10 shadow-[8px_8px_0px_#1E1E24] overflow-hidden"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.78)',
+            backdropFilter: 'blur(20px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+          }}
+        >
           {/* Subtle Ambient Decorative Gradients */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#306998]/10 via-[#FFD43B]/10 to-transparent rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
@@ -329,7 +303,14 @@ function PythonDashboardContent() {
 
             {/* Right Column: Course Progress Panel (Relocated into Hero, Python version removed) */}
             <div className="lg:col-span-5 flex flex-col items-center justify-center w-full">
-              <div className="p-5 sm:p-6 rounded-3xl bg-[#FAF6EE] border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4 w-full">
+              <div
+                className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4 w-full"
+                style={{
+                  backgroundColor: 'rgba(250, 246, 238, 0.88)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                }}
+              >
                 {/* Header */}
                 <div className="flex items-center justify-between pb-3 border-b-2 border-[#1E1E24]/10">
                   <div className="flex items-center gap-2.5">
@@ -454,28 +435,35 @@ function PythonDashboardContent() {
         </section>
 
         {/* =========================================================================
-            B. CHOOSE YOUR PATH (Cards 2, 3, 4 require previous to unlock)
+            B. CHOOSE YOUR PATH (4 Interactive Learning Paths)
            ========================================================================= */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
+        <section className="space-y-5">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b-2 border-[#1E1E24] pb-3">
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD214] text-[#1E1E24] text-xs font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
                 <Compass className="w-3.5 h-3.5" />
                 <span>CHOOSE YOUR PATH</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-serif font-black text-[#1E1E24] mt-1.5">
-                Four Ways to Master Python
+                Choose Your Path
               </h2>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-gray-500 max-w-md">
-              Progress through fundamentals, test yourself in interactive missions, build real software, and earn recognized credentials.
+            <p className="text-xs sm:text-sm font-bold text-gray-600 max-w-md">
+              Progress through Python fundamentals, test your skills in interactive missions, build real software, and earn credentials as you advance.
             </p>
           </div>
 
-          {/* 4 Cards Grid (Horizontal on Desktop, Responsive Wrap on Tablet & Mobile) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* CARD 1: Learn Basics (Always Unlocked) */}
-            <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
+          {/* 4 Cards Grid (Horizontal 4-column row on Desktop, Responsive 2-column on tablet, 1 on mobile) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+            {/* CARD 1: Learn Basics */}
+            <div
+              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.82)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
+            >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <span className="w-8 h-8 rounded-xl bg-[#E0F2FE] border-2 border-[#1E1E24] text-[#0284C7] font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
@@ -505,14 +493,21 @@ function PythonDashboardContent() {
                   href="/courses/python/stage-1"
                   className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                 >
-                  <span>Play Stage 1 Now</span>
+                  <span>Start Learning</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            {/* CARD 2: Play Missions (Locked until Previous Step 1 Completed) */}
-            <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
+            {/* CARD 2: Play Missions */}
+            <div
+              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.82)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
+            >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <span className="w-8 h-8 rounded-xl bg-[#DCFCE7] border-2 border-[#1E1E24] text-emerald-800 font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
@@ -538,30 +533,25 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                {isCard1Complete ? (
-                  <a
-                    href="#featured-missions"
-                    className="btn-arcade btn-arcade-white w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                  >
-                    <span>View Missions</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                ) : (
-                  <button
-                    disabled
-                    type="button"
-                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
-                    title="Complete previous to unlock this"
-                  >
-                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                    <span>Complete previous to unlock this</span>
-                  </button>
-                )}
+                <a
+                  href="#featured-missions"
+                  className="btn-arcade btn-arcade-white w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <span>Play Missions</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
               </div>
             </div>
 
-            {/* CARD 3: Build Projects (Locked until Previous Step 2 Completed) */}
-            <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
+            {/* CARD 3: Build Projects */}
+            <div
+              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.82)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
+            >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <span className="w-8 h-8 rounded-xl bg-[#EDE9FE] border-2 border-[#1E1E24] text-[#6C5CE7] font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
@@ -587,31 +577,26 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                {isCard2Complete ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsProjectsModalOpen(true)}
-                    className="btn-arcade btn-arcade-purple w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                  >
-                    <span>View Projects</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <button
-                    disabled
-                    type="button"
-                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
-                    title="Complete previous to unlock this"
-                  >
-                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                    <span>Complete previous to unlock this</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setIsProjectsModalOpen(true)}
+                  className="btn-arcade btn-arcade-purple w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <span>Build Projects</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
 
-            {/* CARD 4: Get Certified (Locked until Previous Step 3 Completed) */}
-            <div className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group">
+            {/* CARD 4: Get Certified */}
+            <div
+              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] flex flex-col justify-between h-full group opacity-90"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
+            >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <span className="w-8 h-8 rounded-xl bg-amber-100 border-2 border-[#1E1E24] text-amber-900 font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
@@ -623,7 +608,7 @@ function PythonDashboardContent() {
                 </div>
 
                 <div className="space-y-1">
-                  <h3 className="font-serif font-black text-lg text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors">
+                  <h3 className="font-serif font-black text-lg text-[#1E1E24]">
                     Get Certified
                   </h3>
                   <span className="text-[10px] font-black uppercase text-amber-700 tracking-wider block">
@@ -632,294 +617,19 @@ function PythonDashboardContent() {
                 </div>
 
                 <p className="text-xs font-bold text-gray-600 leading-relaxed">
-                  Complete all curriculum chapters, pass the comprehensive Python mastery examination, and earn your verified Dronacharya Certificate.
+                  Complete the curriculum, pass the comprehensive Python mastery examination, and earn your verified Dronacharya Certificate.
                 </p>
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                {isCard3Complete ? (
-                  <button
-                    type="button"
-                    className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                  >
-                    <span>Start Certification</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <button
-                    disabled
-                    type="button"
-                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
-                    title="Complete previous to unlock this"
-                  >
-                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                    <span>Complete previous to unlock this</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* =========================================================================
-            STAGE MAP: THE 5 STAGES OF PYTHON MASTERY
-           ========================================================================= */}
-        <section id="stage-map" className="space-y-5 scroll-mt-28">
-          <div className="flex items-center justify-between flex-wrap gap-2 border-b-2 border-[#1E1E24] pb-3">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#306998] text-white text-xs font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
-                <Compass className="w-3.5 h-3.5" />
-                <span>STAGE MAP</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-serif font-black text-[#1E1E24] mt-1.5 flex items-center gap-2">
-                <span>The 5 Stages of Python Mastery</span>
-                <span className="text-[#FFD214]">⋆˙⟡</span>
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm font-bold text-gray-500 max-w-md">
-              Journey through the Ancient Code Realm stage by stage. Stage 1 is now open for questing!
-            </p>
-          </div>
-
-          {/* 5 Stages Grid (Stage 1 available, Stages 2-5 locked & coming soon) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* STAGE 1: AVAILABLE */}
-            <div className="p-4 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all relative overflow-hidden group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="w-7 h-7 rounded-lg bg-[#FFD214] border-2 border-[#1E1E24] text-[#1E1E24] font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
-                    01
-                  </span>
-                  <span className="text-[10px] font-pixel px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
-                    AVAILABLE
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block">
-                    🟢 Easy
-                  </span>
-                  <h3 className="font-serif font-black text-base text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors leading-tight">
-                    The First Command
-                  </h3>
-                </div>
-
-                <p className="text-xs font-bold text-gray-600 leading-relaxed">
-                  Enter the Ancient Code Realm, commune with the gate, predict outputs, reverse-engineer lost chants, and fix broken scripts.
-                </p>
-
-                {/* Concepts tags */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {['print()', 'Strings', 'Basic Syntax', 'Output Prediction', 'Debugging'].map((c) => (
-                    <span
-                      key={c}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#FAF6EE] text-[#1E1E24] font-bold border border-[#1E1E24]/20"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t-2 border-[#1E1E24]/10">
-                <Link
-                  href="/courses/python/stage-1"
-                  className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>PLAY NOW</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* STAGE 2: COMING SOON */}
-            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
-                    02
-                  </span>
-                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
-                    <span>COMING SOON</span>
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
-                    Treasure Variables
-                  </h3>
-                </div>
-
-                <p className="text-xs font-bold text-gray-500 leading-relaxed">
-                  Variables and storing values in ancient memory slots.
-                </p>
-
-                {/* Concepts tags */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {['Variables', 'Storing Values'].map((c) => (
-                    <span
-                      key={c}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t-2 border-gray-200">
                 <button
                   disabled
                   type="button"
-                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-100/90 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                  title="Certification Exam Coming Soon"
                 >
-                  <Lock className="w-3 h-3" />
-                  <span>COMING SOON</span>
-                </button>
-              </div>
-            </div>
-
-            {/* STAGE 3: COMING SOON */}
-            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
-                    03
-                  </span>
-                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
-                    <span>COMING SOON</span>
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
-                    Fix the Code
-                  </h3>
-                </div>
-
-                <p className="text-xs font-bold text-gray-500 leading-relaxed">
-                  Deep syntax investigation and multi-layer debugging.
-                </p>
-
-                {/* Concepts tags */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {['Syntax', 'Debugging'].map((c) => (
-                    <span
-                      key={c}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t-2 border-gray-200">
-                <button
-                  disabled
-                  type="button"
-                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
-                >
-                  <Lock className="w-3 h-3" />
-                  <span>COMING SOON</span>
-                </button>
-              </div>
-            </div>
-
-            {/* STAGE 4: COMING SOON */}
-            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
-                    04
-                  </span>
-                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
-                    <span>COMING SOON</span>
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
-                    Logic Gate
-                  </h3>
-                </div>
-
-                <p className="text-xs font-bold text-gray-500 leading-relaxed">
-                  Basic conditions, booleans, and decision-making branches.
-                </p>
-
-                {/* Concepts tags */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {['Basic Conditions', 'Decision-making'].map((c) => (
-                    <span
-                      key={c}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t-2 border-gray-200">
-                <button
-                  disabled
-                  type="button"
-                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
-                >
-                  <Lock className="w-3 h-3" />
-                  <span>COMING SOON</span>
-                </button>
-              </div>
-            </div>
-
-            {/* STAGE 5: COMING SOON */}
-            <div className="p-4 rounded-2xl bg-gray-50 border-3 border-[#1E1E24]/50 shadow-[3px_3px_0px_#A0A0B0] flex flex-col justify-between opacity-85">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="w-7 h-7 rounded-lg bg-slate-200 border-2 border-[#1E1E24]/40 text-gray-600 font-pixel text-xs font-black flex items-center justify-center">
-                    05
-                  </span>
-                  <span className="text-[9px] font-pixel px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex items-center gap-1">
-                    <Lock className="w-2.5 h-2.5" />
-                    <span>COMING SOON</span>
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <h3 className="font-serif font-black text-base text-[#1E1E24]/70 leading-tight">
-                    The First Boss
-                  </h3>
-                </div>
-
-                <p className="text-xs font-bold text-gray-500 leading-relaxed">
-                  A grand synthesis challenge combining all previously learned concepts.
-                </p>
-
-                {/* Concepts tags */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {['Synthesis', 'Boss Challenge'].map((c) => (
-                    <span
-                      key={c}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-gray-500 font-bold border border-gray-200"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t-2 border-gray-200">
-                <button
-                  disabled
-                  type="button"
-                  className="w-full py-2 px-3 rounded-xl bg-slate-200 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1 cursor-not-allowed select-none"
-                >
-                  <Lock className="w-3 h-3" />
-                  <span>COMING SOON</span>
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                  <span>Coming Soon ⏳</span>
                 </button>
               </div>
             </div>
@@ -954,12 +664,19 @@ function PythonDashboardContent() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {FEATURED_MISSIONS.map((m) => {
               const Icon = m.icon;
-              const isDone = completedMissions.includes(m.missionId);
+              const isDone = completedMissionKeys.some(
+                (k) => k === m.missionId || k.includes(m.id)
+              );
 
               return (
                 <div
                   key={m.id}
-                  className="p-5 rounded-2xl bg-white border-3 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex flex-col justify-between gap-4 hover:-translate-y-1 hover:shadow-[6px_6px_0px_#1E1E24] transition-all group"
+                  className="p-5 rounded-3xl border-3 border-[#1E1E24] shadow-[5px_5px_0px_#1E1E24] flex flex-col justify-between gap-4 hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1E1E24] transition-all group"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.82)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                  }}
                 >
                   <div className="space-y-3">
                     {/* Top meta row */}

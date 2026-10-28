@@ -162,6 +162,7 @@ function PythonDashboardContent() {
     getPythonCourseProgress()
   );
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
+  const [isSyllabusModalOpen, setIsSyllabusModalOpen] = useState(false);
 
   // Sync state on mount and on storage events
   useEffect(() => {
@@ -209,13 +210,13 @@ function PythonDashboardContent() {
     'py-less-1-1';
 
   // Prerequisite unlocks:
-  // Card 1 (Basics) is always open.
-  // Card 2 (Missions) requires previous (Basics) completed or started.
-  const isCard1Complete = completedLessonsCount >= 1 || completedMissionsCount >= 1;
-  // Card 3 (Projects) requires previous (Missions) completed.
+  // Card 1 (Basics) is always unlocked.
+  // Card 2 (Missions) requires Card 1 completion (all 5 lessons completed).
+  const isCard1Complete = completedLessonsCount >= 5;
+  // Card 3 (Projects) requires Card 2 completion (all 3 featured missions completed).
   const isCard2Complete = isCard1Complete && completedMissionsCount >= 3;
-  // Card 4 (Certification) requires previous (Projects) completed.
-  const isCard3Complete = isCard2Complete && completedProjectsCount >= 2;
+  // Card 4 (Certification) requires Card 3 completion (at least 1 project completed).
+  const isCard3Complete = isCard2Complete && completedProjectsCount >= 1;
 
   return (
     <div className="w-full flex flex-col items-center min-h-screen text-[#1E1E24] pb-20 overflow-x-hidden">
@@ -291,13 +292,14 @@ function PythonDashboardContent() {
                 >
                   <span>⚔️ Enter Code Dungeon</span>
                 </Link>
-                <Link
-                  href="/courses/python"
+                <button
+                  type="button"
+                  onClick={() => setIsSyllabusModalOpen(true)}
                   className="btn-arcade btn-arcade-white px-4 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-[#306998]" />
                   <span>Curriculum Syllabus</span>
-                </Link>
+                </button>
               </div>
             </div>
 
@@ -501,7 +503,9 @@ function PythonDashboardContent() {
 
             {/* CARD 2: Play Missions */}
             <div
-              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group"
+              className={`p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group ${
+                isCard1Complete ? 'hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24]' : 'opacity-85'
+              }`}
               style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.82)',
                 backdropFilter: 'blur(16px)',
@@ -513,8 +517,15 @@ function PythonDashboardContent() {
                   <span className="w-8 h-8 rounded-xl bg-[#DCFCE7] border-2 border-[#1E1E24] text-emerald-800 font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
                     02
                   </span>
-                  <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
-                    <Gamepad2 className="w-4 h-4 text-emerald-600" />
+                  <div className="flex items-center gap-2">
+                    {!isCard1Complete && (
+                      <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-md border border-slate-300 flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Locked
+                      </span>
+                    )}
+                    <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
+                      <Gamepad2 className="w-4 h-4 text-emerald-600" />
+                    </div>
                   </div>
                 </div>
 
@@ -533,19 +544,32 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                <a
-                  href="#featured-missions"
-                  className="btn-arcade btn-arcade-white w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                >
-                  <span>Play Missions</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                {isCard1Complete ? (
+                  <a
+                    href="#featured-missions"
+                    className="btn-arcade btn-arcade-white w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    <span>Play Missions</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100/90 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Complete previous to unlock this level</span>
+                  </button>
+                )}
               </div>
             </div>
 
             {/* CARD 3: Build Projects */}
             <div
-              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group"
+              className={`p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] transition-all flex flex-col justify-between h-full group ${
+                isCard2Complete ? 'hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24]' : 'opacity-85'
+              }`}
               style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.82)',
                 backdropFilter: 'blur(16px)',
@@ -557,8 +581,15 @@ function PythonDashboardContent() {
                   <span className="w-8 h-8 rounded-xl bg-[#EDE9FE] border-2 border-[#1E1E24] text-[#6C5CE7] font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
                     03
                   </span>
-                  <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
-                    <Code2 className="w-4 h-4 text-[#6C5CE7]" />
+                  <div className="flex items-center gap-2">
+                    {!isCard2Complete && (
+                      <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-md border border-slate-300 flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Locked
+                      </span>
+                    )}
+                    <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
+                      <Code2 className="w-4 h-4 text-[#6C5CE7]" />
+                    </div>
                   </div>
                 </div>
 
@@ -577,20 +608,33 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                <button
-                  type="button"
-                  onClick={() => setIsProjectsModalOpen(true)}
-                  className="btn-arcade btn-arcade-purple w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
-                >
-                  <span>Build Projects</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                {isCard2Complete ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsProjectsModalOpen(true)}
+                    className="btn-arcade btn-arcade-purple w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    <span>Build Projects</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100/90 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Complete previous to unlock this level</span>
+                  </button>
+                )}
               </div>
             </div>
 
             {/* CARD 4: Get Certified */}
             <div
-              className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] flex flex-col justify-between h-full group opacity-90"
+              className={`p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] flex flex-col justify-between h-full group ${
+                isCard3Complete ? 'hover:-translate-y-1 hover:shadow-[8px_8px_0px_#1E1E24]' : 'opacity-85'
+              }`}
               style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.75)',
                 backdropFilter: 'blur(16px)',
@@ -602,8 +646,15 @@ function PythonDashboardContent() {
                   <span className="w-8 h-8 rounded-xl bg-amber-100 border-2 border-[#1E1E24] text-amber-900 font-pixel text-xs font-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#1E1E24]">
                     04
                   </span>
-                  <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
-                    <Award className="w-4 h-4 text-amber-500" />
+                  <div className="flex items-center gap-2">
+                    {!isCard3Complete && (
+                      <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-md border border-slate-300 flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Locked
+                      </span>
+                    )}
+                    <div className="w-9 h-9 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
+                      <Award className="w-4 h-4 text-amber-500" />
+                    </div>
                   </div>
                 </div>
 
@@ -622,15 +673,24 @@ function PythonDashboardContent() {
               </div>
 
               <div className="pt-4 mt-4 border-t-2 border-[#1E1E24]/10">
-                <button
-                  disabled
-                  type="button"
-                  className="w-full py-2.5 px-3 rounded-xl bg-slate-100/90 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
-                  title="Certification Exam Coming Soon"
-                >
-                  <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                  <span>Coming Soon ⏳</span>
-                </button>
+                {isCard3Complete ? (
+                  <button
+                    type="button"
+                    className="btn-arcade btn-arcade-gold w-full py-2.5 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    <span>Take Exam</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100/90 border-2 border-slate-300 text-slate-500 text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none shadow-[2px_2px_0px_#A0A0B0]"
+                  >
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Complete previous to unlock this level</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -839,6 +899,117 @@ function PythonDashboardContent() {
 
             <div className="pt-2 text-center text-xs font-bold text-gray-500">
               💡 Completed projects are automatically linked to your public Gurukul player folio.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SYLLABUS MODAL: VIEW PYTHON CURRICULUM SYLLABUS
+         ========================================================================= */}
+      {isSyllabusModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-3xl bg-[#FAF6EE] border-4 border-[#1E1E24] rounded-3xl p-6 sm:p-8 shadow-[10px_10px_0px_#1E1E24] max-h-[88vh] overflow-y-auto space-y-5 animate-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b-2 border-[#1E1E24] pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#306998] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-white font-bold">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-black text-xl text-[#1E1E24]">
+                    Python Curriculum Syllabus
+                  </h3>
+                  <p className="text-xs font-bold text-gray-500">
+                    4 Chapters • 5 Interactive Quests • Rover Arya Simulator & Dungeon
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsSyllabusModalOpen(false)}
+                className="p-2 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Syllabus Chapters Accordion / Cards */}
+            <div className="space-y-3.5">
+              {pythonCourse.chapters.map((ch, idx) => (
+                <div
+                  key={ch.id}
+                  className="p-4 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-[#6C5CE7] border-2 border-[#1E1E24] text-white flex items-center justify-center font-pixel text-xs font-bold shadow-[1.5px_1.5px_0px_#1E1E24]">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <span className="text-[9px] font-black uppercase text-[#6C5CE7] tracking-wider block">
+                          Realm: {(ch as any).realm || 'Gurukul Territory'}
+                        </span>
+                        <h4 className="font-serif font-black text-sm text-[#1E1E24]">
+                          {ch.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-gray-500 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 shrink-0">
+                      {ch.lessons.length} {ch.lessons.length === 1 ? 'Quest' : 'Quests'}
+                    </span>
+                  </div>
+
+                  <p className="text-xs font-bold text-gray-600 leading-relaxed">
+                    {ch.description}
+                  </p>
+
+                  <div className="pt-2 border-t border-[#1E1E24]/10 flex flex-wrap gap-2">
+                    {ch.lessons.map((lesson) => {
+                      const isDone = completedLessonIds.includes(lesson.id);
+                      return (
+                        <Link
+                          key={lesson.id}
+                          href="/courses/python/stage-1"
+                          onClick={() => setIsSyllabusModalOpen(false)}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-xl border-2 flex items-center gap-1.5 transition-all ${
+                            isDone
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-600 shadow-[2px_2px_0px_#059669]'
+                              : 'bg-[#FAF6EE] text-[#1E1E24] border-[#1E1E24] hover:bg-[#FFD214] shadow-[2px_2px_0px_#1E1E24]'
+                          }`}
+                        >
+                          {isDone ? (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          ) : (
+                            <Play className="w-3 h-3 text-[#6C5CE7] fill-current" />
+                          )}
+                          <span>{lesson.title}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-2 flex items-center justify-between flex-wrap gap-3 border-t-2 border-[#1E1E24]">
+              <Link
+                href="/paths"
+                onClick={() => setIsSyllabusModalOpen(false)}
+                className="text-xs font-black text-[#6C5CE7] hover:underline flex items-center gap-1"
+              >
+                <span>🗺️ Open Interactive Python World Map</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+              <Link
+                href="/courses/python/stage-1"
+                onClick={() => setIsSyllabusModalOpen(false)}
+                className="btn-arcade btn-arcade-gold px-4 py-2 text-xs font-black flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24]"
+              >
+                <span>Start Stage 1 Quest</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
           </div>
         </div>

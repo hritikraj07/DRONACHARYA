@@ -54,6 +54,12 @@ function CourseDetailContent() {
   const [openChapters, setOpenChapters] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
+    if (rawId === 'python') {
+      router.replace('/courses/python/dashboard');
+    }
+  }, [rawId, router]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
         const p = getLearnerProgress();
@@ -63,6 +69,15 @@ function CourseDetailContent() {
       } catch (e) {}
     }
   }, []);
+
+  if (rawId === 'python') {
+    return (
+      <div className="min-h-screen bg-[#FAF6EE] flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-4 border-[#6C5CE7] border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="font-mono text-xs font-bold text-gray-500">Redirecting to Python Dashboard...</p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (course) {

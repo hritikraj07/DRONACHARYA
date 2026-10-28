@@ -299,7 +299,7 @@ export function PythonOdysseyArena({
       handleSwitchQuest(nextQ.id);
       router.push(`/learn/${nextQ.id}`);
     } else {
-      router.push('/courses/python');
+      router.push('/courses/python/dashboard');
     }
   };
 
@@ -583,11 +583,11 @@ export function PythonOdysseyArena({
         {/* Left: Realm & Quest Selector */}
         <div className="flex items-center gap-3">
           <Link
-            href="/courses/python"
+            href="/courses/python/dashboard"
             className="flex items-center gap-1.5 text-xs font-black text-[#4A4A58] hover:text-[#1E1E24] p-1.5 rounded-lg hover:bg-[#FAF6EE] border border-transparent hover:border-[#1E1E24]"
-            title="Return to Python Syllabus"
+            title="Return to Python Dashboard"
           >
-            <span>← Syllabus</span>
+            <span>← Dashboard</span>
           </Link>
 
           <div className="h-5 w-[2px] bg-gray-200 hidden sm:block" />

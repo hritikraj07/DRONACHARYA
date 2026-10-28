@@ -232,23 +232,23 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap">
             {currentUser ? (
               <>
-                {/* 1. Player Profile (Whole Name + Avatar Initial) */}
+                {/* 1. Player Profile (Whole Name on desktop, Avatar Initial on mobile) */}
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#6C5CE7] hover:bg-[#5b4bc4] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-white transition-all shrink-0 cursor-pointer"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#6C5CE7] hover:bg-[#5b4bc4] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-white transition-all shrink-0 cursor-pointer"
                   title={`Adventurer: ${currentUser.name} (Quest Hub)`}
                 >
                   <div className="w-5 h-5 rounded-md bg-white/20 flex items-center justify-center font-serif font-black text-[11px] shrink-0">
                     {currentUser.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="font-bold text-xs truncate max-w-[130px]">
+                  <span className="font-bold text-xs truncate max-w-[130px] hidden sm:inline">
                     {currentUser.name}
                   </span>
                 </Link>
 
                 {/* 2. Hearts Remaining */}
                 <div
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-50 border border-rose-200 text-xs font-black text-rose-600 shrink-0"
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl bg-rose-50 border border-rose-200 text-xs font-black text-rose-600 shrink-0"
                   title="Player Hearts Remaining"
                 >
                   <Heart className="w-3.5 h-3.5 fill-rose-600 shrink-0" />
@@ -279,7 +279,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 {!isHomePage && (
                   <button
                     onClick={onOpenMentor}
-                    className="btn-arcade btn-arcade-purple text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
+                    className="btn-arcade btn-arcade-purple text-xs py-1.5 px-2.5 sm:px-3 hidden md:flex items-center gap-1 shrink-0"
                     title="Open AI Mentor Guidance"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
@@ -287,10 +287,10 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   </button>
                 )}
 
-                {/* Sign Out Button */}
+                {/* Sign Out Button (Desktop only, mobile has it in drawer) */}
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 rounded-xl border border-transparent hover:border-slate-200 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
+                  className="hidden sm:flex p-1.5 rounded-xl border border-transparent hover:border-slate-200 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
                   title="Sign Out"
                   aria-label="Sign Out"
                 >
@@ -300,7 +300,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                 {/* Mobile / Tablet Menu Toggle Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="xl:hidden p-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 shrink-0 cursor-pointer hover:bg-slate-50"
+                  className="lg:hidden p-1.5 rounded-xl border-2 border-[#1E1E24] bg-white text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] shrink-0 cursor-pointer hover:bg-amber-50 transition-colors"
                   aria-label="Toggle Navigation Menu"
                 >
                   {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -308,27 +308,27 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               </>
             ) : (
               <>
-                {/* Log In Button (Tactile Slate Pill Button) */}
+                {/* Log In Button */}
                 <Link
                   href="/auth?mode=signin"
-                  className="btn-arcade btn-arcade-dark text-xs py-1.5 px-3 shrink-0"
+                  className="btn-arcade btn-arcade-dark text-[11px] sm:text-xs py-1 sm:py-1.5 px-2.5 sm:px-3 shrink-0"
                 >
                   Log In
                 </Link>
 
-                {/* Sign Up Button (Tactile Gold Pill Button) */}
+                {/* Sign Up Button */}
                 <Link
                   href="/auth?mode=signup"
-                  className="btn-arcade btn-arcade-gold text-xs py-1.5 px-3 flex items-center gap-1 shrink-0"
+                  className="btn-arcade btn-arcade-gold text-[11px] sm:text-xs py-1 sm:py-1.5 px-2.5 sm:px-3 flex items-center gap-1 shrink-0"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#071426]" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#071426] hidden sm:inline" />
                   <span>Sign Up</span>
                 </Link>
 
                 {/* Mobile / Tablet Menu Toggle Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="xl:hidden p-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 shrink-0 cursor-pointer hover:bg-slate-50"
+                  className="lg:hidden p-1.5 rounded-xl border-2 border-[#1E1E24] bg-white text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] shrink-0 cursor-pointer hover:bg-amber-50 transition-colors"
                   aria-label="Toggle Navigation Menu"
                 >
                   {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -340,7 +340,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
         {/* Mobile / Tablet Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden border-t border-slate-200 bg-[#FAF6EE] px-4 pt-3 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-150">
+          <div className="lg:hidden border-t-2 border-[#1E1E24] bg-[#FAF6EE] px-4 pt-3 pb-6 space-y-3.5 max-h-[calc(100vh-3.5rem)] overflow-y-auto shadow-[0_8px_0px_#1E1E24] animate-in slide-in-from-top-2 duration-150 text-[#1E1E24]">
             {/* Subject Switch Action (Only visible after signing in, and not on home page) */}
             {!isHomePage && !!currentUser && (
               <button
@@ -348,7 +348,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   setMobileMenuOpen(false);
                   setSwitchModalOpen(true);
                 }}
-                className="w-full text-left p-3 rounded-xl bg-white border border-slate-200 text-xs font-bold flex items-center justify-between"
+                className="w-full text-left p-3 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-bold flex items-center justify-between hover:bg-[#FEF9C3] transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-[#6C5CE7]" />
@@ -356,7 +356,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                     Course: <strong>{activeSubjectObj.name}</strong>
                   </span>
                 </div>
-                <span className="text-[10px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded">
+                <span className="text-[10px] font-black uppercase text-[#6C5CE7] bg-[#EDE9FE] px-2 py-0.5 rounded border border-[#6C5CE7]/30">
                   Switch
                 </span>
               </button>
@@ -364,38 +364,63 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
             {/* Quick Stats or Guest CTA on Mobile */}
             {currentUser ? (
-              <div className="grid grid-cols-3 gap-2 text-center text-xs font-black">
-                <div className="bg-rose-50 p-2 rounded-lg border border-rose-200">
-                  <div className="text-[10px] text-slate-500 font-bold">LIVES</div>
-                  <div className="text-rose-600">{currentUser.hearts ?? 5} / 5</div>
+              <div className="p-3.5 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#6C5CE7] text-white flex items-center justify-center font-bold text-xs border border-[#1E1E24]">
+                      {currentUser.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="font-serif font-black text-xs text-[#1E1E24] block leading-tight">
+                        {currentUser.name}
+                      </span>
+                      <span className="text-[10px] font-bold text-gray-500">
+                        {currentUser.rank || 'Sadhaka'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:underline px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 cursor-pointer"
+                  >
+                    <LogOut className="w-3 h-3" />
+                    <span>Sign Out</span>
+                  </button>
                 </div>
-                <div className="bg-amber-50 p-2 rounded-lg border border-amber-200">
-                  <div className="text-[10px] text-slate-500 font-bold">STREAK</div>
-                  <div className="text-amber-700">{currentUser.currentStreak}d Active</div>
-                </div>
-                <div className="bg-amber-100 p-2 rounded-lg border border-amber-300">
-                  <div className="text-[10px] text-slate-700 font-bold">XP / LVL</div>
-                  <div className="text-slate-900">{currentUser.totalXp} XP (L{currentUser.level || 1})</div>
+
+                <div className="grid grid-cols-3 gap-2 text-center text-xs font-black pt-1 border-t border-[#1E1E24]/10">
+                  <div className="bg-rose-50 p-2 rounded-xl border border-rose-200">
+                    <div className="text-[9px] text-slate-500 font-bold uppercase">LIVES</div>
+                    <div className="text-rose-600">{currentUser.hearts ?? 5} / 5</div>
+                  </div>
+                  <div className="bg-amber-50 p-2 rounded-xl border border-amber-200">
+                    <div className="text-[9px] text-slate-500 font-bold uppercase">STREAK</div>
+                    <div className="text-amber-700">{currentUser.currentStreak}d</div>
+                  </div>
+                  <div className="bg-purple-50 p-2 rounded-xl border border-purple-200">
+                    <div className="text-[9px] text-[#6C5CE7] font-bold uppercase">XP / LVL</div>
+                    <div className="text-[#1E1E24]">{currentUser.totalXp} XP (L{currentUser.level || 1})</div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-900">
+              <div className="p-3.5 rounded-2xl bg-[#FEF9C3] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2.5">
+                <div className="flex items-center justify-between text-xs font-bold text-[#1E1E24]">
                   <span>🕹️ Playing as Guest Explorer</span>
-                  <span className="text-amber-700">{guestUser?.totalXp || 0} XP Stashed</span>
+                  <span className="text-[#854D0E] font-mono font-black">{guestUser?.totalXp || 0} XP Stashed</span>
                 </div>
                 <div className="flex gap-2">
                   <Link
                     href="/auth?mode=signin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 btn-arcade btn-arcade-dark py-2 text-center"
+                    className="flex-1 btn-arcade btn-arcade-dark py-2 text-center text-xs"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/auth?mode=signup"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 btn-arcade btn-arcade-gold py-2 text-center"
+                    className="flex-1 btn-arcade btn-arcade-gold py-2 text-center text-xs"
                   >
                     Sign Up to Save
                   </Link>
@@ -403,20 +428,34 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               </div>
             )}
 
+            {/* AI Mentor Button in Mobile Drawer */}
+            {!isHomePage && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenMentor();
+                }}
+                className="w-full btn-arcade btn-arcade-purple py-2.5 text-xs font-black flex items-center justify-center gap-2 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-[#FBBF24]" />
+                <span>Open AI Mentor Guidance</span>
+              </button>
+            )}
+
             {/* Navigation Links Grid */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               {allNavLinks.map((link) => {
                 const Icon = link.icon;
-                const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(`${link.href}/`));
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-colors ${
+                    className={`flex items-center gap-2 p-2.5 rounded-2xl border-2 text-xs font-black transition-all ${
                       isActive
-                        ? 'bg-[#6C5CE7] text-white border-[#6C5CE7]'
-                        : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
+                        ? 'bg-[#6C5CE7] text-white border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24]'
+                        : 'bg-white text-[#1E1E24] border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:bg-[#FEF9C3]'
                     }`}
                   >
                     <Icon className="w-4 h-4 shrink-0" />

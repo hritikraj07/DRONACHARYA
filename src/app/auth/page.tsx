@@ -2,7 +2,7 @@
 // Matches the warm Gurukul adventure realm background with translucent frosted-glass neo-brutalist aesthetic
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -41,6 +41,8 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [studentClass, setStudentClass] = useState('Class 10');
+  const [classDropdownOpen, setClassDropdownOpen] = useState(false);
+  const classDropdownRef = useRef<HTMLDivElement>(null);
   const [selectedSubject, setSelectedSubject] = useState('python');
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -50,6 +52,17 @@ export default function AuthPage() {
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Close class dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (classDropdownRef.current && !classDropdownRef.current.contains(e.target as Node)) {
+        setClassDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleGenerateSafePassword = () => {
     const prefixes = ['Quest', 'Hero', 'Code', 'Drona', 'Arcade', 'Gurukul'];
@@ -460,7 +473,7 @@ export default function AuthPage() {
                 </div>
               </div>
 
-              {/* Student Class Selection Field */}
+              {/* Student Class Selection Field (Custom Neo-Brutalist Dropdown) */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-black text-[#1E1E24] flex items-center gap-1.5">
@@ -469,21 +482,58 @@ export default function AuthPage() {
                   </label>
                   <span className="text-[10px] text-gray-500 font-bold">Curriculum Level</span>
                 </div>
-                <div className="relative">
-                  <select
-                    value={studentClass}
-                    onChange={(e) => setStudentClass(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/60 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm font-bold text-[#1E1E24] focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white/90 transition-colors cursor-pointer appearance-none shadow-[2px_2px_0px_#1E1E24]"
+                <div className="relative" ref={classDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setClassDropdownOpen(!classDropdownOpen)}
+                    className={`w-full px-4 py-2.5 rounded-xl bg-white/70 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm font-bold text-[#1E1E24] transition-all cursor-pointer flex items-center justify-between shadow-[2px_2px_0px_#1E1E24] ${
+                      classDropdownOpen ? 'bg-amber-50 ring-2 ring-[#6C5CE7]' : 'hover:bg-white'
+                    }`}
                   >
-                    {AVAILABLE_CLASSES.map((cls) => (
-                      <option key={cls} value={cls}>
-                        {cls}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-700">
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                      <span className="font-bold">{studentClass}</span>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-[#1E1E24] transition-transform duration-200 ${
+                        classDropdownOpen ? 'rotate-180 text-[#6C5CE7]' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {/* Custom Styled Neo-Brutalist Dropdown Menu */}
+                  {classDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1.5 z-40 bg-[#FAF6EE] border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-1.5 animate-in fade-in-50 zoom-in-95 duration-150">
+                      <div className="px-2.5 py-1 text-[9px] font-black uppercase text-gray-400 tracking-wider">
+                        Select Standard / Level
+                      </div>
+                      <div className="space-y-1">
+                        {AVAILABLE_CLASSES.map((cls) => {
+                          const isSelected = studentClass === cls;
+                          return (
+                            <button
+                              type="button"
+                              key={cls}
+                              onClick={() => {
+                                setStudentClass(cls);
+                                setClassDropdownOpen(false);
+                              }}
+                              className={`w-full px-3 py-2 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#FFD214] text-[#1E1E24] font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
+                                  : 'text-[#1E1E24] hover:bg-white border-2 border-transparent hover:border-[#1E1E24] hover:shadow-[2px_2px_0px_#1E1E24]'
+                              }`}
+                            >
+                              <span>{cls}</span>
+                              {isSelected && (
+                                <CheckCircle2 className="w-4 h-4 text-[#1E1E24] fill-[#1E1E24] text-white" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

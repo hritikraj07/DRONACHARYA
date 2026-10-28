@@ -115,21 +115,32 @@ function PathsContent() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-[#D1FAE5] text-[#059669] border border-[#059669] mb-3">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Deterministic Python Learning Roadmap</span>
+            <span>Interactive Python Mastery Map</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E1E24] tracking-tight">
-            The Python Gurukul Roadmap
+            The Python Gurukul World Map
           </h1>
           <p className="text-sm font-bold text-[#4A4A58] mt-1 max-w-2xl">
-            10 Stages • 112 Structured Topics • Zero Arbitrary Questions. Every lesson unlocks strictly through mastered prerequisites and proven code execution.
+            Vedic-Tech Diorama • 4 Sequential Ascents from Starter Plains to Capstone Summit • Connected Milestones & Dynamic Syllabus
           </p>
         </div>
 
         {/* View Switcher Tabs */}
         <div className="flex items-center gap-2 bg-white p-1 rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24]">
           <button
+            onClick={() => setActiveTab('worldmap')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
+              activeTab === 'worldmap'
+                ? 'bg-[#6C5CE7] text-white shadow-[2px_2px_0px_#1E1E24]'
+                : 'text-[#4A4A58] hover:bg-[#FAF6EE]'
+            }`}
+          >
+            <Compass className="w-4 h-4" />
+            <span>Python Mastery Map</span>
+          </button>
+          <button
             onClick={() => setActiveTab('roadmap')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
               activeTab === 'roadmap'
                 ? 'bg-[#6C5CE7] text-white shadow-[2px_2px_0px_#1E1E24]'
                 : 'text-[#4A4A58] hover:bg-[#FAF6EE]'
@@ -137,17 +148,6 @@ function PathsContent() {
           >
             <BookOpen className="w-4 h-4" />
             <span>Curriculum Roadmap</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('worldmap')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all ${
-              activeTab === 'worldmap'
-                ? 'bg-[#6C5CE7] text-white shadow-[2px_2px_0px_#1E1E24]'
-                : 'text-[#4A4A58] hover:bg-[#FAF6EE]'
-            }`}
-          >
-            <Map className="w-4 h-4" />
-            <span>2D Game World</span>
           </button>
         </div>
       </div>

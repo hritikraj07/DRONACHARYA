@@ -118,7 +118,7 @@ export default function DashboardPage() {
               {isGuest ? 'Welcome, Guest Explorer!' : `Welcome back, ${currentUser?.name || 'Apprentice'}!`}
             </h1>
             <p className="text-xs sm:text-sm text-[#4A4A58] font-medium max-w-xl flex items-center flex-wrap gap-2">
-              <span>Current Curriculum: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong> • Level: <strong>{currentUser?.studentClass || 'Class 10'}</strong></span>
+              <span>Active Course: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong></span>
               <Link
                 href="/settings"
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6C5CE7] hover:text-[#5b4bc4] bg-white px-2 py-0.5 rounded-lg border border-slate-300 shadow-xs hover:border-[#6C5CE7] transition-all"

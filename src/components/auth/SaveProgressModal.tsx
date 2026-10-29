@@ -43,7 +43,6 @@ import {
   getGuestSession,
   registerUser,
   authenticateUser,
-  AVAILABLE_CLASSES,
   AVAILABLE_SUBJECTS,
   RegisteredUser,
 } from '@/lib/db/auth-db';
@@ -68,7 +67,6 @@ export function SaveProgressModal({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [studentClass, setStudentClass] = useState(AVAILABLE_CLASSES[1]); // Class 10
   const [targetSubject, setTargetSubject] = useState(AVAILABLE_SUBJECTS[0].id);
 
   // Status
@@ -125,7 +123,6 @@ export function SaveProgressModal({
           name: name.trim(),
           email: cleanEmail,
           password,
-          studentClass,
           targetSubject: guestData?.targetSubject || targetSubject,
         });
 
@@ -362,27 +359,7 @@ export function SaveProgressModal({
             </div>
           </div>
 
-          {mode === 'signup' && (
-            <div>
-              <label className="block text-xs font-black text-[#1E1E24] mb-1">
-                Your Academic Level:
-              </label>
-              <div className="relative">
-                <select
-                  value={studentClass}
-                  onChange={(e) => setStudentClass(e.target.value)}
-                  className="w-full px-3.5 py-2.5 pl-9 appearance-none rounded-xl border-2 border-[#1E1E24] bg-white text-xs font-bold text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] focus:outline-none focus:border-[#6C5CE7] cursor-pointer"
-                >
-                  {AVAILABLE_CLASSES.map((cls) => (
-                    <option key={cls} value={cls}>
-                      {cls}
-                    </option>
-                  ))}
-                </select>
-                <GraduationCap className="w-4 h-4 text-[#7E7E8F] absolute left-3 top-3 pointer-events-none" />
-              </div>
-            </div>
-          )}
+
 
           {/* Action Button */}
           <div className="pt-2">

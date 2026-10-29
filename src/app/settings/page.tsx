@@ -23,7 +23,6 @@ import {
   getGuestSession,
   updateUserLearningSelection,
   AVAILABLE_SUBJECTS,
-  AVAILABLE_CLASSES,
   RegisteredUser,
 } from '@/lib/db/auth-db';
 
@@ -36,7 +35,6 @@ export default function SettingsPage() {
   const [bio, setBio] = useState(state.user.bio || '');
   const [lang, setLang] = useState<LanguagePreference>(state.user.preferredLanguage || 'en');
   const [selectedSubject, setSelectedSubject] = useState<string>('python');
-  const [selectedClass, setSelectedClass] = useState<string>('Class 10');
   const [savedFeedback, setSavedFeedback] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -49,7 +47,6 @@ export default function SettingsPage() {
     setCurrentUser(session);
     if (session.name) setFullName(session.name);
     if (session.targetSubject) setSelectedSubject(session.targetSubject);
-    if (session.studentClass) setSelectedClass(session.studentClass);
     if (session.preferredLanguage) setLang(session.preferredLanguage as LanguagePreference);
     setIsCheckingAuth(false);
   }, [router]);
@@ -75,7 +72,6 @@ export default function SettingsPage() {
 
     // 2. Persist directly to Supabase profiles & synchronous session cache
     const updated = updateUserLearningSelection({
-      studentClass: selectedClass,
       targetSubject: selectedSubject,
       preferredLanguage: lang,
     });
@@ -198,24 +194,7 @@ export default function SettingsPage() {
             })}
           </div>
 
-          {/* Academic Grade / Level */}
-          <div className="pt-2 border-t border-slate-200">
-            <label className="block text-xs font-black text-[#1E1E24] mb-1.5 flex items-center gap-1.5">
-              <GraduationCap className="w-4 h-4 text-[#6C5CE7]" />
-              <span>Academic Grade / Experience Level</span>
-            </label>
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-3.5 py-2.5 border-2 border-[#1E1E24] rounded-xl text-xs font-bold focus:outline-none bg-white text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
-            >
-              {AVAILABLE_CLASSES.map((cls) => (
-                <option key={cls} value={cls}>
-                  {cls}
-                </option>
-              ))}
-            </select>
-          </div>
+
         </div>
 
         {/* =========================================================================

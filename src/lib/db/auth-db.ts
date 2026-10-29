@@ -362,7 +362,7 @@ export async function registerUser(params: {
   name: string;
   email: string;
   password: string;
-  studentClass: string;
+  studentClass?: string;
   targetSubject: string;
   preferredLanguage?: 'en' | 'hi' | 'hinglish';
 }): Promise<{ success: boolean; user?: RegisteredUser; session?: any; error?: string }> {

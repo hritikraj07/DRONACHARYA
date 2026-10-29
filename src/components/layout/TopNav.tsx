@@ -11,7 +11,6 @@ import {
   setActiveSession,
   RegisteredUser,
   AVAILABLE_SUBJECTS,
-  AVAILABLE_CLASSES,
   updateUserLearningSelection,
 } from '@/lib/db/auth-db';
 import dynamic from 'next/dynamic';
@@ -112,8 +111,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
   const handleOpenSwitchModal = () => {
     const effective = currentUser || guestUser || getGuestSession();
-    setSelectedClass(effective.studentClass || 'Class 10');
-    setSelectedSubject(effective.targetSubject || 'html');
+    setSelectedSubject(effective.targetSubject || 'python');
     setSwitchModalOpen(true);
   };
 
@@ -126,7 +124,6 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   const handleSaveSwitch = (e: React.FormEvent) => {
     e.preventDefault();
     const updated = updateUserLearningSelection({
-      studentClass: selectedClass,
       targetSubject: selectedSubject,
     });
     if (updated) {
@@ -482,7 +479,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                   PERSONALIZED LEARNING PATH
                 </span>
                 <h3 className="font-pixel text-base sm:text-lg text-[#1E1E24]">
-                  Choose Realm & Grade
+                  Choose Active Course
                 </h3>
               </div>
               <button
@@ -498,37 +495,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             <form onSubmit={handleSaveSwitch} className="space-y-5 text-xs">
               <div>
                 <label className="block font-black text-[#1E1E24] text-xs mb-2">
-                  Class Standard (Aligned with NEP 2020):
-                </label>
-                <div className="space-y-2">
-                  {AVAILABLE_CLASSES.map((c) => {
-                    const isActive = selectedClass === c;
-                    return (
-                      <button
-                        type="button"
-                        key={c}
-                        onClick={() => setSelectedClass(c)}
-                        className={`w-full p-3 rounded-xl border-2 text-left cursor-pointer transition-all flex items-center justify-between ${
-                          isActive
-                            ? 'bg-[#FEF9C3] border-[#1E1E24] text-[#854D0E] shadow-[3px_3px_0px_#1E1E24] font-black'
-                            : 'bg-white border-[#1E1E24] hover:bg-slate-50 text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] font-bold'
-                        }`}
-                      >
-                        <span className="text-xs">{c}</span>
-                        {isActive && (
-                          <span className="font-pixel text-[10px] text-[#854D0E] flex items-center gap-1">
-                            ✓ Active
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-black text-[#1E1E24] text-xs mb-2">
-                  Target Course Realm:
+                  Active Course:
                 </label>
                 <div className="relative">
                   <select

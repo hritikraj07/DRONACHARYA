@@ -1,17 +1,16 @@
 // Dronacharya Authentication Gateway (Sign In, Sign Up, Guest Demo)
-// Matches the warm Gurukul adventure realm background with translucent frosted-glass neo-brutalist aesthetic
+// Translucent frosted neo-brutalist aesthetic with minimal scrollability, confirm password, and course dropdown
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   authenticateUser,
   registerUser,
   createGuestSession,
   setActiveSession,
   AVAILABLE_SUBJECTS,
-  AVAILABLE_CLASSES,
 } from '@/lib/db/auth-db';
 import {
   ArrowRight,
@@ -24,14 +23,15 @@ import {
   Mail,
   User,
   Zap,
-  GraduationCap,
   ChevronDown,
   ShieldCheck,
   Cpu,
+  BookOpen,
 } from 'lucide-react';
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Mode: 'signin' | 'signup' | 'guest'
   const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'guest'>('signin');
@@ -39,11 +39,11 @@ export default function AuthPage() {
   // Form Fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [studentClass, setStudentClass] = useState('Class 10');
-  const [classDropdownOpen, setClassDropdownOpen] = useState(false);
-  const classDropdownRef = useRef<HTMLDivElement>(null);
   const [selectedSubject, setSelectedSubject] = useState('python');
+  const [courseDropdownOpen, setCourseDropdownOpen] = useState(false);
+  const courseDropdownRef = useRef<HTMLDivElement>(null);
   const [rememberMe, setRememberMe] = useState(true);
 
   // UI Status
@@ -52,38 +52,18 @@ export default function AuthPage() {
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Close class dropdown on click outside
+  // Sync mode from URL searchParams automatically whenever query changes
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (classDropdownRef.current && !classDropdownRef.current.contains(e.target as Node)) {
-        setClassDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleGenerateSafePassword = () => {
-    const prefixes = ['Quest', 'Hero', 'Code', 'Drona', 'Arcade', 'Gurukul'];
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const num = Math.floor(100 + Math.random() * 900);
-    const symbols = ['!', '#', '$', '@', '*'];
-    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-    const generated = `${prefix}#${num}${symbol}`;
-    setPassword(generated);
-    setShowPassword(true);
-    setInfoMsg(`Generated safe password: ${generated}`);
-  };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const modeParam = params.get('mode');
-      if (modeParam === 'signup' || modeParam === 'signin' || modeParam === 'guest') {
-        setAuthMode(modeParam);
-      }
+    const modeParam = searchParams.get('mode');
+    if (modeParam === 'signup' || modeParam === 'signin' || modeParam === 'guest') {
+      setAuthMode(modeParam);
     }
+  }, [searchParams]);
+
+  // Check existing session
+  useEffect(() => {
     const session =
       typeof window !== 'undefined'
         ? localStorage.getItem('dronacharya_active_session_v2')
@@ -91,6 +71,17 @@ export default function AuthPage() {
     if (session) {
       window.location.href = '/';
     }
+  }, []);
+
+  // Close course dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (courseDropdownRef.current && !courseDropdownRef.current.contains(e.target as Node)) {
+        setCourseDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Sync document title with active auth mode
@@ -103,6 +94,29 @@ export default function AuthPage() {
       document.title = 'Guest Demo ⋆˙⟡ Dronacharya';
     }
   }, [authMode]);
+
+  // Unified mode switcher that keeps state & URL query aligned
+  const switchMode = (mode: 'signin' | 'signup' | 'guest') => {
+    setAuthMode(mode);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setInfoMsg(null);
+    router.replace(`/auth?mode=${mode}`, { scroll: false });
+  };
+
+  const handleGenerateSafePassword = () => {
+    const prefixes = ['Quest', 'Hero', 'Code', 'Drona', 'Arcade', 'Gurukul'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const num = Math.floor(100 + Math.random() * 900);
+    const symbols = ['!', '#', '$', '@', '*'];
+    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const generated = `${prefix}#${num}${symbol}`;
+    setPassword(generated);
+    setConfirmPassword(generated);
+    setShowPassword(true);
+    setShowConfirmPassword(true);
+    setInfoMsg(`Generated safe password applied to both fields!`);
+  };
 
   // Handle standard user Sign In
   const handleSignIn = async (e: React.FormEvent) => {
@@ -125,7 +139,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
         window.location.href = '/';
-      }, 400);
+      }, 350);
     } else {
       setErrorMsg(result.error || 'Authentication failed. Please check credentials.');
     }
@@ -155,13 +169,17 @@ export default function AuthPage() {
       return;
     }
 
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify both password fields.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     const result = await registerUser({
       name: fullName.trim(),
       email: cleanEmail,
       password,
-      studentClass: studentClass || 'Class 10',
       targetSubject: selectedSubject || 'python',
     });
     setIsSubmitting(false);
@@ -173,7 +191,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
         window.location.href = '/';
-      }, 400);
+      }, 350);
     } else {
       setErrorMsg(result.error || 'Registration failed.');
     }
@@ -185,7 +203,7 @@ export default function AuthPage() {
     setIsSubmitting(true);
     setSuccessMsg('Launching Instant Guest Demo...');
 
-    createGuestSession(sub, studentClass || 'Class 10');
+    createGuestSession(sub);
     window.dispatchEvent(new Event('dronacharya_session_change'));
     window.dispatchEvent(new Event('storage'));
 
@@ -194,27 +212,29 @@ export default function AuthPage() {
     }, 300);
   };
 
+  const selectedSubjectObj = AVAILABLE_SUBJECTS.find((s) => s.id === selectedSubject) || AVAILABLE_SUBJECTS[0];
+
   return (
-    <div className="relative flex-1 flex flex-col justify-center items-center py-16 sm:py-24 px-4 sm:px-6 min-h-[calc(100vh-140px)] mb-16 sm:mb-24">
+    <div className="relative flex-1 flex flex-col justify-center items-center py-6 sm:py-10 px-4 min-h-[calc(100vh-3.5rem)]">
       {/* Centered Auth Card Wrapper */}
-      <div className="relative z-10 w-full max-w-xl flex flex-col items-center justify-center">
+      <div className="relative z-10 w-full max-w-lg flex flex-col items-center justify-center">
         {/* ========================================================
-            MAIN AUTHENTICATION CARD (Translucent Frosted Glass)
+            MAIN AUTHENTICATION CARD (Translucent Frosted Neo-Brutalist)
            ======================================================== */}
         <div
-          className="w-full max-w-xl rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-6 sm:p-9 text-[#1E1E24] transition-all relative overflow-hidden"
+          className="w-full max-w-lg rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-5 sm:p-7 text-[#1E1E24] transition-all relative overflow-hidden"
           style={{
-            backgroundColor: 'rgba(250, 246, 238, 0.68)',
-            backdropFilter: 'blur(24px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backdropFilter: 'blur(20px) saturate(160%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
           }}
         >
           {/* Brand Logo & Header */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-4">
             <img
               src="/logo.png"
               alt="Dronacharya Logo"
-              className="w-14 h-14 rounded-2xl border-2 border-[#1E1E24] object-cover shadow-[3px_3px_0px_#1E1E24] mb-3 mx-auto bg-white/70"
+              className="w-12 h-12 rounded-2xl border-2 border-[#1E1E24] object-cover shadow-[2px_2px_0px_#1E1E24] mb-2 mx-auto bg-white/80"
             />
 
             <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#1E1E24] tracking-tight">
@@ -225,9 +245,9 @@ export default function AuthPage() {
                 : 'Sign In'}
             </h1>
 
-            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1.5 max-w-sm mx-auto">
+            <p className="text-xs text-[#4A4A58] font-bold mt-1 max-w-sm mx-auto">
               {authMode === 'guest'
-                ? 'Explore all realms and interactive studios with zero signup required.'
+                ? 'Explore all courses and interactive studios with zero signup required.'
                 : authMode === 'signup'
                 ? 'Embark on RPG quests, earn XP, and unlock verifiable achievements.'
                 : 'Enter your credentials to load your saved progress and rank.'}
@@ -235,16 +255,11 @@ export default function AuthPage() {
           </div>
 
           {/* 3-Tab Switcher: Sign In | Sign Up | Guest Demo */}
-          <div className="flex bg-white/45 backdrop-blur-md p-1.5 rounded-2xl border-2 border-[#1E1E24] mb-6 shadow-[2px_2px_0px_#1E1E24]">
+          <div className="flex bg-white/70 backdrop-blur-md p-1 rounded-2xl border-2 border-[#1E1E24] mb-4 shadow-[2px_2px_0px_#1E1E24]">
             <button
               type="button"
-              onClick={() => {
-                setAuthMode('signin');
-                setErrorMsg(null);
-                setSuccessMsg(null);
-                setInfoMsg(null);
-              }}
-              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
+              onClick={() => switchMode('signin')}
+              className={`flex-1 py-1.5 text-xs font-black rounded-xl transition-all cursor-pointer ${
                 authMode === 'signin'
                   ? 'bg-[#6C5CE7] text-white shadow-[2px_2px_0px_#1E1E24]'
                   : 'text-[#4A4A58] hover:text-[#1E1E24]'
@@ -255,13 +270,8 @@ export default function AuthPage() {
 
             <button
               type="button"
-              onClick={() => {
-                setAuthMode('signup');
-                setErrorMsg(null);
-                setSuccessMsg(null);
-                setInfoMsg(null);
-              }}
-              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
+              onClick={() => switchMode('signup')}
+              className={`flex-1 py-1.5 text-xs font-black rounded-xl transition-all cursor-pointer ${
                 authMode === 'signup'
                   ? 'bg-[#6C5CE7] text-white shadow-[2px_2px_0px_#1E1E24]'
                   : 'text-[#4A4A58] hover:text-[#1E1E24]'
@@ -272,13 +282,8 @@ export default function AuthPage() {
 
             <button
               type="button"
-              onClick={() => {
-                setAuthMode('guest');
-                setErrorMsg(null);
-                setSuccessMsg(null);
-                setInfoMsg(null);
-              }}
-              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              onClick={() => switchMode('guest')}
+              className={`flex-1 py-1.5 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 authMode === 'guest'
                   ? 'bg-[#FFD214] text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
                   : 'text-[#4A4A58] hover:text-[#1E1E24]'
@@ -291,21 +296,21 @@ export default function AuthPage() {
 
           {/* Feedback Alerts */}
           {errorMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-50/90 border-2 border-rose-300 text-xs text-rose-800 font-bold flex items-start gap-2.5 animate-in fade-in backdrop-blur-xs">
+            <div className="mb-3.5 p-3 rounded-xl bg-rose-50/95 border-2 border-rose-300 text-xs text-rose-800 font-bold flex items-start gap-2 animate-in fade-in">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-emerald-50/90 border-2 border-emerald-300 text-xs text-emerald-800 font-bold flex items-center gap-2.5 animate-in fade-in backdrop-blur-xs">
+            <div className="mb-3.5 p-3 rounded-xl bg-emerald-50/95 border-2 border-emerald-300 text-xs text-emerald-800 font-bold flex items-center gap-2 animate-in fade-in">
               <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {infoMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-purple-50/90 border-2 border-purple-300 text-xs text-purple-900 font-bold flex items-center gap-2.5 animate-in fade-in backdrop-blur-xs">
+            <div className="mb-3.5 p-3 rounded-xl bg-purple-50/95 border-2 border-purple-300 text-xs text-purple-900 font-bold flex items-center gap-2 animate-in fade-in">
               <Sparkles className="w-4 h-4 shrink-0 text-[#6C5CE7]" />
               <span>{infoMsg}</span>
             </div>
@@ -315,13 +320,13 @@ export default function AuthPage() {
               TAB 1: SIGN IN FORM
              ======================================================== */}
           {authMode === 'signin' && (
-            <form onSubmit={handleSignIn} className="space-y-4">
+            <form onSubmit={handleSignIn} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
+                <label className="block text-xs font-black text-[#1E1E24] mb-1">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-3" />
+                  <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-2.5" />
                   <input
                     type="email"
                     required
@@ -329,17 +334,17 @@ export default function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     onBlur={() => setEmail((e) => e.trim())}
                     placeholder="explorer@gurukul.edu"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/60 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white/90 transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/70 backdrop-blur-sm border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
+                <label className="block text-xs font-black text-[#1E1E24] mb-1">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-3" />
+                  <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-2.5" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -348,12 +353,12 @@ export default function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white/60 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white/90 transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
+                    className="w-full pl-10 pr-10 py-2 rounded-xl bg-white/70 backdrop-blur-sm border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
+                    className="absolute right-3.5 top-2.5 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -362,15 +367,15 @@ export default function AuthPage() {
               </div>
 
               {/* Remember Me & Forgot Password Helper */}
-              <div className="flex items-center justify-between text-xs font-bold pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-[#4A4A58] select-none hover:text-[#1E1E24]">
+              <div className="flex items-center justify-between text-xs font-bold pt-0.5">
+                <label className="flex items-center gap-1.5 cursor-pointer text-[#4A4A58] select-none hover:text-[#1E1E24]">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 rounded border-2 border-[#1E1E24] text-[#6C5CE7] accent-[#6C5CE7] cursor-pointer"
                   />
-                  <span>Remember this device</span>
+                  <span>Remember me</span>
                 </label>
 
                 <button
@@ -389,7 +394,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full btn-arcade btn-arcade-purple py-3 px-6 text-xs sm:text-sm flex items-center justify-center gap-2 mt-2"
+                className="w-full btn-arcade btn-arcade-purple py-2.5 px-6 text-xs sm:text-sm flex items-center justify-center gap-2 mt-1 shadow-[3px_3px_0px_#1E1E24]"
               >
                 <span>{isSubmitting ? 'Signing in...' : 'Sign In to Quest'}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -398,33 +403,33 @@ export default function AuthPage() {
           )}
 
           {/* ========================================================
-              TAB 2: SIGN UP FORM
+              TAB 2: SIGN UP FORM (With Confirm Password & Course Dropdown)
              ======================================================== */}
           {authMode === 'signup' && (
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-3">
               <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
+                <label className="block text-xs font-black text-[#1E1E24] mb-1">
                   Adventurer Name
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-3" />
+                  <User className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-2.5" />
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Arjun Dev"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/60 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white/90 transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/70 backdrop-blur-sm border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
+                <label className="block text-xs font-black text-[#1E1E24] mb-1">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-3" />
+                  <Mail className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-2.5" />
                   <input
                     type="email"
                     required
@@ -432,13 +437,14 @@ export default function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     onBlur={() => setEmail((e) => e.trim())}
                     placeholder="arjun@adventure.io"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/60 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white/90 transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/70 backdrop-blur-sm border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
                   />
                 </div>
               </div>
 
+              {/* Password */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-black text-[#1E1E24]">
                     Password (min 6 characters)
                   </label>
@@ -447,11 +453,11 @@ export default function AuthPage() {
                     onClick={handleGenerateSafePassword}
                     className="text-[10px] text-[#6C5CE7] hover:underline font-black flex items-center gap-1 cursor-pointer bg-purple-50/80 px-2 py-0.5 rounded-md border border-[#6C5CE7]/30 transition-colors"
                   >
-                    <span>🎲 Generate Safe Password</span>
+                    <span>🎲 Generate Safe</span>
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-3" />
+                  <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-2.5" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -460,12 +466,12 @@ export default function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white/60 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white/90 transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
+                    className="w-full pl-10 pr-10 py-2 rounded-xl bg-white/70 backdrop-blur-sm border-2 border-[#1E1E24] text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:border-[#6C5CE7] focus:bg-white transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
+                    className="absolute right-3.5 top-2.5 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -473,58 +479,114 @@ export default function AuthPage() {
                 </div>
               </div>
 
-              {/* Student Class Selection Field (Custom Neo-Brutalist Dropdown) */}
+              {/* Confirm Password Section */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-black text-[#1E1E24] flex items-center gap-1.5">
-                    <GraduationCap className="w-3.5 h-3.5 text-[#6C5CE7]" />
-                    <span>Student Class / Grade</span>
-                  </label>
-                  <span className="text-[10px] text-gray-500 font-bold">Curriculum Level</span>
-                </div>
-                <div className="relative" ref={classDropdownRef}>
+                <label className="block text-xs font-black text-[#1E1E24] mb-1">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-[#7E7E8F] absolute left-3.5 top-2.5" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className={`w-full pl-10 pr-10 py-2 rounded-xl bg-white/70 backdrop-blur-sm border-2 ${
+                      confirmPassword && confirmPassword !== password
+                        ? 'border-rose-500 focus:border-rose-500'
+                        : confirmPassword && confirmPassword === password
+                        ? 'border-emerald-500 focus:border-emerald-500'
+                        : 'border-[#1E1E24] focus:border-[#6C5CE7]'
+                    } text-xs sm:text-sm text-[#1E1E24] placeholder-gray-500 focus:outline-hidden focus:bg-white transition-colors shadow-[2px_2px_0px_rgba(30,30,36,0.06)]`}
+                  />
                   <button
                     type="button"
-                    onClick={() => setClassDropdownOpen(!classDropdownOpen)}
-                    className={`w-full px-4 py-2.5 rounded-xl bg-white/70 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm font-bold text-[#1E1E24] transition-all cursor-pointer flex items-center justify-between shadow-[2px_2px_0px_#1E1E24] ${
-                      classDropdownOpen ? 'bg-amber-50 ring-2 ring-[#6C5CE7]' : 'hover:bg-white'
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3.5 top-2.5 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {confirmPassword && confirmPassword !== password && (
+                  <p className="text-[10px] text-rose-600 font-bold mt-1">Passwords do not match.</p>
+                )}
+                {confirmPassword && confirmPassword === password && (
+                  <p className="text-[10px] text-emerald-600 font-bold mt-1">✓ Passwords match</p>
+                )}
+              </div>
+
+              {/* Starting Course Selection (Custom Neo-Brutalist Dropdown - No Class, No Realm) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-black text-[#1E1E24] flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                    <span>Select Starting Course</span>
+                  </label>
+                  <span className="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300">
+                    Active
+                  </span>
+                </div>
+                <div className="relative" ref={courseDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setCourseDropdownOpen(!courseDropdownOpen)}
+                    className={`w-full px-3.5 py-2 rounded-xl bg-white/80 backdrop-blur-md border-2 border-[#1E1E24] text-xs sm:text-sm font-bold text-[#1E1E24] transition-all cursor-pointer flex items-center justify-between shadow-[2px_2px_0px_#1E1E24] ${
+                      courseDropdownOpen ? 'bg-amber-50 ring-2 ring-[#6C5CE7]' : 'hover:bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-                      <span className="font-bold">{studentClass}</span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                      <span className="font-black text-[#1E1E24]">{selectedSubjectObj.name}</span>
+                      <span className="text-[10px] text-gray-500 hidden sm:inline font-mono">
+                        ({selectedSubjectObj.tagline})
+                      </span>
                     </div>
                     <ChevronDown
                       className={`w-4 h-4 text-[#1E1E24] transition-transform duration-200 ${
-                        classDropdownOpen ? 'rotate-180 text-[#6C5CE7]' : ''
+                        courseDropdownOpen ? 'rotate-180 text-[#6C5CE7]' : ''
                       }`}
                     />
                   </button>
 
                   {/* Custom Styled Neo-Brutalist Dropdown Menu */}
-                  {classDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1.5 z-40 bg-[#FAF6EE] border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-1.5 animate-in fade-in-50 zoom-in-95 duration-150">
+                  {courseDropdownOpen && (
+                    <div className="absolute bottom-full mb-1.5 left-0 right-0 z-40 bg-[#FAF6EE] border-3 border-[#1E1E24] rounded-2xl shadow-[6px_6px_0px_#1E1E24] p-1.5 animate-in fade-in-50 zoom-in-95 duration-150 max-h-56 overflow-y-auto">
                       <div className="px-2.5 py-1 text-[9px] font-black uppercase text-gray-400 tracking-wider">
-                        Select Standard / Level
+                        Select Curriculum Course
                       </div>
                       <div className="space-y-1">
-                        {AVAILABLE_CLASSES.map((cls) => {
-                          const isSelected = studentClass === cls;
+                        {AVAILABLE_SUBJECTS.map((s) => {
+                          const isSelected = selectedSubject === s.id;
+                          const isPlayable = !s.isComingSoon;
                           return (
                             <button
                               type="button"
-                              key={cls}
+                              key={s.id}
                               onClick={() => {
-                                setStudentClass(cls);
-                                setClassDropdownOpen(false);
+                                if (isPlayable) {
+                                  setSelectedSubject(s.id);
+                                  setCourseDropdownOpen(false);
+                                }
                               }}
-                              className={`w-full px-3 py-2 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
-                                isSelected
+                              disabled={!isPlayable}
+                              className={`w-full px-3 py-1.5 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                                !isPlayable
+                                  ? 'opacity-40 cursor-not-allowed bg-gray-100 text-gray-400'
+                                  : isSelected
                                   ? 'bg-[#FFD214] text-[#1E1E24] font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
                                   : 'text-[#1E1E24] hover:bg-white border-2 border-transparent hover:border-[#1E1E24] hover:shadow-[2px_2px_0px_#1E1E24]'
                               }`}
                             >
-                              <span>{cls}</span>
+                              <div className="flex items-center gap-2">
+                                <span>{s.name}</span>
+                                <span className="text-[10px] text-gray-500 font-mono">
+                                  {isPlayable ? '• Playable' : '• Coming Soon'}
+                                </span>
+                              </div>
                               {isSelected && (
                                 <CheckCircle2 className="w-4 h-4 text-[#1E1E24] fill-[#1E1E24] text-white" />
                               )}
@@ -537,53 +599,6 @@ export default function AuthPage() {
                 </div>
               </div>
 
-              {/* Starting Realm Track Selection */}
-              <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
-                  Starting Realm Track
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {AVAILABLE_SUBJECTS.map((s) => {
-                    const isSelected = selectedSubject === s.id;
-                    const isPlayable = !s.isComingSoon;
-                    return (
-                      <button
-                        type="button"
-                        key={s.id}
-                        onClick={() => {
-                          if (isPlayable) {
-                            setSelectedSubject(s.id);
-                          }
-                        }}
-                        className={`p-2.5 rounded-xl border-2 text-left transition-all ${
-                          isSelected
-                            ? 'bg-[#EDE9FE]/90 border-[#6C5CE7] shadow-[2px_2px_0px_#6C5CE7]'
-                            : isPlayable
-                            ? 'bg-white/55 backdrop-blur-md border-[#1E1E24] hover:bg-white/80 cursor-pointer shadow-[2px_2px_0px_rgba(30,30,36,0.06)]'
-                            : 'bg-gray-100/60 border-gray-300 opacity-60 cursor-not-allowed'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="block text-xs font-black text-[#1E1E24]">{s.name}</span>
-                          {isPlayable ? (
-                            <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded border border-emerald-300">
-                              Active
-                            </span>
-                          ) : (
-                            <span className="text-[9px] font-bold text-gray-500 bg-gray-200 px-1 py-0.2 rounded">
-                              Soon
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-gray-500 truncate block font-bold mt-0.5">
-                          {s.tagline}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Code of Conduct & Honor Code */}
               <p className="text-[10px] text-gray-500 font-bold leading-tight">
                 By embarking, you accept the Gurukul Code of Conduct & Academic Honor Code.
@@ -592,7 +607,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full btn-arcade btn-arcade-purple py-3 px-6 text-xs sm:text-sm flex items-center justify-center gap-2 mt-3"
+                className="w-full btn-arcade btn-arcade-purple py-2.5 px-6 text-xs sm:text-sm flex items-center justify-center gap-2 mt-2 shadow-[3px_3px_0px_#1E1E24]"
               >
                 <span>{isSubmitting ? 'Creating account...' : 'Create Account & Begin Quest'}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -604,16 +619,16 @@ export default function AuthPage() {
               TAB 3: GUEST DEMO
              ======================================================== */}
           {authMode === 'guest' && (
-            <div className="space-y-5">
-              <div className="p-3.5 rounded-2xl bg-[#FEF3C7]/90 border-2 border-[#1E1E24] text-xs text-amber-900 font-bold leading-relaxed shadow-[2px_2px_0px_#1E1E24] backdrop-blur-xs">
+            <div className="space-y-4">
+              <div className="p-3 rounded-2xl bg-[#FEF3C7]/90 border-2 border-[#1E1E24] text-xs text-amber-900 font-bold leading-relaxed shadow-[2px_2px_0px_#1E1E24]">
                 ⚡ <strong>Instant Exploration:</strong> Jump straight into live coding quests, interactive test assertions, and 2D mini-game simulators without creating an account.
               </div>
 
               <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-2">
-                  Choose Realm to Start:
+                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
+                  Choose Course to Start:
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {AVAILABLE_SUBJECTS.map((s) => {
                     const isSelected = selectedSubject === s.id;
                     const isPlayable = !s.isComingSoon;
@@ -625,27 +640,27 @@ export default function AuthPage() {
                             setSelectedSubject(s.id);
                           }
                         }}
-                        className={`p-3.5 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                        className={`p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between ${
                           !isPlayable
                             ? 'opacity-50 cursor-not-allowed bg-gray-100/60 border-gray-300'
                             : isSelected
                             ? 'bg-[#FFD214]/90 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] cursor-pointer'
-                            : 'bg-white/60 backdrop-blur-md border-[#1E1E24] hover:bg-white/80 shadow-[2px_2px_0px_#1E1E24] cursor-pointer'
+                            : 'bg-white/70 backdrop-blur-md border-[#1E1E24] hover:bg-white/90 shadow-[2px_2px_0px_#1E1E24] cursor-pointer'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-black text-xs text-[#1E1E24]">{s.name}</span>
                           <span
-                            className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${
+                            className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${
                               isPlayable
                                 ? 'text-emerald-800 bg-emerald-100 border-emerald-300'
                                 : 'text-gray-600 bg-gray-200 border-gray-300'
                             }`}
                           >
-                            {isPlayable ? 'Playable' : 'Coming Soon'}
+                            {isPlayable ? 'Playable' : 'Soon'}
                           </span>
                         </div>
-                        <span className="text-[11px] text-gray-600 font-bold mt-1 line-clamp-1">
+                        <span className="text-[10px] text-gray-600 font-bold mt-1 line-clamp-1">
                           {s.tagline}
                         </span>
                       </div>
@@ -658,27 +673,22 @@ export default function AuthPage() {
                 type="button"
                 onClick={() => handleLaunchGuestDemo(selectedSubject)}
                 disabled={isSubmitting}
-                className="w-full btn-arcade btn-arcade-gold py-3.5 px-6 text-xs sm:text-sm flex items-center justify-center gap-2"
+                className="w-full btn-arcade btn-arcade-gold py-3 px-6 text-xs sm:text-sm flex items-center justify-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
               >
                 <Zap className="w-4 h-4 fill-current" />
-                <span>{isSubmitting ? 'Entering realm...' : 'Enter as Guest Explorer Now →'}</span>
+                <span>{isSubmitting ? 'Entering course...' : 'Enter as Guest Explorer Now →'}</span>
               </button>
             </div>
           )}
 
           {/* Quick Switch Text Links */}
-          <div className="mt-6 text-center text-xs font-bold text-gray-600">
+          <div className="mt-4 text-center text-xs font-bold text-gray-600">
             {authMode === 'signin' ? (
               <p>
                 Don&apos;t have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setAuthMode('signup');
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setInfoMsg(null);
-                  }}
+                  onClick={() => switchMode('signup')}
                   className="text-[#6C5CE7] hover:underline font-black cursor-pointer"
                 >
                   Create one for free
@@ -686,12 +696,7 @@ export default function AuthPage() {
                 {' or '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setAuthMode('guest');
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setInfoMsg(null);
-                  }}
+                  onClick={() => switchMode('guest')}
                   className="text-amber-600 hover:underline font-black cursor-pointer"
                 >
                   Try guest demo
@@ -702,12 +707,7 @@ export default function AuthPage() {
                 Already have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setAuthMode('signin');
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setInfoMsg(null);
-                  }}
+                  onClick={() => switchMode('signin')}
                   className="text-[#6C5CE7] hover:underline font-black cursor-pointer"
                 >
                   Sign in here
@@ -718,12 +718,7 @@ export default function AuthPage() {
                 Want to save permanent progress?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setAuthMode('signup');
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setInfoMsg(null);
-                  }}
+                  onClick={() => switchMode('signup')}
                   className="text-[#6C5CE7] hover:underline font-black cursor-pointer"
                 >
                   Sign up for an account
@@ -733,9 +728,9 @@ export default function AuthPage() {
           </div>
 
           {/* ========================================================
-              TRUST, CLOUD & TECH STACK BADGES (Restored)
+              TRUST, CLOUD & TECH STACK BADGES
              ======================================================== */}
-          <div className="mt-6 pt-4 border-t-2 border-[#1E1E24]/15 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-gray-600 font-bold">
+          <div className="mt-4 pt-3 border-t-2 border-[#1E1E24]/15 flex flex-col sm:flex-row items-center justify-between gap-1.5 text-[10px] text-gray-600 font-bold">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Encrypted Cloud Sync via Supabase Auth</span>
@@ -752,5 +747,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold text-xs">Loading Quest Gateway...</div>}>
+      <AuthContent />
+    </Suspense>
   );
 }

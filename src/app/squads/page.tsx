@@ -26,6 +26,8 @@ import {
   UserMinus,
   Lock,
   LogIn,
+  Search,
+  Target,
 } from 'lucide-react';
 
 export default function SquadsPage() {
@@ -39,6 +41,7 @@ export default function SquadsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [requestedGuildIds, setRequestedGuildIds] = useState<string[]>([]);
+  const [guildSearchQuery, setGuildSearchQuery] = useState('');
 
   // Modals for option buttons: "Create Guild", "Join Guild", and "Remove Member"
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -55,6 +58,16 @@ export default function SquadsPage() {
   const [availableGuilds, setAvailableGuilds] = useState<GurukulSquad[]>(INITIAL_SQUADS);
 
   const squad = state.squad || INITIAL_SQUADS[0];
+
+  const filteredGuilds = availableGuilds.filter((g) => {
+    if (!guildSearchQuery.trim()) return true;
+    const q = guildSearchQuery.toLowerCase();
+    return (
+      g.name.toLowerCase().includes(q) ||
+      (g.description && g.description.toLowerCase().includes(q)) ||
+      (g.joinCode && g.joinCode.toLowerCase().includes(q))
+    );
+  });
 
   // Sync auth state
   useEffect(() => {
@@ -459,47 +472,61 @@ export default function SquadsPage() {
           </div>
         </div>
 
-        {/* Right Column: Peer Code Review Station & Guild Quick Switch */}
+        {/* Right Column: Squad Weekly Quest & Live Guild Search */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Peer Code Review Station */}
+          {/* Squad Weekly Quest & Perks Station */}
           <div
-            className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24]"
+            className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.88)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
             }}
           >
-            <h3 className="font-black text-base text-[#1E1E24] mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-[#FBBF24]" />
-              <span>Peer Review Station</span>
-            </h3>
-            <p className="text-xs text-[#4A4A58] font-bold mb-4 leading-relaxed">
-              Earn Gurukul Honor points by reviewing a squad mate&apos;s milestone submission before final evaluation.
-            </p>
+            <div className="flex items-center justify-between">
+              <h3 className="font-black text-base text-[#1E1E24] flex items-center gap-1.5">
+                <Target className="w-4 h-4 text-[#6C5CE7]" />
+                <span>Squad Weekly Quest & Perks</span>
+              </h3>
+              <span className="text-[10px] font-black uppercase text-purple-700 bg-purple-100 px-2 py-0.5 rounded-md border border-purple-300">
+                Active Week
+              </span>
+            </div>
 
-            {peerReviewRequested ? (
-              <div className="p-3.5 rounded-xl bg-[#10B981]/20 border-2 border-[#1E1E24] text-xs text-[#1E1E24] font-black animate-in fade-in duration-150">
-                ✓ Peer Review Request Broadcasted to {squad.name}!
+            {/* Weekly Goal Progress Bar */}
+            <div className="p-3.5 rounded-2xl bg-[#FAF6EE] border-2 border-[#1E1E24] space-y-2">
+              <div className="flex items-center justify-between text-xs font-black text-[#1E1E24]">
+                <span>Weekly Quest Target</span>
+                <span className="text-[#6C5CE7]">18 / 25 Missions</span>
               </div>
-            ) : (
-              <button
-                onClick={() => setPeerReviewRequested(true)}
-                className="btn-arcade btn-arcade-gold w-full text-xs py-3 flex items-center justify-center gap-1.5 shadow-[3px_3px_0px_#1E1E24] cursor-pointer"
-              >
-                <span>Request Squad Code Review</span>
-                <Send className="w-3.5 h-3.5" />
-              </button>
-            )}
+              <div className="w-full h-3 rounded-full bg-gray-200 border-2 border-[#1E1E24] overflow-hidden p-0.5">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#6C5CE7] to-[#00B894] transition-all"
+                  style={{ width: '72%' }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[11px] font-bold text-gray-500">
+                <span>Complete 25 team challenges</span>
+                <span className="text-emerald-700 font-black">+500 Guild XP</span>
+              </div>
+            </div>
 
-            <div className="mt-4 pt-3 border-t-2 border-[#1E1E24] text-[11px] text-[#4A4A58] font-bold">
-              3 constructive peer reviews unlock the <em>Seal of the Generous Sage</em> badge.
+            {/* Live Squad Perks */}
+            <div className="space-y-2 text-xs font-bold text-[#4A4A58]">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50/80 border border-amber-300 text-amber-950">
+                <Zap className="w-4 h-4 text-amber-600 shrink-0 fill-current" />
+                <span><strong>+15% Group XP Boost</strong> active for all party quests</span>
+              </div>
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-300 text-emerald-950">
+                <Flame className="w-4 h-4 text-emerald-600 shrink-0 fill-current" />
+                <span><strong>Shared Streak Shield:</strong> 3+ daily active coders keeps streak alive</span>
+              </div>
             </div>
           </div>
 
-          {/* Available Guilds Quick Browse */}
+          {/* Interactive Guild Search & Browse */}
           <div
-            className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-3"
+            className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-3.5"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.88)',
               backdropFilter: 'blur(16px)',
@@ -509,56 +536,91 @@ export default function SquadsPage() {
             <div className="flex items-center justify-between">
               <h3 className="font-black text-sm text-[#1E1E24] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#6C5CE7]" />
-                <span>Realm Guilds</span>
+                <span>Coding Guilds</span>
               </h3>
               <button
                 onClick={handleOpenJoinModal}
                 className="text-[11px] font-bold text-[#6C5CE7] hover:underline cursor-pointer"
               >
-                View All →
+                Join by Code →
               </button>
             </div>
 
-            <div className="space-y-2.5">
-              {availableGuilds.slice(0, 3).map((g) => {
-                const isActive = g.joinCode.toUpperCase() === squad.joinCode.toUpperCase();
-                const isRequested = requestedGuildIds.includes(g.id || g.joinCode);
-                return (
-                  <div
-                    key={g.id || g.joinCode}
-                    className={`p-3 rounded-2xl border-2 transition-all flex items-center justify-between text-xs ${
-                      isActive
-                        ? 'bg-purple-50 border-[#6C5CE7] shadow-[2px_2px_0px_#6C5CE7]'
-                        : 'bg-[#FAF6EE] border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:bg-[#FEF9C3]'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-black text-[#1E1E24]">{g.name}</div>
-                      <div className="text-[10px] text-gray-500 font-mono mt-0.5">
-                        {g.collectiveXp} XP • {g.members?.length || 2}/5 Members
-                      </div>
-                    </div>
+            {/* Interactive Guild Search Bar */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={guildSearchQuery}
+                onChange={(e) => setGuildSearchQuery(e.target.value)}
+                placeholder="Search guild by name or code..."
+                className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-[#FAF6EE] border-2 border-[#1E1E24] text-xs font-bold text-[#1E1E24] placeholder-gray-400 focus:outline-hidden focus:bg-white shadow-[2px_2px_0px_#1E1E24]"
+              />
+              {guildSearchQuery && (
+                <button
+                  onClick={() => setGuildSearchQuery('')}
+                  className="absolute right-2.5 top-1.5 text-xs font-black text-gray-400 hover:text-[#1E1E24] cursor-pointer"
+                >
+                  ×
+                </button>
+              )}
+            </div>
 
-                    {isActive ? (
-                      <span className="text-[10px] font-pixel font-bold px-2 py-0.5 rounded bg-[#6C5CE7] text-white">
-                        ACTIVE
-                      </span>
-                    ) : isRequested ? (
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300">
-                        ✓ Requested
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleRequestToJoin(g)}
-                        className="btn-arcade btn-arcade-white px-2.5 py-1 text-[11px] font-black cursor-pointer shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1"
-                      >
-                        <Send className="w-3 h-3 text-[#6C5CE7]" />
-                        <span>Request Join</span>
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+            {/* Filtered Guilds List */}
+            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-0.5">
+              {filteredGuilds.length > 0 ? (
+                filteredGuilds.slice(0, 4).map((g) => {
+                  const isActive = g.joinCode.toUpperCase() === squad.joinCode.toUpperCase();
+                  const isRequested = requestedGuildIds.includes(g.id || g.joinCode);
+                  return (
+                    <div
+                      key={g.id || g.joinCode}
+                      className={`p-3 rounded-2xl border-2 transition-all flex items-center justify-between text-xs ${
+                        isActive
+                          ? 'bg-purple-50 border-[#6C5CE7] shadow-[2px_2px_0px_#6C5CE7]'
+                          : 'bg-[#FAF6EE] border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] hover:bg-[#FEF9C3]'
+                      }`}
+                    >
+                      <div className="pr-2 min-w-0">
+                        <div className="font-black text-[#1E1E24] truncate">{g.name}</div>
+                        <div className="text-[10px] text-gray-500 font-mono mt-0.5">
+                          {g.collectiveXp} XP • {g.members?.length || 2}/5 Members
+                        </div>
+                      </div>
+
+                      {isActive ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#6C5CE7] text-white shrink-0">
+                          ACTIVE
+                        </span>
+                      ) : isRequested ? (
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
+                          ✓ Requested
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleRequestToJoin(g)}
+                          className="btn-arcade btn-arcade-white px-2.5 py-1 text-[11px] font-black cursor-pointer shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1 shrink-0"
+                        >
+                          <Send className="w-3 h-3 text-[#6C5CE7]" />
+                          <span>Request Join</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-4 rounded-2xl bg-[#FAF6EE] border-2 border-dashed border-[#1E1E24] text-center space-y-2">
+                  <p className="text-xs font-bold text-gray-500">
+                    No guild matches &ldquo;{guildSearchQuery}&rdquo;
+                  </p>
+                  <button
+                    onClick={handleOpenCreateModal}
+                    className="btn-arcade btn-arcade-gold px-3 py-1.5 text-xs font-black shadow-[2px_2px_0px_#1E1E24]"
+                  >
+                    + Create &ldquo;{guildSearchQuery}&rdquo; Guild
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

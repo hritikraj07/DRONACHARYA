@@ -217,9 +217,9 @@ export default function CoursesPage() {
                       )}
                     </div>
 
-                    {/* Title with retro gaming accents ★ ✧ */}
+                    {/* Course Title */}
                     <h3 className="font-pixel text-xs sm:text-sm font-bold text-[#1E1E24] leading-relaxed">
-                      {c.title} <span className="text-amber-500 font-sans text-xs">★ ✧</span>
+                      {c.title}
                     </h3>
 
                     <p className="text-xs font-bold text-gray-600 line-clamp-2 leading-relaxed">

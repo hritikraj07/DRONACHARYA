@@ -12,7 +12,6 @@ import {
   registerUser,
   createGuestSession,
   RegisteredUser,
-  AVAILABLE_CLASSES,
   AVAILABLE_SUBJECTS,
 } from '@/lib/db/auth-db';
 import { COURSES_CATALOG, Course } from '@/lib/data/course-system';
@@ -60,31 +59,6 @@ export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Authentication Modal State
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
-  const [signupStep, setSignupStep] = useState<1 | 2 | 3>(1);
-
-  // Form Fields
-  const [authEmail, setAuthEmail] = useState('');
-  const [authPassword, setAuthPassword] = useState('');
-  const [authName, setAuthName] = useState('');
-  const [authClass, setAuthClass] = useState(AVAILABLE_CLASSES[1]);
-  const [authSubject, setAuthSubject] = useState('html');
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleGenerateSafePassword = () => {
-    const prefixes = ['Quest', 'Hero', 'Code', 'Drona', 'Arcade', 'Gurukul'];
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const num = Math.floor(100 + Math.random() * 900);
-    const symbols = ['!', '#', '$', '@', '*'];
-    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-    const generated = `${prefix}#${num}${symbol}`;
-    setAuthPassword(generated);
-    setShowPassword(true);
-  };
 
   // Hero In-Browser Code Studio State
   const [activeCodeTab, setActiveCodeTab] = useState<'python' | 'html' | 'javascript'>('python');
@@ -174,100 +148,9 @@ export default function HomePage() {
     }, 350);
   };
 
-  // Handle Sign In
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    setAuthSuccess(null);
-
-    const cleanEmail = authEmail.trim();
-    setAuthEmail(cleanEmail);
-
-    const res = await authenticateUser({
-      email: cleanEmail,
-      password: authPassword,
-    });
-
-    if (res.success && res.user) {
-      setAuthSuccess(`Welcome back, ${res.user.name}! Entering your learning adventure...`);
-      setActiveSession(res.user, res.session);
-      window.dispatchEvent(new Event('dronacharya_session_change'));
-      window.dispatchEvent(new Event('storage'));
-      setTimeout(() => {
-        setCurrentUser(res.user!);
-        setIsAuthModalOpen(false);
-      }, 300);
-    } else {
-      setAuthError(res.error || 'Authentication failed. Please verify credentials.');
-    }
-  };
-
-  // Step 1 Validation -> Proceed to Step 2
-  const handleProceedToStep2 = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    if (!authName.trim()) {
-      setAuthError('Please enter your adventurer name.');
-      return;
-    }
-    const cleanEmail = authEmail.trim();
-    setAuthEmail(cleanEmail);
-    if (!cleanEmail || !cleanEmail.includes('@')) {
-      setAuthError('Please enter a valid email address.');
-      return;
-    }
-    if (authPassword.length < 6) {
-      setAuthError('Password must be at least 6 characters long.');
-      return;
-    }
-    setSignupStep(2);
-  };
-
-  // Step 2 Validation -> Proceed to Step 3
-  const handleProceedToStep3 = () => {
-    setAuthError(null);
-    if (!authClass) {
-      setAuthError('Please select your experience grade.');
-      return;
-    }
-    setSignupStep(3);
-  };
-
-  // Step 3 Completion -> Register in Database
-  const handleFinalSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    setAuthSuccess(null);
-
-    const cleanEmail = authEmail.trim();
-    setAuthEmail(cleanEmail);
-
-    const res = await registerUser({
-      name: authName.trim(),
-      email: cleanEmail,
-      password: authPassword,
-      studentClass: authClass,
-      targetSubject: authSubject,
-    });
-
-    if (res.success && res.user) {
-      setAuthSuccess(`Welcome, ${res.user.name}! Your adventure begins.`);
-      setActiveSession(res.user, res.session);
-      window.dispatchEvent(new Event('dronacharya_session_change'));
-      window.dispatchEvent(new Event('storage'));
-      setTimeout(() => {
-        setCurrentUser(res.user!);
-        setIsAuthModalOpen(false);
-      }, 300);
-    } else {
-      setAuthError(res.error || 'Registration failed.');
-    }
-  };
-
   const handleInstantGuestLaunch = () => {
-    const guestUser = createGuestSession(authSubject, authClass);
+    const guestUser = createGuestSession('python');
     setCurrentUser(guestUser);
-    setIsAuthModalOpen(false);
     window.dispatchEvent(new Event('dronacharya_session_change'));
     window.dispatchEvent(new Event('storage'));
   };
@@ -321,16 +204,13 @@ export default function HomePage() {
                     <span>Resume Adventure 🚀</span>
                   </Link>
                 ) : (
-                  <button
-                    onClick={() => {
-                      setAuthMode('signup');
-                      setIsAuthModalOpen(true);
-                    }}
+                  <Link
+                    href="/auth?mode=signup"
                     className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4 text-[#071426]" />
                     <span>Start Your Adventure 🚀</span>
-                  </button>
+                  </Link>
                 )}
 
                 <Link
@@ -548,9 +428,9 @@ export default function HomePage() {
                       )}
                     </div>
 
-                    {/* Title with retro gaming accents ★ ✧ */}
+                    {/* Course Title */}
                     <h3 className="font-pixel text-xs sm:text-sm font-bold text-[#1E1E24] leading-relaxed">
-                      {c.title} <span className="text-amber-500 font-sans text-xs">★ ✧</span>
+                      {c.title}
                     </h3>
 
                     <p className="text-xs font-bold text-gray-600 line-clamp-2 leading-relaxed">
@@ -605,17 +485,24 @@ export default function HomePage() {
             href="/courses"
             className="inline-flex items-center gap-2 text-xs font-black text-[#6C5CE7] hover:underline"
           >
-            <span>View All Curricula Realms</span>
+            <span>View All Courses</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>
 
       {/* =========================================================================
-          4. "LEVEL UP YOUR LEARNING" GAMIFICATION GRID
+          4. "LEVEL UP YOUR LEARNING" GAMIFICATION GRID (Translucent Frosted Neo-Brutalist)
          ========================================================================= */}
-      <section className="w-full bg-white/80 backdrop-blur-xs border-y-2 border-[#1E1E24] py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto space-y-12">
+      <section className="w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div
+          className="rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-8 sm:p-12 space-y-10"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backdropFilter: 'blur(20px) saturate(160%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+          }}
+        >
           <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
             <div className="mb-4 select-none relative z-10">
               <span className="inline-block text-xs font-black uppercase tracking-wider text-[#FFD214] bg-[#1E1E24] px-4 py-1.5 rounded-full border-2 border-[#1E1E24] shadow-[2px_2px_0px_#6C5CE7]">
@@ -632,7 +519,14 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: XP & Badges */}
-            <div className="bg-[#FAF6EE] rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4">
+            <div
+              className="rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 hover:translate-y-[-2px] transition-transform"
+              style={{
+                backgroundColor: 'rgba(250, 246, 238, 0.92)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }}
+            >
               <div className="w-12 h-12 rounded-2xl bg-[#EDE9FE] border-2 border-[#1E1E24] text-[#6C5CE7] flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
                 <Award className="w-6 h-6" />
               </div>
@@ -640,12 +534,19 @@ export default function HomePage() {
                 RPG XP & Collectible Badges
               </h3>
               <p className="text-xs font-bold text-[#4A4A58] leading-relaxed">
-                Earn mastery experience points on every validated challenge. Level up your adventurer rank and unlock advanced coding realms.
+                Earn mastery experience points on every validated challenge. Level up your adventurer rank and unlock advanced coding courses.
               </p>
             </div>
 
             {/* Card 2: Daily Coding Streaks */}
-            <div className="bg-[#FAF6EE] rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4">
+            <div
+              className="rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 hover:translate-y-[-2px] transition-transform"
+              style={{
+                backgroundColor: 'rgba(250, 246, 238, 0.92)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }}
+            >
               <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-[#1E1E24] text-amber-600 flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
                 <Flame className="w-6 h-6" />
               </div>
@@ -658,7 +559,14 @@ export default function HomePage() {
             </div>
 
             {/* Card 3: Socratic Acharya AI */}
-            <div className="bg-[#FAF6EE] rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4">
+            <div
+              className="rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 hover:translate-y-[-2px] transition-transform"
+              style={{
+                backgroundColor: 'rgba(250, 246, 238, 0.92)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }}
+            >
               <div className="w-12 h-12 rounded-2xl bg-emerald-100 border-2 border-[#1E1E24] text-emerald-600 flex items-center justify-center shadow-[2px_2px_0px_#1E1E24]">
                 <Sparkles className="w-6 h-6" />
               </div>
@@ -674,7 +582,7 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          5. "PRACTICE YOUR CODING CHOPS" MINI-GAME ARENA
+          5. "PRACTICE YOUR CODING CHOPS" MINI-GAME ARENA (Translucent Frosted Neo-Brutalist)
          ========================================================================= */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8 overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -692,7 +600,7 @@ export default function HomePage() {
 
           <Link
             href="/simulator"
-            className="btn-arcade btn-arcade-dark px-5 py-2.5 flex items-center gap-1.5 self-start md:self-auto shrink-0"
+            className="btn-arcade btn-arcade-dark px-5 py-2.5 flex items-center gap-1.5 self-start md:self-auto shrink-0 shadow-[3px_3px_0px_#1E1E24]"
           >
             <span>Open Simulator Hub</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -701,7 +609,14 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Practice Arena 1: Rover Rescue */}
-          <div className="bg-white rounded-3xl border-2 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between">
+          <div
+            className="rounded-3xl border-3 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.88)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+            }}
+          >
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <span className="text-xs font-mono font-black text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-1 rounded-lg border border-[#1E1E24]">
@@ -714,16 +629,16 @@ export default function HomePage() {
               <h3 className="text-xl sm:text-2xl font-black text-[#1E1E24] leading-tight break-words">
                 Rescue Exploration Rover Arya
               </h3>
-              <p className="text-xs font-bold text-gray-500 leading-relaxed break-words">
+              <p className="text-xs font-bold text-gray-600 leading-relaxed break-words">
                 Program an autonomous exploration rover through an infected research labyrinth. Collect power cells, evade hazardous debris, and reach the extraction beacon before battery failure.
               </p>
-              <div className="p-3 rounded-xl bg-[#1E1E24] text-emerald-300 font-mono text-xs overflow-x-auto max-w-full">
+              <div className="p-3 rounded-xl bg-[#1E1E24] text-emerald-300 font-mono text-xs overflow-x-auto max-w-full shadow-inner">
                 <code className="whitespace-pre block">for step in range(3):&#10;  rover.move_right()&#10;rover.collect()</code>
               </div>
             </div>
             <Link
               href="/simulator?mission=mission-rescue-robot"
-              className="w-full btn-arcade btn-arcade-purple py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2"
+              className="w-full btn-arcade btn-arcade-purple py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2 shadow-[3px_3px_0px_#1E1E24]"
             >
               <span>Launch Rover Arena</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -731,7 +646,14 @@ export default function HomePage() {
           </div>
 
           {/* Practice Arena 2: Hazard Filter */}
-          <div className="bg-white rounded-3xl border-2 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between">
+          <div
+            className="rounded-3xl border-3 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.88)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+            }}
+          >
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <span className="text-xs font-mono font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-[#1E1E24]">
@@ -744,16 +666,16 @@ export default function HomePage() {
               <h3 className="text-xl sm:text-2xl font-black text-[#1E1E24] leading-tight break-words">
                 Decontaminate Bio-Data Stream
               </h3>
-              <p className="text-xs font-bold text-gray-500 leading-relaxed break-words">
+              <p className="text-xs font-bold text-gray-600 leading-relaxed break-words">
                 Radiation has scrambled incoming biological sensor packets. Write conditional loops to inspect sensor arrays, routing clean samples into the cold vault while burning corrupted cells.
               </p>
-              <div className="p-3 rounded-xl bg-[#1E1E24] text-amber-300 font-mono text-xs overflow-x-auto max-w-full">
+              <div className="p-3 rounded-xl bg-[#1E1E24] text-amber-300 font-mono text-xs overflow-x-auto max-w-full shadow-inner">
                 <code className="whitespace-pre block">for cell in incoming_stream:&#10;  if cell &gt; 0:&#10;    vault.append(cell)</code>
               </div>
             </div>
             <Link
               href="/simulator?mission=mission-hazard-filter"
-              className="w-full btn-arcade btn-arcade-gold py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2"
+              className="w-full btn-arcade btn-arcade-gold py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2 shadow-[3px_3px_0px_#1E1E24]"
             >
               <span>Launch Hazard Arena</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -763,10 +685,17 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          FINAL CTA BANNER
+          FINAL CTA BANNER (Translucent Frosted Neo-Brutalist)
          ========================================================================= */}
-      <section className="w-full bg-[#FAF6EE]/75 backdrop-blur-xs border-t-2 border-[#1E1E24] py-16 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
+      <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-16">
+        <div
+          className="p-8 sm:p-14 rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] text-center space-y-6"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backdropFilter: 'blur(20px) saturate(160%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+          }}
+        >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black">
             <Sparkles className="w-3.5 h-3.5" />
             <span>NO INSTALLATIONS REQUIRED</span>
@@ -784,24 +713,21 @@ export default function HomePage() {
             {currentUser ? (
               <Link
                 href={`/learn/${activeFirstLessonId}`}
-                className="btn-arcade btn-arcade-purple px-8 py-3.5"
+                className="btn-arcade btn-arcade-purple px-8 py-3.5 shadow-[3px_3px_0px_#1E1E24]"
               >
                 Continue Your Adventure Now →
               </Link>
             ) : (
               <>
-                <button
-                  onClick={() => {
-                    setAuthMode('signup');
-                    setIsAuthModalOpen(true);
-                  }}
-                  className="btn-arcade btn-arcade-purple px-8 py-3.5"
+                <Link
+                  href="/auth?mode=signup"
+                  className="btn-arcade btn-arcade-purple px-8 py-3.5 shadow-[3px_3px_0px_#1E1E24]"
                 >
                   Start Free Adventure Now →
-                </button>
+                </Link>
                 <button
                   onClick={handleInstantGuestLaunch}
-                  className="btn-arcade btn-arcade-gold px-6 py-3.5"
+                  className="btn-arcade btn-arcade-gold px-6 py-3.5 shadow-[3px_3px_0px_#1E1E24]"
                 >
                   ⚡ Instant 1-Click Guest Demo
                 </button>
@@ -811,319 +737,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =========================================================================
-          AUTHENTICATION MODAL (Guest Demo + Supabase Login/Signup)
-         ========================================================================= */}
-      {isAuthModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E24]/35 backdrop-blur-xs">
-          <div className="relative w-full max-w-lg bg-white border-3 border-[#1E1E24] rounded-3xl shadow-[8px_8px_0px_#1E1E24] p-6 sm:p-8 animate-in zoom-in-95">
-            <button
-              onClick={() => setIsAuthModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-xl border-2 border-[#1E1E24] bg-[#FAF6EE] text-[#1E1E24] hover:bg-rose-100"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Header */}
-            <div className="text-center mb-6">
-              <img
-                src="/logo.png"
-                alt="Dronacharya Logo"
-                className="w-14 h-14 rounded-2xl border-2 border-[#1E1E24] object-cover shadow-[3px_3px_0px_#1E1E24] mx-auto mb-3 bg-[#FAF6EE]"
-              />
-              <h2 className="text-2xl font-black text-[#1E1E24]">
-                {authMode === 'signin' ? 'Sign In to Your Adventure' : 'Join Dronacharya ⋆˙⟡'}
-              </h2>
-              <p className="text-xs text-[#4A4A58] font-bold mt-1">
-                {authMode === 'signin'
-                  ? 'Enter credentials to load your saved progress & rank.'
-                  : 'Start learning in browser with zero setup required.'}
-              </p>
-            </div>
-
-            {/* Quick 1-Click Guest Demo Button */}
-            <div className="mb-5 p-3 rounded-2xl bg-[#FFD214]/20 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-between gap-2">
-              <div>
-                <div className="font-black text-xs text-[#1E1E24] flex items-center gap-1.5">
-                  <span>Want to explore without an account?</span>
-                  <span className="text-[10px] bg-[#00B894] text-white px-1.5 py-0.2 rounded font-black">
-                    Instant
-                  </span>
-                </div>
-                <div className="text-[11px] text-[#4A4A58] font-bold">
-                  Play as Guest Demo directly.
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleInstantGuestLaunch}
-                className="btn-arcade btn-arcade-gold py-1.5 px-3.5 flex items-center gap-1 shrink-0"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>Play as Guest</span>
-              </button>
-            </div>
-
-            {/* Auth Mode Tabs */}
-            <div className="flex border-b-2 border-[#1E1E24] mb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode('signin');
-                  setAuthError(null);
-                }}
-                className={`flex-1 py-2 text-xs font-black border-b-2 transition-all ${
-                  authMode === 'signin'
-                    ? 'border-[#6C5CE7] text-[#6C5CE7]'
-                    : 'border-transparent text-gray-400'
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode('signup');
-                  setSignupStep(1);
-                  setAuthError(null);
-                }}
-                className={`flex-1 py-2 text-xs font-black border-b-2 transition-all ${
-                  authMode === 'signup'
-                    ? 'border-[#6C5CE7] text-[#6C5CE7]'
-                    : 'border-transparent text-gray-400'
-                }`}
-              >
-                New Apprentice
-              </button>
-            </div>
-
-            {/* Error & Success Feedback */}
-            {authError && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border-2 border-rose-400 text-xs text-rose-700 font-bold flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{authError}</span>
-              </div>
-            )}
-
-            {authSuccess && (
-              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border-2 border-emerald-400 text-xs text-emerald-800 font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{authSuccess}</span>
-              </div>
-            )}
-
-            {/* SIGN IN FORM */}
-            {authMode === 'signin' ? (
-              <form onSubmit={handleSignIn} className="space-y-4 text-xs font-bold">
-                <div>
-                  <label className="block text-[#1E1E24] mb-1">Email Address</label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                    <input
-                      type="email"
-                      required
-                      value={authEmail}
-                      onChange={(e) => setAuthEmail(e.target.value)}
-                      onBlur={() => setAuthEmail((e) => e.trim())}
-                      placeholder="scholar@gurukul.edu"
-                      className="w-full pl-9 pr-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[#1E1E24]">Password</label>
-                  </div>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      autoComplete="current-password"
-                      data-lpignore="true"
-                      value={authPassword}
-                      onChange={(e) => setAuthPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full pl-9 pr-10 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1E1E24] cursor-pointer"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full btn-arcade btn-arcade-purple py-2.5 mt-2"
-                >
-                  Enter Adventure Realm →
-                </button>
-              </form>
-            ) : (
-              /* SIGN UP WIZARD */
-              <div>
-                {/* Step Indicators */}
-                <div className="flex items-center justify-between mb-5 px-4 text-xs font-black">
-                  <div className={`flex items-center gap-1.5 ${signupStep >= 1 ? 'text-[#6C5CE7]' : 'text-gray-400'}`}>
-                    <span className="w-5 h-5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] flex items-center justify-center text-[10px]">1</span>
-                    <span>Account</span>
-                  </div>
-                  <div className="w-8 h-0.5 bg-gray-300" />
-                  <div className={`flex items-center gap-1.5 ${signupStep >= 2 ? 'text-[#6C5CE7]' : 'text-gray-400'}`}>
-                    <span className="w-5 h-5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] flex items-center justify-center text-[10px]">2</span>
-                    <span>Class</span>
-                  </div>
-                  <div className="w-8 h-0.5 bg-gray-300" />
-                  <div className={`flex items-center gap-1.5 ${signupStep >= 3 ? 'text-[#6C5CE7]' : 'text-gray-400'}`}>
-                    <span className="w-5 h-5 rounded-full bg-[#EDE9FE] border border-[#1E1E24] flex items-center justify-center text-[10px]">3</span>
-                    <span>Track</span>
-                  </div>
-                </div>
-
-                {/* Step 1: Account Info */}
-                {signupStep === 1 && (
-                  <form onSubmit={handleProceedToStep2} className="space-y-4 text-xs font-bold">
-                    <div>
-                      <label className="block text-[#1E1E24] mb-1">Explorer Name</label>
-                      <input
-                        type="text"
-                        required
-                        value={authName}
-                        onChange={(e) => setAuthName(e.target.value)}
-                        placeholder="e.g. Robin Hood"
-                        className="w-full px-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#1E1E24] mb-1">Email Address</label>
-                      <input
-                        type="email"
-                        required
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
-                        onBlur={() => setAuthEmail((e) => e.trim())}
-                        placeholder="robin@adventure.dev"
-                        className="w-full px-3 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-[#1E1E24]">Password (min 6 chars)</label>
-                        <button
-                          type="button"
-                          onClick={handleGenerateSafePassword}
-                          className="text-[10px] text-[#6C5CE7] hover:underline font-black flex items-center gap-1 cursor-pointer bg-[#EDE9FE] px-2 py-0.5 rounded-md border border-[#6C5CE7]/30"
-                        >
-                          <span>🎲 Safe Password</span>
-                        </button>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          required
-                          autoComplete="new-password"
-                          data-lpignore="true"
-                          value={authPassword}
-                          onChange={(e) => setAuthPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-3 pr-10 py-2 border-2 border-[#1E1E24] rounded-xl bg-[#FAF6EE] focus:bg-white focus:outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1E1E24] cursor-pointer"
-                          tabIndex={-1}
-                        >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full btn-arcade btn-arcade-purple py-2.5"
-                    >
-                      Next: Choose Experience Grade →
-                    </button>
-                  </form>
-                )}
-
-                {/* Step 2: Class Selection */}
-                {signupStep === 2 && (
-                  <div className="space-y-4 text-xs font-bold">
-                    <label className="block text-[#1E1E24]">Select Your Current Level:</label>
-                    <div className="space-y-2">
-                      {AVAILABLE_CLASSES.map((c) => (
-                        <div
-                          key={c}
-                          onClick={() => setAuthClass(c)}
-                          className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex items-center justify-between ${
-                            authClass === c ? 'bg-[#FFD214] shadow-[2px_2px_0px_#1E1E24] font-black' : 'bg-white hover:bg-gray-50'
-                          }`}
-                        >
-                          <span>{c}</span>
-                          {authClass === c && <CheckCircle2 className="w-4 h-4 text-[#1E1E24]" />}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                      <button onClick={() => setSignupStep(1)} className="btn-arcade btn-arcade-white py-2 px-4">
-                        Back
-                      </button>
-                      <button
-                        onClick={handleProceedToStep3}
-                        className="flex-1 btn-arcade btn-arcade-purple py-2 px-4"
-                      >
-                        Next: Choose Realm Track →
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Track Selection (Active Only) */}
-                {signupStep === 3 && (
-                  <div className="space-y-4 text-xs font-bold">
-                    <label className="block text-[#1E1E24]">Select Your Active Starting Track:</label>
-                    <div className="space-y-2">
-                      {AVAILABLE_SUBJECTS.filter((s) => !s.isComingSoon).map((s) => (
-                        <div
-                          key={s.id}
-                          onClick={() => setAuthSubject(s.id)}
-                          className={`p-3 rounded-xl border-2 border-[#1E1E24] cursor-pointer transition-all flex items-center justify-between ${
-                            authSubject === s.id ? 'bg-[#EDE9FE] border-[#6C5CE7] shadow-[2px_2px_0px_#6C5CE7] font-black' : 'bg-white hover:bg-gray-50'
-                          }`}
-                        >
-                          <div>
-                            <span className="block font-black text-[#1E1E24]">{s.name}</span>
-                            <span className="text-[11px] text-gray-500">{s.tagline}</span>
-                          </div>
-                          {authSubject === s.id && <CheckCircle2 className="w-4 h-4 text-[#6C5CE7]" />}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                      <button onClick={() => setSignupStep(2)} className="btn-arcade btn-arcade-white py-2 px-4">
-                        Back
-                      </button>
-                      <button
-                        onClick={handleFinalSignUp}
-                        className="flex-1 btn-arcade btn-arcade-gold py-2.5 px-4"
-                      >
-                        Embark on Quest Now! 🚀
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

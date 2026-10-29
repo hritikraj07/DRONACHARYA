@@ -51,6 +51,7 @@ import {
   Globe,
   Palette,
   ExternalLink,
+  MapPin,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -172,52 +173,59 @@ export default function HomePage() {
     });
 
   return (
-    <div className="w-full flex flex-col items-center text-[#1E1E24] overflow-x-hidden">
+    <div className="w-full flex flex-col items-center text-[#1E1E24] overflow-x-clip">
       {/* =========================================================================
           1. CODÉDEX HERO SECTION WITH AMBIENT ADVENTURE SCENERY
          ========================================================================= */}
-      <section className="relative w-full min-h-[calc(100vh-3.5rem)] flex items-center justify-center overflow-hidden">
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+      <section className="relative w-full overflow-hidden">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-12 sm:pb-16">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Authentic Codédex Copy & Dual CTAs */}
-            <div className="md:col-span-6 lg:col-span-6 flex flex-col justify-center space-y-7 sm:space-y-9">
-              <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-[76px] font-black text-[#1E1E24] leading-[1.04] tracking-tight">
+            <div className="md:col-span-6 lg:col-span-6 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
+                <Sparkles className="w-4 h-4 text-[#1E1E24]" />
+                <span className="text-xs font-black uppercase tracking-wider text-[#1E1E24]">
+                  THE DIGITAL GURUKUL ⋆˙⟡ CODING ADVENTURE
+                </span>
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#1E1E24] leading-[1.05] tracking-tight">
                 START YOUR <br />
-                <span className="inline-block pb-3 pr-1 bg-gradient-to-r from-[#6C5CE7] via-[#FF7675] to-[#FFD214] bg-clip-text text-transparent">
+                <span className="inline-block pb-2 pr-1 bg-gradient-to-r from-[#6C5CE7] via-[#FF7675] to-[#FFD214] bg-clip-text text-transparent">
                   Coding Adventure
                 </span>{' '}
-                <span className="text-[#FFD214] text-4xl sm:text-5xl select-none inline-block align-middle">⋆˙⟡</span>
+                <span className="text-[#FFD214] text-3xl sm:text-4xl">⋆˙⟡</span>
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-[#3A3A48] max-w-xl font-bold leading-relaxed">
+              <p className="text-sm sm:text-base text-[#4A4A58] max-w-xl font-bold leading-relaxed">
                 The most fun and beginner-friendly way to learn to code. Level up through bite-sized RPG quests, code live in browser studios, and build real-world web apps & games.
               </p>
 
               {/* Dual CTAs (Tactile Arcade Buttons) */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-5 pt-2">
+              <div className="flex flex-wrap items-center gap-4 pt-1">
                 {currentUser ? (
                   <Link
                     href={activeSubjectId === 'python' ? '/courses/python/dashboard' : `/learn/${activeFirstLessonId}`}
-                    className="btn-arcade btn-arcade-gold px-8 py-4 text-sm sm:text-base font-black flex items-center gap-2.5 shadow-[4px_4px_0px_#1E1E24]"
+                    className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
                   >
-                    <Sparkles className="w-5 h-5 text-[#071426]" />
+                    <Sparkles className="w-4 h-4 text-[#071426]" />
                     <span>Resume Adventure 🚀</span>
                   </Link>
                 ) : (
                   <Link
                     href="/auth?mode=signup"
-                    className="btn-arcade btn-arcade-gold px-8 py-4 text-sm sm:text-base font-black flex items-center gap-2.5 shadow-[4px_4px_0px_#1E1E24]"
+                    className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
                   >
-                    <Sparkles className="w-5 h-5 text-[#071426]" />
+                    <Sparkles className="w-4 h-4 text-[#071426]" />
                     <span>Start Your Adventure 🚀</span>
                   </Link>
                 )}
 
                 <Link
                   href="/courses"
-                  className="btn-arcade btn-arcade-white px-7 py-4 text-sm sm:text-base font-black flex items-center gap-2.5 shadow-[4px_4px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-white px-6 py-3.5 flex items-center gap-2"
                 >
-                  <Compass className="w-5 h-5 text-[#6C5CE7]" />
+                  <Compass className="w-4 h-4 text-[#6C5CE7]" />
                   <span>Explore All Quests →</span>
                 </Link>
               </div>
@@ -580,103 +588,297 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          5. "PRACTICE YOUR CODING CHOPS" MINI-GAME ARENA (Translucent Frosted Neo-Brutalist)
+          5. VEDIC-TECH OVERWORLD • QUEST ROADMAP (Translucent Frosted Neo-Brutalist)
          ========================================================================= */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8 overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-xs font-black uppercase tracking-wider text-[#00B894] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-300">
-              Interactive Practice Arenas
+            <span className="text-xs font-black uppercase tracking-wider text-[#6C5CE7] bg-[#EDE9FE] px-3.5 py-1.5 rounded-full border border-[#6C5CE7]/30 shadow-[1px_1px_0px_#6C5CE7]">
+              ⋆˙⟡ Vedic-Tech Overworld • Quest Roadmap
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2 break-words">
-              Practice Your Coding Chops
+              The 4 Ascents: Your Quest Journey
             </h2>
             <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1 max-w-xl break-words">
-              Apply what you learn in playful, code-controlled game simulations.
+              Ascend from Starter Village to Capstone Summit Peak. Interactive milestones dynamically sync with your validated code missions.
             </p>
           </div>
 
           <Link
-            href="/simulator"
+            href="/paths"
             className="btn-arcade btn-arcade-dark px-5 py-2.5 flex items-center gap-1.5 self-start md:self-auto shrink-0 shadow-[3px_3px_0px_#1E1E24]"
           >
-            <span>Open Simulator Hub</span>
+            <span>Open Full World Map</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          {/* Practice Arena 1: Rover Rescue */}
-          <div
-            className="rounded-3xl border-3 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.88)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-            }}
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-xs font-mono font-black text-[#6C5CE7] bg-[#EDE9FE] px-2.5 py-1 rounded-lg border border-[#1E1E24]">
-                  Stage 3 • Loop Lab
-                </span>
-                <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
-                  +150 XP
-                </span>
+        {/* The 4 Overworld Stage Cards Grid */}
+        <div
+          className="rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-5 sm:p-8 space-y-6"
+          style={{
+            backgroundColor: 'rgba(250, 246, 238, 0.80)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+          }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Stage 1: Active */}
+            <div className="relative rounded-2xl border-3 border-[#6C5CE7] bg-white/95 p-4 sm:p-5 shadow-[5px_5px_0px_#6C5CE7] flex flex-col justify-between transition-transform hover:-translate-y-1">
+              <div className="absolute -top-3 right-3 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#6C5CE7] text-white text-[9px] font-pixel font-bold border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFD214] animate-ping" />
+                <span>ACTIVE</span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-[#1E1E24] leading-tight break-words">
-                Rescue Exploration Rover Arya
-              </h3>
-              <p className="text-xs font-bold text-gray-600 leading-relaxed break-words">
-                Program an autonomous exploration rover through an infected research labyrinth. Collect power cells, evade hazardous debris, and reach the extraction beacon before battery failure.
-              </p>
-              <div className="p-3 rounded-xl bg-[#1E1E24] text-emerald-300 font-mono text-xs overflow-x-auto max-w-full shadow-inner">
-                <code className="whitespace-pre block">for step in range(3):&#10;  rover.move_right()&#10;rover.collect()</code>
+
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-pixel uppercase px-2 py-0.5 rounded-md border border-[#1E1E24] bg-[#FAF6EE] text-[#1E1E24]">
+                    0M – 300M
+                  </span>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#FAF6EE] border border-[#1E1E24]/30 text-gray-600">
+                    Stage 1
+                  </span>
+                </div>
+
+                <div className="w-12 h-12 rounded-xl bg-amber-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
+                  🏕️
+                </div>
+
+                <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
+                  Starter Village & Rover Plains
+                </h3>
+                <span className="text-[11px] font-mono font-bold text-[#6C5CE7] block mb-2">
+                  print() & String Transmissions
+                </span>
+                <p className="text-xs text-[#4A4A58] line-clamp-3 font-bold leading-relaxed">
+                  Wake stranded field rover Arya on the starter plains. Master string literals, console output, and indentation.
+                </p>
+
+                <div className="mt-3 p-1.5 rounded-lg bg-[#FAF6EE] border border-[#1E1E24]/20 text-[10px] text-[#1E1E24] font-bold flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-[#6C5CE7] shrink-0" />
+                  <span className="truncate">Rover Arya Field Station</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t-2 border-[#1E1E24]/15 flex items-center justify-between">
+                <span className="text-xs font-mono font-black text-amber-900 bg-[#FFD214]/40 px-2 py-0.5 rounded border border-amber-400">
+                  +130 XP
+                </span>
+                <Link
+                  href="/learn/py-less-1-1"
+                  className="btn-arcade btn-arcade-purple px-3 py-1.5 text-xs flex items-center gap-1 shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <span>Enter Quest</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
             </div>
-            <Link
-              href="/simulator?mission=mission-rescue-robot"
-              className="w-full btn-arcade btn-arcade-purple py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2 shadow-[3px_3px_0px_#1E1E24]"
-            >
-              <span>Launch Rover Arena</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+
+            {/* Stage 2: Locked */}
+            <div className="relative rounded-2xl border-3 border-[#1E1E24] bg-[#FAF6EE]/80 p-4 sm:p-5 shadow-[4px_4px_0px_#1E1E24] flex flex-col justify-between opacity-85 transition-transform hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-pixel uppercase px-2 py-0.5 rounded-md border border-[#1E1E24] bg-white text-[#1E1E24]">
+                    400M – 800M
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-300">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>LOCKED</span>
+                  </span>
+                </div>
+
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
+                  🌲
+                </div>
+
+                <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
+                  Variable Valley & Gurukul Tree
+                </h3>
+                <span className="text-[11px] font-mono font-bold text-[#6C5CE7] block mb-2">
+                  State Memory & Registers
+                </span>
+                <p className="text-xs text-[#4A4A58] line-clamp-3 font-bold leading-relaxed">
+                  Ascend the tiered terracotta cliffs to the sacred Gurukul Tree. Store battery reserves, coordinates, and health.
+                </p>
+
+                <div className="mt-3 p-1.5 rounded-lg bg-white border border-[#1E1E24]/20 text-[10px] text-[#1E1E24] font-bold flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-[#6C5CE7] shrink-0" />
+                  <span className="truncate">Centuries-Old Gurukul Tree</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t-2 border-[#1E1E24]/15 flex items-center justify-between">
+                <span className="text-xs font-mono font-black text-amber-900 bg-[#FFD214]/40 px-2 py-0.5 rounded border border-amber-400">
+                  +170 XP
+                </span>
+                <Link
+                  href="/paths"
+                  className="btn-arcade btn-arcade-white px-3 py-1.5 text-xs flex items-center gap-1 shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <span>Inspect</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Stage 3: Locked */}
+            <div className="relative rounded-2xl border-3 border-[#1E1E24] bg-[#FAF6EE]/80 p-4 sm:p-5 shadow-[4px_4px_0px_#1E1E24] flex flex-col justify-between opacity-85 transition-transform hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-pixel uppercase px-2 py-0.5 rounded-md border border-[#1E1E24] bg-white text-[#1E1E24]">
+                    900M – 1200M
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-300">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>LOCKED</span>
+                  </span>
+                </div>
+
+                <div className="w-12 h-12 rounded-xl bg-purple-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
+                  🏰
+                </div>
+
+                <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
+                  Conditional Castle & Logic Gates
+                </h3>
+                <span className="text-[11px] font-mono font-bold text-[#6C5CE7] block mb-2">
+                  Branching if, elif, else Logic
+                </span>
+                <p className="text-xs text-[#4A4A58] line-clamp-3 font-bold leading-relaxed">
+                  Navigate the steep mountain pass carved with monolithic stone archways. Equip Arya with sensor threshold evaluations.
+                </p>
+
+                <div className="mt-3 p-1.5 rounded-lg bg-white border border-[#1E1E24]/20 text-[10px] text-[#1E1E24] font-bold flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-[#6C5CE7] shrink-0" />
+                  <span className="truncate">Monolithic Stone Archways</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t-2 border-[#1E1E24]/15 flex items-center justify-between">
+                <span className="text-xs font-mono font-black text-amber-900 bg-[#FFD214]/40 px-2 py-0.5 rounded border border-amber-400">
+                  +170 XP
+                </span>
+                <Link
+                  href="/paths"
+                  className="btn-arcade btn-arcade-white px-3 py-1.5 text-xs flex items-center gap-1 shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <span>Inspect</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Stage 4: Locked */}
+            <div className="relative rounded-2xl border-3 border-[#1E1E24] bg-[#FAF6EE]/80 p-4 sm:p-5 shadow-[4px_4px_0px_#1E1E24] flex flex-col justify-between opacity-85 transition-transform hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-pixel uppercase px-2 py-0.5 rounded-md border border-[#1E1E24] bg-white text-[#1E1E24]">
+                    1300M – 1600M
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-300">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>LOCKED</span>
+                  </span>
+                </div>
+
+                <div className="w-12 h-12 rounded-xl bg-rose-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
+                  🏔️
+                </div>
+
+                <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
+                  Loop Lab & Capstone Summit
+                </h3>
+                <span className="text-[11px] font-mono font-bold text-[#6C5CE7] block mb-2">
+                  Loops & Capstone Project
+                </span>
+                <p className="text-xs text-[#4A4A58] line-clamp-3 font-bold leading-relaxed">
+                  Reach the highest altitude: the grand Temple-Castle peak. Automate wheel rotations with loops and construct the Capstone.
+                </p>
+
+                <div className="mt-3 p-1.5 rounded-lg bg-white border border-[#1E1E24]/20 text-[10px] text-[#1E1E24] font-bold flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-[#6C5CE7] shrink-0" />
+                  <span className="truncate">Grand Temple-Castle Peak</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t-2 border-[#1E1E24]/15 flex items-center justify-between">
+                <span className="text-xs font-mono font-black text-amber-900 bg-[#FFD214]/40 px-2 py-0.5 rounded border border-amber-400">
+                  +350 XP
+                </span>
+                <Link
+                  href="/paths"
+                  className="btn-arcade btn-arcade-white px-3 py-1.5 text-xs flex items-center gap-1 shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <span>Inspect</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
           </div>
 
-          {/* Practice Arena 2: Hazard Filter */}
-          <div
-            className="rounded-3xl border-3 border-[#1E1E24] p-5 sm:p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 max-w-full overflow-hidden break-words flex flex-col justify-between"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.88)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-            }}
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-xs font-mono font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-[#1E1E24]">
-                  Stage 4 • Decision Forest
-                </span>
-                <span className="text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
-                  +150 XP
-                </span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-black text-[#1E1E24] leading-tight break-words">
-                Decontaminate Bio-Data Stream
-              </h3>
-              <p className="text-xs font-bold text-gray-600 leading-relaxed break-words">
-                Radiation has scrambled incoming biological sensor packets. Write conditional loops to inspect sensor arrays, routing clean samples into the cold vault while burning corrupted cells.
-              </p>
-              <div className="p-3 rounded-xl bg-[#1E1E24] text-amber-300 font-mono text-xs overflow-x-auto max-w-full shadow-inner">
-                <code className="whitespace-pre block">for cell in incoming_stream:&#10;  if cell &gt; 0:&#10;    vault.append(cell)</code>
-              </div>
-            </div>
+          {/* Interactive Terrain Props Bottom Row */}
+          <div className="pt-4 border-t-2 border-[#1E1E24]/15 grid grid-cols-1 md:grid-cols-3 gap-3.5">
             <Link
-              href="/simulator?mission=mission-hazard-filter"
-              className="w-full btn-arcade btn-arcade-gold py-2.5 px-4 flex items-center justify-center gap-1.5 mt-2 shadow-[3px_3px_0px_#1E1E24]"
+              href="/paths"
+              className="p-3.5 rounded-2xl bg-white/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] hover:-translate-y-0.5 transition-all flex items-center justify-between group"
             >
-              <span>Launch Hazard Arena</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-sky-100 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center text-xl">
+                  🤖
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-serif font-black text-xs sm:text-sm text-[#1E1E24]">Rover Arya</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-500">
+                    Starter Village • Live Telemetry
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-black text-[#6C5CE7] group-hover:underline">HUD →</span>
+            </Link>
+
+            <Link
+              href="/paths"
+              className="p-3.5 rounded-2xl bg-white/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] hover:-translate-y-0.5 transition-all flex items-center justify-between group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center text-xl">
+                  🌳
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-serif font-black text-xs sm:text-sm text-[#1E1E24]">The Gurukul Tree</span>
+                    <span className="text-[9px] font-pixel bg-amber-200 px-1 rounded text-amber-900">CODEX</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-500">
+                    Sculpted roots • Memory register
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-black text-[#6C5CE7] group-hover:underline">Archive →</span>
+            </Link>
+
+            <Link
+              href="/paths"
+              className="p-3.5 rounded-2xl bg-white/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] hover:-translate-y-0.5 transition-all flex items-center justify-between group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-200 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center text-xl">
+                  📜
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-serif font-black text-xs sm:text-sm text-[#1E1E24]">Capstone Scroll</span>
+                    <span className="text-[9px] font-pixel bg-purple-200 px-1 rounded text-purple-900">SUMMIT</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-500">
+                    Character Creator • Stage synthesis
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-black text-[#6C5CE7] group-hover:underline">Briefing →</span>
             </Link>
           </div>
         </div>

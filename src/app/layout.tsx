@@ -52,9 +52,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${lora.variable} ${inter.variable} ${jetbrainsMono.variable} ${pressStart2P.variable} h-full antialiased`}
+      className={`${lora.variable} ${inter.variable} ${jetbrainsMono.variable} ${pressStart2P.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-[#FAF6EE] text-[#1E1E24]">
+      <body className="min-h-screen flex flex-col font-sans bg-[#FAF6EE] text-[#1E1E24]">
         <AppShell>{children}</AppShell>
       </body>
     </html>

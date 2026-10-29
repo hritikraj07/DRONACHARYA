@@ -169,7 +169,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
   return (
     <>
       <header
-        className="sticky top-0 z-40 w-full bg-[#FAF6EE]/95 backdrop-blur-md border-b border-slate-200 text-[#1E1E24] transition-colors"
+        className="sticky top-0 z-50 w-full bg-[#FAF6EE]/95 backdrop-blur-md border-b border-slate-200 text-[#1E1E24]"
       >
         <div className="w-full px-3 sm:px-6 h-14 flex items-center justify-between flex-nowrap gap-2 overflow-visible">
           {/* LEFT: Brand Logo & Title */}

@@ -224,9 +224,9 @@ function AuthContent() {
         <div
           className="w-full max-w-lg rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-5 sm:p-7 text-[#1E1E24] transition-all relative overflow-hidden"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(20px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+            backgroundColor: 'rgba(250, 246, 238, 0.78)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
           }}
         >
           {/* Brand Logo & Header */}

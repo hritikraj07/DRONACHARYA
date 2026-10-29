@@ -39,6 +39,7 @@ export default function SquadsPage() {
 
   // Authentication check
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [requestedGuildIds, setRequestedGuildIds] = useState<string[]>([]);
   const [guildSearchQuery, setGuildSearchQuery] = useState('');
@@ -74,6 +75,7 @@ export default function SquadsPage() {
     const checkAuth = () => {
       const s = getActiveSession();
       setIsLoggedIn(!!s && s.id !== 'guest');
+      setAuthLoaded(true);
     };
     checkAuth();
     window.addEventListener('dronacharya_session_change', checkAuth);
@@ -272,6 +274,101 @@ export default function SquadsPage() {
         },
       ];
 
+  // If not logged in, display sign-in / sign-up barrier matching user requirements
+  if (authLoaded && !isLoggedIn) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 w-full text-[#1E1E24]">
+        <div
+          className="rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-8 sm:p-12 text-center space-y-8"
+          style={{
+            backgroundColor: 'rgba(250, 246, 238, 0.80)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+          }}
+        >
+          {/* Top Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black">
+            <Users className="w-4 h-4 text-[#1E1E24]" />
+            <span>CO-OP CODING SQUADS</span>
+          </div>
+
+          <div className="space-y-3 max-w-2xl mx-auto">
+            <h1 className="font-serif font-black text-3xl sm:text-5xl text-[#1E1E24] tracking-tight">
+              Coding Guilds & Squads
+            </h1>
+            <p className="text-sm sm:text-base font-bold text-[#4A4A58] leading-relaxed">
+              Team up in 1-5 member squads. Solve coding quests together, safeguard your daily streak flame, and earn collective group XP rewards.
+            </p>
+          </div>
+
+          {/* Perks Feature Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-2">
+            <div className="p-4 rounded-2xl bg-white/75 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 border border-[#1E1E24] flex items-center justify-center text-amber-700 shadow-[1px_1px_0px_#1E1E24]">
+                <Flame className="w-5 h-5 fill-current" />
+              </div>
+              <h4 className="font-black text-xs sm:text-sm text-[#1E1E24]">Shared Streak Shield</h4>
+              <p className="text-[11px] font-bold text-gray-600 leading-normal">
+                3+ daily active coders in your party protect everyone&apos;s streak when life gets busy.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/75 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-[#1E1E24] flex items-center justify-center text-emerald-700 shadow-[1px_1px_0px_#1E1E24]">
+                <Zap className="w-5 h-5 fill-current" />
+              </div>
+              <h4 className="font-black text-xs sm:text-sm text-[#1E1E24]">+15% Group XP Boost</h4>
+              <p className="text-[11px] font-bold text-gray-600 leading-normal">
+                Active parties enjoy amplified mastery experience points on all validated code challenges.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/75 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-purple-100 border border-[#1E1E24] flex items-center justify-center text-[#6C5CE7] shadow-[1px_1px_0px_#1E1E24]">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h4 className="font-black text-xs sm:text-sm text-[#1E1E24]">Co-op Weekly Quests</h4>
+              <p className="text-[11px] font-bold text-gray-600 leading-normal">
+                Collaborate on multiplayer coding goals, peer reviews, and capstone team projects.
+              </p>
+            </div>
+          </div>
+
+          {/* Locked / Sign In Barrier Prompt Box */}
+          <div className="p-6 rounded-2xl bg-[#FAF6EE] border-2 border-dashed border-[#1E1E24] max-w-lg mx-auto space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center mx-auto text-[#6C5CE7]">
+              <Lock className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-black text-base text-[#1E1E24]">
+                Sign In or Sign Up to View Guilds
+              </h3>
+              <p className="text-xs font-bold text-gray-500">
+                You must be logged in to view your party roster, browse public guilds, or create a squad.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <Link
+                href="/auth?mode=signin"
+                className="btn-arcade btn-arcade-dark px-6 py-2.5 text-xs font-black shadow-[3px_3px_0px_#1E1E24]"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/auth?mode=signup"
+                className="btn-arcade btn-arcade-gold px-6 py-2.5 text-xs font-black flex items-center gap-1.5 shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <Sparkles className="w-4 h-4 text-[#1E1E24]" />
+                <span>Sign Up to Enter</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full text-[#1E1E24]">
       {/* Header */}
@@ -337,7 +434,7 @@ export default function SquadsPage() {
           <div
             className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24]"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.88)',
+              backgroundColor: 'rgba(250, 246, 238, 0.80)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
             }}
@@ -478,7 +575,7 @@ export default function SquadsPage() {
           <div
             className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.88)',
+              backgroundColor: 'rgba(250, 246, 238, 0.80)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
             }}
@@ -528,7 +625,7 @@ export default function SquadsPage() {
           <div
             className="p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-3.5"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.88)',
+              backgroundColor: 'rgba(250, 246, 238, 0.80)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
             }}

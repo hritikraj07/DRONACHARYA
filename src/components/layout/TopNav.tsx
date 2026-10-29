@@ -41,6 +41,7 @@ import {
   Lock,
   Pickaxe,
   Settings,
+  Home,
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -144,6 +145,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
 
   // All navigation links directly visible in navbar (More dropdown eliminated)
   const navLinks = [
+    { name: 'Home', href: '/', icon: Home },
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Practice', href: '/simulator', icon: Gamepad2 },
     { name: 'Code Dungeon', href: '/dungeon', icon: Pickaxe },

@@ -180,49 +180,47 @@ export default function HomePage() {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Authentic Codédex Copy & Dual CTAs */}
-            <div className="md:col-span-6 lg:col-span-6 space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#1E1E24] leading-[1.05] tracking-tight">
+            <div className="md:col-span-6 lg:col-span-6 flex flex-col justify-center space-y-7 sm:space-y-9">
+              <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-[76px] font-black text-[#1E1E24] leading-[1.04] tracking-tight">
                 START YOUR <br />
-                <span className="inline-block pb-2 pr-1 bg-gradient-to-r from-[#6C5CE7] via-[#FF7675] to-[#FFD214] bg-clip-text text-transparent">
+                <span className="inline-block pb-3 pr-1 bg-gradient-to-r from-[#6C5CE7] via-[#FF7675] to-[#FFD214] bg-clip-text text-transparent">
                   Coding Adventure
                 </span>{' '}
-                <span className="text-[#FFD214] text-3xl sm:text-4xl">⋆˙⟡</span>
+                <span className="text-[#FFD214] text-4xl sm:text-5xl select-none inline-block align-middle">⋆˙⟡</span>
               </h1>
 
-              <p className="text-sm sm:text-base text-[#4A4A58] max-w-xl font-bold leading-relaxed">
+              <p className="text-base sm:text-lg lg:text-xl text-[#3A3A48] max-w-xl font-bold leading-relaxed">
                 The most fun and beginner-friendly way to learn to code. Level up through bite-sized RPG quests, code live in browser studios, and build real-world web apps & games.
               </p>
 
               {/* Dual CTAs (Tactile Arcade Buttons) */}
-              <div className="flex flex-wrap items-center gap-4 pt-1">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-5 pt-2">
                 {currentUser ? (
                   <Link
                     href={activeSubjectId === 'python' ? '/courses/python/dashboard' : `/learn/${activeFirstLessonId}`}
-                    className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
+                    className="btn-arcade btn-arcade-gold px-8 py-4 text-sm sm:text-base font-black flex items-center gap-2.5 shadow-[4px_4px_0px_#1E1E24]"
                   >
-                    <Sparkles className="w-4 h-4 text-[#071426]" />
+                    <Sparkles className="w-5 h-5 text-[#071426]" />
                     <span>Resume Adventure 🚀</span>
                   </Link>
                 ) : (
                   <Link
                     href="/auth?mode=signup"
-                    className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
+                    className="btn-arcade btn-arcade-gold px-8 py-4 text-sm sm:text-base font-black flex items-center gap-2.5 shadow-[4px_4px_0px_#1E1E24]"
                   >
-                    <Sparkles className="w-4 h-4 text-[#071426]" />
+                    <Sparkles className="w-5 h-5 text-[#071426]" />
                     <span>Start Your Adventure 🚀</span>
                   </Link>
                 )}
 
                 <Link
                   href="/courses"
-                  className="btn-arcade btn-arcade-white px-6 py-3.5 flex items-center gap-2"
+                  className="btn-arcade btn-arcade-white px-7 py-4 text-sm sm:text-base font-black flex items-center gap-2.5 shadow-[4px_4px_0px_#1E1E24]"
                 >
-                  <Compass className="w-4 h-4 text-[#6C5CE7]" />
+                  <Compass className="w-5 h-5 text-[#6C5CE7]" />
                   <span>Explore All Quests →</span>
                 </Link>
               </div>
-
-
             </div>
 
             {/* Right Column: In-Browser Interactive Code Studio */}
@@ -498,9 +496,9 @@ export default function HomePage() {
         <div
           className="rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] p-8 sm:p-12 space-y-10"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(20px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+            backgroundColor: 'rgba(250, 246, 238, 0.78)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
           }}
         >
           <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
@@ -522,7 +520,7 @@ export default function HomePage() {
             <div
               className="rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 hover:translate-y-[-2px] transition-transform"
               style={{
-                backgroundColor: 'rgba(250, 246, 238, 0.92)',
+                backgroundColor: 'rgba(255, 255, 255, 0.72)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
               }}
@@ -542,7 +540,7 @@ export default function HomePage() {
             <div
               className="rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 hover:translate-y-[-2px] transition-transform"
               style={{
-                backgroundColor: 'rgba(250, 246, 238, 0.92)',
+                backgroundColor: 'rgba(255, 255, 255, 0.72)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
               }}
@@ -562,7 +560,7 @@ export default function HomePage() {
             <div
               className="rounded-3xl border-2 border-[#1E1E24] p-7 shadow-[6px_6px_0px_#1E1E24] space-y-4 hover:translate-y-[-2px] transition-transform"
               style={{
-                backgroundColor: 'rgba(250, 246, 238, 0.92)',
+                backgroundColor: 'rgba(255, 255, 255, 0.72)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
               }}
@@ -691,9 +689,9 @@ export default function HomePage() {
         <div
           className="p-8 sm:p-14 rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] text-center space-y-6"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(20px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+            backgroundColor: 'rgba(250, 246, 238, 0.78)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
           }}
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black">

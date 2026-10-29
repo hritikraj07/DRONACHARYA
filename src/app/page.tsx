@@ -293,18 +293,11 @@ export default function HomePage() {
       {/* =========================================================================
           1. CODÉDEX HERO SECTION WITH AMBIENT ADVENTURE SCENERY
          ========================================================================= */}
-      <section className="relative w-full overflow-hidden">
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-12 sm:pb-16">
+      <section className="relative w-full min-h-[calc(100vh-3.5rem)] flex items-center justify-center overflow-hidden">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Authentic Codédex Copy & Dual CTAs */}
             <div className="md:col-span-6 lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
-                <Sparkles className="w-4 h-4 text-[#1E1E24]" />
-                <span className="text-xs font-black uppercase tracking-wider text-[#1E1E24]">
-                  THE DIGITAL GURUKUL ⋆˙⟡ CODING ADVENTURE
-                </span>
-              </div>
-
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#1E1E24] leading-[1.05] tracking-tight">
                 START YOUR <br />
                 <span className="inline-block pb-2 pr-1 bg-gradient-to-r from-[#6C5CE7] via-[#FF7675] to-[#FFD214] bg-clip-text text-transparent">
@@ -354,7 +347,7 @@ export default function HomePage() {
 
             {/* Right Column: In-Browser Interactive Code Studio */}
             <div className="md:col-span-6 lg:col-span-6">
-              <div className="bg-[#1E1E24] rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] overflow-hidden text-white font-mono text-xs">
+              <div className="bg-[#1E1E24] rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] overflow-hidden text-white font-mono text-xs animate-floating transition-shadow hover:shadow-[12px_12px_0px_#1E1E24]">
                 {/* Studio Window Header Bar */}
                 <div className="bg-[#2A2B36] px-4 py-3 border-b-2 border-[#12131A] flex items-center justify-between gap-3">
                   {/* Dots and File Tabs */}

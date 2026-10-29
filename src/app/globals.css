@@ -471,6 +471,19 @@ code, pre, .font-mono {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
+@keyframes float-window {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-floating {
+  animation: float-window 4.5s ease-in-out infinite;
+}
+
 .animate-bobble {
   animation: bobble 2s ease-in-out infinite;
 }

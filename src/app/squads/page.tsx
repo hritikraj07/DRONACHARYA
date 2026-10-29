@@ -40,9 +40,10 @@ export default function SquadsPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [requestedGuildIds, setRequestedGuildIds] = useState<string[]>([]);
 
-  // Modals for option buttons: "Create Guild" and "Join Guild"
+  // Modals for option buttons: "Create Guild", "Join Guild", and "Remove Member"
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<{ userId: string; fullName: string } | null>(null);
 
   // Create Guild Form State
   const [newGuildName, setNewGuildName] = useState('');
@@ -444,7 +445,7 @@ export default function SquadsPage() {
                     {displayMembers.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveMember(member.userId, member.fullName)}
+                        onClick={() => setMemberToRemove({ userId: member.userId, fullName: member.fullName })}
                         className="p-1.5 rounded-xl border-2 border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-600 transition-all cursor-pointer shadow-[1.5px_1.5px_0px_#EF4444] shrink-0"
                         title={`Remove ${member.fullName} from squad`}
                       >
@@ -797,6 +798,74 @@ export default function SquadsPage() {
               >
                 Create Account Free
               </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =======================================================================
+          MODAL 4: CONFIRM REMOVE MEMBER
+         ======================================================================= */}
+      {memberToRemove && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs select-none animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-[#FAF6EE] text-[#1E1E24] rounded-3xl border-4 border-[#1E1E24] shadow-[10px_10px_0px_#1E1E24] p-6 space-y-5 animate-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b-2 border-[#1E1E24] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-rose-100 border-2 border-rose-600 flex items-center justify-center text-rose-600 shadow-[2px_2px_0px_#EF4444]">
+                  <UserMinus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-black text-xl text-[#1E1E24] leading-tight">
+                    Confirm Member Removal
+                  </h3>
+                  <p className="text-[11px] font-bold text-gray-500">
+                    Guild Roster Management
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMemberToRemove(null)}
+                className="w-8 h-8 rounded-xl bg-white border-2 border-[#1E1E24] flex items-center justify-center font-black hover:bg-rose-50 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Prompt Body */}
+            <div className="space-y-3 text-xs font-bold text-[#4A4A58] leading-relaxed">
+              <p>
+                Are you sure you want to remove <strong className="text-[#1E1E24] font-black text-sm">{memberToRemove.fullName}</strong> from <strong className="text-[#6C5CE7]">{squad.name}</strong>?
+              </p>
+              <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-[11px] font-bold leading-normal flex items-start gap-2 shadow-[2px_2px_0px_#D97706]">
+                <span className="text-base shrink-0">⚠️</span>
+                <span>
+                  Their contributed XP will be retained by the guild, but they will be removed from your active party and squad quests.
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 pt-2 border-t-2 border-[#1E1E24]">
+              <button
+                type="button"
+                onClick={() => setMemberToRemove(null)}
+                className="btn-arcade btn-arcade-white px-4 py-2.5 text-xs font-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleRemoveMember(memberToRemove.userId, memberToRemove.fullName);
+                  setMemberToRemove(null);
+                }}
+                className="btn-arcade btn-arcade-coral px-5 py-2.5 text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
+              >
+                <UserMinus className="w-4 h-4" />
+                <span>Confirm Removal</span>
+              </button>
             </div>
           </div>
         </div>

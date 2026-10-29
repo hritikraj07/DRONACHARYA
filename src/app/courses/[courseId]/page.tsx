@@ -31,7 +31,7 @@ export default function CourseDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F5F2EB] flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="w-10 h-10 border-4 border-[#6C5CE7] border-t-transparent rounded-full animate-spin mb-4" />
           <p className="font-mono text-sm font-bold text-gray-500">Loading course curriculum...</p>
         </div>
@@ -99,7 +99,7 @@ function CourseDetailContent() {
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-[#F5F2EB] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-black text-[#1E1E24]">Course Realm Not Found</h1>
         <p className="text-sm font-bold text-gray-500 mt-2">The requested curriculum does not exist.</p>
         <Link
@@ -134,7 +134,7 @@ function CourseDetailContent() {
   // COMING SOON VIEW
   if (course.isComingSoon) {
     return (
-      <div className="min-h-screen bg-[#F5F2EB] py-12 px-4 sm:px-6 lg:px-8 text-[#1E1E24]">
+      <div className="w-full min-h-screen py-12 px-4 sm:px-6 lg:px-8 text-[#1E1E24]">
         <div className="max-w-3xl mx-auto space-y-6">
           <Link
             href="/courses"
@@ -196,7 +196,7 @@ function CourseDetailContent() {
 
   // ACTIVE COURSE SYLLABUS VIEW
   return (
-    <div className="min-h-screen bg-[#F5F2EB] py-10 px-4 sm:px-6 lg:px-8 text-[#1E1E24]">
+    <div className="w-full min-h-screen py-10 px-4 sm:px-6 lg:px-8 text-[#1E1E24]">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-xs font-bold text-[#4A4A58]">

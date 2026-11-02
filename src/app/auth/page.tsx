@@ -11,14 +11,13 @@ import {
   setActiveSession,
   AVAILABLE_SUBJECTS,
 } from '@/lib/db/auth-db';
+import { PixelEyeIcon } from '@/components/common/PixelEyeIcon';
 import {
   ArrowRight,
   Sparkles,
   AlertCircle,
   CheckCircle2,
   Lock,
-  Eye,
-  EyeOff,
   Mail,
   User,
   Zap,
@@ -323,8 +322,9 @@ function AuthContent() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3.5 top-2.5 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
                     tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    <PixelEyeIcon isOpen={showPassword} className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -436,8 +436,9 @@ function AuthContent() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3.5 top-2.5 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
                     tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    <PixelEyeIcon isOpen={showPassword} className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -470,8 +471,9 @@ function AuthContent() {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3.5 top-2.5 text-[#7E7E8F] hover:text-[#1E1E24] cursor-pointer"
                     tabIndex={-1}
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    <PixelEyeIcon isOpen={showConfirmPassword} className="w-4 h-4" />
                   </button>
                 </div>
                 {confirmPassword && confirmPassword !== password && (

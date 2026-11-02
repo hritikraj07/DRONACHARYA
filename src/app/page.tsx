@@ -169,8 +169,8 @@ export default function HomePage() {
       {/* =========================================================================
           1. CODÉDEX HERO SECTION WITH AMBIENT ADVENTURE SCENERY
          ========================================================================= */}
-      <section className="relative w-full overflow-hidden">
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-12 sm:pb-16">
+      <section className="relative w-full min-h-[calc(100vh-3.5rem)] flex flex-col justify-center overflow-hidden py-10 sm:py-16 lg:py-20">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Authentic Codédex Copy & Dual CTAs */}
             <div className="md:col-span-6 lg:col-span-6 space-y-6">
@@ -330,6 +330,113 @@ export default function HomePage() {
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          2. OFFICIAL GURUKUL ADVENTURE TRAILER (Arcade CRT Showcase)
+         ========================================================================= */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black uppercase tracking-wider text-[#1E1E24]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>OFFICIAL PREVIEW • CINEMATIC TRAILER</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2">
+              Experience The Coding Adventure
+            </h2>
+            <p className="text-xs sm:text-sm text-[#4A4A58] font-bold mt-1 max-w-xl">
+              Watch how Dronacharya turns dry programming concepts into an epic RPG saga filled with quests, boss battles, and Socratic AI guidance.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
+            <span className="px-3 py-1.5 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-mono font-black text-[#6C5CE7] flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span>1080P FULL HD • STEREO</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Retro Arcade Cinema Monitor Cabinet */}
+        <div
+          className="rounded-3xl border-3 border-[#1E1E24] shadow-[10px_10px_0px_#1E1E24] p-4 sm:p-7 space-y-4"
+          style={{
+            backgroundColor: 'rgba(250, 246, 238, 0.90)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+          }}
+        >
+          {/* Top Marquee Bar */}
+          <div className="flex items-center justify-between px-2 pb-2 border-b-2 border-[#1E1E24]/15">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#1E1E24]" />
+              <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#1E1E24]" />
+              <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1E1E24]" />
+              <span className="ml-2 text-xs font-mono font-black uppercase text-[#1E1E24] hidden sm:inline">
+                DRONACHARYA ARCHIVE • TRAILER.MP4
+              </span>
+            </div>
+            <span className="text-[10px] font-pixel text-slate-700 bg-amber-100 px-2.5 py-1 rounded border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24]">
+              NO SETUP • IN-BROWSER
+            </span>
+          </div>
+
+          {/* CRT Screen Frame & Video */}
+          <div className="relative rounded-2xl border-3 border-[#1E1E24] bg-black overflow-hidden shadow-[4px_4px_0px_#1E1E24] aspect-video flex items-center justify-center group">
+            <video
+              id="dronacharya-trailer-video"
+              src="/videos/dronacharya-trailer.mp4"
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          {/* Feature Highlights beneath video */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+            <div className="p-3 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 border border-[#1E1E24] flex items-center justify-center shrink-0">
+                <Gamepad2 className="w-4 h-4 text-[#6C5CE7]" />
+              </div>
+              <div>
+                <span className="text-xs font-mono font-black text-[#1E1E24] block">RPG Quests</span>
+                <span className="text-[10px] font-bold text-gray-500">Learn by playing</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 border border-[#1E1E24] flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <span className="text-xs font-mono font-black text-[#1E1E24] block">Socratic AI</span>
+                <span className="text-[10px] font-bold text-gray-500">Acharya guidance</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-100 border border-[#1E1E24] flex items-center justify-center shrink-0">
+                <Flame className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <span className="text-xs font-mono font-black text-[#1E1E24] block">Daily Streaks</span>
+                <span className="text-[10px] font-bold text-gray-500">Shield freeze</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-sky-100 border border-[#1E1E24] flex items-center justify-center shrink-0">
+                <Code2 className="w-4 h-4 text-sky-600" />
+              </div>
+              <div>
+                <span className="text-xs font-mono font-black text-[#1E1E24] block">Zero Setup</span>
+                <span className="text-[10px] font-bold text-gray-500">Instant sandbox</span>
               </div>
             </div>
           </div>

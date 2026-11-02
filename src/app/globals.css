@@ -501,6 +501,35 @@ code, pre, .font-mono {
   animation: pulse-ring 2.5s ease-in-out infinite;
 }
 
+/* Logo 360 Rotation Animation on Hover */
+@keyframes logoSpin360 {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  35% {
+    transform: rotate(160deg) scale(1.18);
+  }
+  70% {
+    transform: rotate(300deg) scale(1.12);
+  }
+  88% {
+    transform: rotate(375deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.logo-spin-360 {
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center center;
+  display: inline-block;
+}
+
+.logo-spin-360:hover {
+  animation: logoSpin360 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* Custom scrollbar for game workspace */
 ::-webkit-scrollbar {
   width: 8px;

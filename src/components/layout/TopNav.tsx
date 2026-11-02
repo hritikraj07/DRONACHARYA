@@ -149,6 +149,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Practice', href: '/simulator', icon: Gamepad2 },
     { name: 'Code Dungeon', href: '/dungeon', icon: Pickaxe },
+    { name: 'Meditation', href: '/meditation', icon: Sparkles },
     { name: 'World Map', href: '/paths', icon: Compass },
     { name: 'Community', href: '/leaderboard', icon: Flame },
     { name: 'Squads', href: '/squads', icon: Users },
@@ -178,7 +179,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               <img
                 src="/logo.png"
                 alt="Dronacharya Logo"
-                className="w-9 h-9 object-contain group-hover:rotate-6 group-hover:scale-105 transition-all shrink-0 select-none drop-shadow-xs"
+                className="w-9 h-9 object-contain logo-spin-360 shrink-0 select-none drop-shadow-xs"
               />
               <div className="flex flex-col justify-center shrink-0">
                 <span className="font-serif font-black text-sm sm:text-base tracking-tight leading-none text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors flex items-center gap-1 select-none">

@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# temp folder - do not upload to git
+/temp
+/temp/
+
+# scratch folder
+/scratch
+/scratch/

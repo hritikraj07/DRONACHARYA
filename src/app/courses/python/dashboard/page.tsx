@@ -21,6 +21,7 @@ import {
   Compass,
   Play,
   FolderCode,
+  Pickaxe,
   X,
 } from 'lucide-react';
 import { COURSES_CATALOG } from '@/lib/data/course-system';
@@ -226,61 +227,26 @@ function PythonDashboardContent() {
             A. AUTHENTIC PIXEL ART PYTHON SERPENT JUNGLE BANNER & HERO
            ========================================================================= */}
         <section className="relative w-full rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] overflow-hidden bg-[#1B4332]">
-          {/* Panoramic Python Jungle Pixel Art Banner */}
-          <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden border-b-3 border-[#1E1E24]">
+          {/* Panoramic Python Jungle Pixel Art Banner (Pure Pristine Artwork, No Text Overlay) */}
+          <div className="relative w-full h-64 sm:h-80 md:h-[400px] overflow-hidden border-b-3 border-[#1E1E24]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/courses/python-hero-banner.jpg"
-              alt="Learn Python Jungle Serpent Realm"
-              className="w-full h-full object-cover object-center filter saturate-110"
+              alt="Python Serpent Realm Sanctuary"
+              className="w-full h-full object-cover object-center"
             />
-            {/* Ambient Dark Gradient Vignette for Readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1E1E24]/90 via-[#1E1E24]/30 to-transparent pointer-events-none" />
-
-            {/* Overlaid Banner Typography & Fast Stage Action */}
-            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-8 right-4 sm:right-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD214] text-[#1E1E24] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[10px] sm:text-xs font-pixel font-bold">
-                  <span>PYTHON REALM</span>
-                </div>
-                <h1 className="text-3xl sm:text-5xl font-pixel font-black text-white tracking-wide drop-shadow-[0_3px_6px_rgba(0,0,0,0.8)]">
-                  Python
-                </h1>
-                <p className="text-xs sm:text-sm font-bold text-amber-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] max-w-xl">
-                  Think in Logic. Master Python through quests, interactive simulations, and in-browser execution.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3 shrink-0">
-                <Link
-                  href="/courses/python/stage-1"
-                  className="btn-arcade btn-arcade-gold px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
-                >
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>Play Stage 1 Now →</span>
-                </Link>
-                <Link
-                  href="/dungeon"
-                  className="btn-arcade btn-arcade-purple px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
-                >
-                  <span>Enter Code Dungeon</span>
-                </Link>
-              </div>
-            </div>
           </div>
 
-          {/* Lower Hero Bar: Python Track Specifications & Real-time Progress HUD */}
+          {/* Clean Course Specifications & Progress HUD */}
           <div
-            className="p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
-            style={{
-              backgroundColor: 'rgba(250, 246, 238, 0.95)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-            }}
+            className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[#FAF6EE]"
           >
-            {/* Left Specs & Fast Links */}
-            <div className="lg:col-span-7 space-y-3.5">
+            {/* Left Specs, Title & Fast Links */}
+            <div className="lg:col-span-7 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD214] text-[#1E1E24] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-pixel font-bold">
+                  <span>PYTHON REALM</span>
+                </div>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                   Beginner Friendly
                 </span>
@@ -295,24 +261,47 @@ function PythonDashboardContent() {
                 </span>
               </div>
 
-              <p className="text-xs sm:text-sm font-bold text-[#4A4A58] leading-relaxed">
-                From the basics to real-world projects: learn Python by solving missions,
-                writing code and building useful programs. Control autonomous rovers,
-                craft calculations, and defeat dungeon bugs in real in-browser execution.
-              </p>
+              <div>
+                <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight text-[#1E1E24]">
+                  Python
+                </h1>
+                <p className="text-base sm:text-lg font-serif font-bold text-[#6C5CE7] mt-1">
+                  “Think in Logic. Master Python through quests, simulations, and real code.”
+                </p>
+                <p className="text-xs sm:text-sm font-bold text-[#4A4A58] mt-2 max-w-2xl leading-relaxed">
+                  From first-principles logic to algorithmic thinking: solve interactive quests, control autonomous rovers, and defeat dungeon bugs in real in-browser execution.
+                </p>
+              </div>
 
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Link
+                  href="/courses/python/stage-1"
+                  className="btn-arcade btn-arcade-gold px-6 py-3 text-xs sm:text-sm font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>Play Stage 1 Now →</span>
+                </Link>
+
+                <Link
+                  href="/dungeon"
+                  className="btn-arcade btn-arcade-purple px-5 py-3 text-xs sm:text-sm font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
+                >
+                  <Pickaxe className="w-4 h-4" />
+                  <span>Enter Code Dungeon</span>
+                </Link>
+
                 <button
                   type="button"
                   onClick={() => setIsSyllabusModalOpen(true)}
-                  className="btn-arcade btn-arcade-white px-4 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-white px-4 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                 >
-                  <BookOpen className="w-3.5 h-3.5 text-[#306998]" />
+                  <BookOpen className="w-3.5 h-3.5 text-[#1E1E24]" />
                   <span>Curriculum Syllabus</span>
                 </button>
+
                 <Link
                   href="/paths"
-                  className="btn-arcade btn-arcade-white px-4 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-white px-4 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                 >
                   <Compass className="w-3.5 h-3.5 text-[#6C5CE7]" />
                   <span>Interactive World Map</span>

@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { ShieldCheck, Lock, HardDrive, Cpu, ArrowLeft, Mail, Eye, CheckCircle2, FileText } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Dronacharya ⋆˙⟡',
+  title: 'Privacy Policy | Dronacharya ',
   description: 'Privacy Policy for Dronacharya. Learn how we safeguard student data, in-browser code, and game progress.',
 };
 
@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
             Effective Date: {lastUpdated} • Version 2.4
           </p>
           <p className="text-sm sm:text-base text-[#4A4A58] font-bold leading-relaxed max-w-2xl">
-            At <strong className="text-[#1E1E24]">Dronacharya ⋆˙⟡</strong>, we believe student privacy is fundamental. We architect our learning environment with local-first storage, in-browser sandboxes, and minimal data collection.
+            At <strong className="text-[#1E1E24]">Dronacharya </strong>, we believe student privacy is fundamental. We architect our learning environment with local-first storage, in-browser sandboxes, and minimal data collection.
           </p>
         </div>
 
@@ -197,7 +197,7 @@ export default function PrivacyPolicyPage() {
             <FileText className="w-4 h-4 text-[#6C5CE7]" />
             <span>Read Terms of Service →</span>
           </Link>
-          <span>DRONACHARYA ⋆˙⟡ (The Digital Gurukul)</span>
+          <span>DRONACHARYA  (The Digital Gurukul)</span>
         </div>
       </div>
     </div>

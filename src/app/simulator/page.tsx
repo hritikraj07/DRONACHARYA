@@ -136,7 +136,7 @@ def filter_healthy_cells(data_cells: list) -> list:
       'Wrap your text inside quotes, for example: print("Hello, Dronacharya!").',
       'Run the code and verify the output appears in the live console.',
     ],
-    initialCode: `# 🐍 Mission 1: Hello, Python!
+    initialCode: `#  Mission 1: Hello, Python!
 # Objective: Write your first Python program to print a greeting!
 
 print("Hello, Dronacharya! I am ready to code in Python.")
@@ -165,7 +165,7 @@ print("Hello, Dronacharya! I am ready to code in Python.")
       'Handle division by zero gracefully by returning "Error: Division by zero".',
       'Return the calculated numeric result.',
     ],
-    initialCode: `# 🧮 Mission 2: Build a Calculator
+    initialCode: `#  Mission 2: Build a Calculator
 # Objective: Create a function calculate(a, b, op) that computes results.
 
 def calculate(a, b, op):
@@ -214,7 +214,7 @@ print("40 / 5 =", calculate(40, 5, "/"))
       'Implement complete_task(index) to mark an item complete.',
       'Implement get_pending_count() to return the number of pending tasks.',
     ],
-    initialCode: `# 📝 Mission 3: Create a To-Do List Manager
+    initialCode: `#  Mission 3: Create a To-Do List Manager
 # Objective: Build task manager to add, complete, and count pending tasks.
 
 class TodoList:
@@ -266,8 +266,8 @@ function SimulatorContent() {
   const [activeTab, setActiveTab] = useState<'arena' | 'code' | 'guide' | 'terminal'>('arena');
   const [terminalSubTab, setTerminalSubTab] = useState<'console' | 'diagnostics' | 'tests'>('console');
   const [consoleLogs, setConsoleLogs] = useState<string[]>([
-    `🎮 Initialized mission: ${currentMission.title}`,
-    '💡 Ready for Python code execution.',
+    ` Initialized mission: ${currentMission.title}`,
+    ' Ready for Python code execution.',
   ]);
 
   // Robot Grid Simulation State
@@ -331,8 +331,8 @@ def boosted_rescue(cells: list) -> list:
     setQuarantineCount(0);
     setActiveCellIndex(-1);
     setConsoleLogs([
-      `🎮 Realm: ${currentMission.realmName} — ${currentMission.title}`,
-      '💡 Review your mission objectives and write code to control the simulation.',
+      ` Realm: ${currentMission.realmName} — ${currentMission.title}`,
+      ' Review your mission objectives and write code to control the simulation.',
     ]);
   }, [currentMission.id]);
 
@@ -353,7 +353,7 @@ def boosted_rescue(cells: list) -> list:
     setActiveCellIndex(-1);
     setMatrixVaultCount(0);
     setQuarantineCount(0);
-    setConsoleLogs((prev) => [...prev.slice(-4), '🔄 Simulation reset to initial coordinates.']);
+    setConsoleLogs((prev) => [...prev.slice(-4), ' Simulation reset to initial coordinates.']);
   };
 
   // Run Robot Code Simulation
@@ -369,7 +369,7 @@ def boosted_rescue(cells: list) -> list:
     setConsoleLogs((prev) => [
       ...prev,
       '▶ Compiling & executing Python commands...',
-      `⚡ Interpreted ${result.frames.length - 1} actions. Commencing rover simulation...`,
+      ` Interpreted ${result.frames.length - 1} actions. Commencing rover simulation...`,
     ]);
 
     // Animate frames step-by-step
@@ -551,8 +551,8 @@ def boosted_rescue(cells: list) -> list:
     if (result.allPassed) {
       setConsoleLogs((prev) => [
         ...prev,
-        '✨ All assertion checks passed!',
-        `🎉 Mission Complete! +${currentMission.xpReward} XP awarded.`,
+        ' All assertion checks passed!',
+        ` Mission Complete! +${currentMission.xpReward} XP awarded.`,
       ]);
 
       try {
@@ -573,7 +573,7 @@ def boosted_rescue(cells: list) -> list:
     } else {
       deductHeart();
       if (result.stderr) {
-        setConsoleLogs((prev) => [...prev, `❌ Error: ${result.stderr}`]);
+        setConsoleLogs((prev) => [...prev, ` Error: ${result.stderr}`]);
       }
       setTerminalSubTab('diagnostics');
       setProactiveTrigger({
@@ -692,13 +692,13 @@ def boosted_rescue(cells: list) -> list:
               className="btn-arcade text-xs px-3.5 py-2 bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#D97706] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
               title="Launch Rover Arya's Python Odyssey RPG Arena"
             >
-              <span>🚀 Python Odyssey</span>
+              <span> Python Odyssey</span>
             </Link>
             <Link
               href="/dungeon"
               className="btn-arcade text-xs px-3.5 py-2 btn-arcade-yellow flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] whitespace-nowrap"
             >
-              <span>⚔️ Code Dungeon</span>
+              <span> Code Dungeon</span>
             </Link>
           </div>
         </div>
@@ -712,7 +712,7 @@ def boosted_rescue(cells: list) -> list:
             activeTab === 'arena' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
-          🎮 Game Arena
+           Game Arena
         </button>
         <button
           onClick={() => setActiveTab('code')}
@@ -720,7 +720,7 @@ def boosted_rescue(cells: list) -> list:
             activeTab === 'code' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
-          💻 Code Editor
+           Code Editor
         </button>
         <button
           onClick={() => setActiveTab('guide')}
@@ -728,7 +728,7 @@ def boosted_rescue(cells: list) -> list:
             activeTab === 'guide' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
-          📜 Codex Guide
+           Codex Guide
         </button>
         <button
           onClick={() => setActiveTab('terminal')}
@@ -736,7 +736,7 @@ def boosted_rescue(cells: list) -> list:
             activeTab === 'terminal' ? 'bg-[#6C5CE7] text-white shadow-xs' : 'text-[#4A4A58] hover:bg-slate-100'
           }`}
         >
-          📟 Output
+           Output
         </button>
       </div>
 
@@ -1045,7 +1045,7 @@ for step in range(4):
                     : 'bg-white text-[#4A4A58] border-transparent hover:border-[#1E1E24]'
                 }`}
               >
-                📟 Console Log
+                 Console Log
               </button>
               <button
                 onClick={() => setTerminalSubTab('diagnostics')}
@@ -1055,7 +1055,7 @@ for step in range(4):
                     : 'bg-white text-[#4A4A58] border-transparent hover:border-[#1E1E24]'
                 }`}
               >
-                ⚔️ Bug-to-Battle
+                 Bug-to-Battle
               </button>
               <button
                 onClick={() => setTerminalSubTab('tests')}

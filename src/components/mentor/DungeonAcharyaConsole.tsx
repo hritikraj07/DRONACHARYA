@@ -114,7 +114,7 @@ export function DungeonAcharyaConsole({
           ...prev,
           {
             sender: 'acharya',
-            text: `⚠️ ${result.error || 'Failed to fetch solution from Gemini API. Check your GEMINI_API_KEY.'}`,
+            text: ` ${result.error || 'Failed to fetch solution from Gemini API. Check your GEMINI_API_KEY.'}`,
             isError: true,
           },
         ]);
@@ -124,7 +124,7 @@ export function DungeonAcharyaConsole({
         ...prev,
         {
           sender: 'acharya',
-          text: `⚠️ Network error communicating with AI Mentor: ${err?.message || 'Server unreachable'}.`,
+          text: ` Network error communicating with AI Mentor: ${err?.message || 'Server unreachable'}.`,
           isError: true,
         },
       ]);

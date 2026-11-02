@@ -117,7 +117,7 @@ export function MentorChat({
           {
             id: `err-${Date.now()}`,
             role: 'assistant',
-            content: `⚠️ ${errorText}`,
+            content: ` ${errorText}`,
             timestamp: 'Just now',
             isError: true,
           },
@@ -174,7 +174,7 @@ export function MentorChat({
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: `⚠️ ${netErr}`,
+          content: ` ${netErr}`,
           timestamp: 'Just now',
           isError: true,
         },
@@ -192,10 +192,10 @@ export function MentorChat({
   };
 
   const quickActionChips = [
-    { label: '💡 Exact Solution', prompt: 'Provide the exact working code solution to this problem with explanations.' },
-    { label: '🔍 Diagnose Error', prompt: 'Analyze my current code attempt against the problem requirements. What is the bottleneck or bug?' },
-    { label: '⚡ Explain Concepts', prompt: 'Explain the core programming concepts required to solve this problem clearly.' },
-    { label: '🛠️ Optimize Code', prompt: 'How can I optimize and clean up my current attempt for maximum efficiency?' },
+    { label: ' Exact Solution', prompt: 'Provide the exact working code solution to this problem with explanations.' },
+    { label: ' Diagnose Error', prompt: 'Analyze my current code attempt against the problem requirements. What is the bottleneck or bug?' },
+    { label: ' Explain Concepts', prompt: 'Explain the core programming concepts required to solve this problem clearly.' },
+    { label: ' Optimize Code', prompt: 'How can I optimize and clean up my current attempt for maximum efficiency?' },
   ];
 
   return (

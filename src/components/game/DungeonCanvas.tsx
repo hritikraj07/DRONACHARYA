@@ -94,10 +94,10 @@ export function DungeonCanvas({
 
     let desc: string = tile?.type || 'stone';
     if (enemy) desc = `${enemy.name} (${enemy.hp} HP)`;
-    else if (gem) desc = 'Mana Gem 💎';
-    else if (sw) desc = 'Pressure Switch ⚙️';
-    else if (gate) desc = gate.isOpen ? 'Gate (Open) 🔓' : 'Gate (Locked) 🔒';
-    else if (crystal) desc = 'Healing Crystal 💚';
+    else if (gem) desc = 'Mana Gem ';
+    else if (sw) desc = 'Pressure Switch ';
+    else if (gate) desc = gate.isOpen ? 'Gate (Open) ' : 'Gate (Locked) ';
+    else if (crystal) desc = 'Healing Crystal ';
 
     setSelectedTile({ x, y, type: desc });
     if (onTileInspect) onTileInspect(x, y, desc);
@@ -231,7 +231,7 @@ export function DungeonCanvas({
                 tileIcon = <div className="w-full h-full bg-[#141418] rounded-xs opacity-60" />;
               } else if (tileType === 'spike') {
                 tileBg = 'bg-[#3A2828] border-[#7F1D1D]';
-                tileIcon = <span className="text-xs sm:text-sm animate-pulse">⚙️</span>;
+                tileIcon = <span className="text-xs sm:text-sm animate-pulse"></span>;
               } else if (tileType === 'lava') {
                 tileBg = 'bg-[#451A03] border-[#B45309]';
                 tileIcon = <Flame className="w-3.5 h-3.5 text-[#F59E0B] animate-bounce" />;
@@ -239,7 +239,7 @@ export function DungeonCanvas({
                 tileBg = 'bg-[#1E3A8A] border-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.6)]';
                 tileIcon = (
                   <span className="text-base sm:text-lg animate-spin" style={{ animationDuration: '4s' }}>
-                    🌀
+                    
                   </span>
                 );
               }
@@ -248,20 +248,20 @@ export function DungeonCanvas({
               if (gem) {
                 tileIcon = (
                   <span className="text-base sm:text-lg animate-bounce drop-shadow-[0_0_8px_rgba(56,189,248,0.8)]">
-                    💎
+                    
                   </span>
                 );
               } else if (crystal) {
                 tileIcon = (
                   <span className="text-base sm:text-lg animate-pulse drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">
-                    💚
+                    
                   </span>
                 );
               } else if (sw) {
-                tileIcon = <span className="text-sm sm:text-base">{sw.toggled ? '🟢' : '🔘'}</span>;
+                tileIcon = <span className="text-sm sm:text-base">{sw.toggled ? '' : ''}</span>;
               } else if (gate) {
                 tileIcon = (
-                  <span className="text-sm sm:text-base">{gate.isOpen ? '🔓' : '🔒'}</span>
+                  <span className="text-sm sm:text-base">{gate.isOpen ? '' : ''}</span>
                 );
                 if (!gate.isOpen) {
                   tileBg = 'bg-[#2A2323] border-[#991B1B]';
@@ -286,7 +286,7 @@ export function DungeonCanvas({
                         isBoss ? 'text-2xl sm:text-3xl animate-pulse' : 'text-base sm:text-xl'
                       }`}
                     >
-                      {isBoss ? '🗿' : enemy.type === 'skeleton' ? '💀' : '👺'}
+                      {isBoss ? '' : enemy.type === 'skeleton' ? '' : ''}
                     </span>
                   </div>
                 );
@@ -326,7 +326,7 @@ export function DungeonCanvas({
                           facingRotation[facing]
                         } ${actionType === 'victory' ? 'animate-bounce' : ''}`}
                       >
-                        🧙‍♂️
+                        
                       </div>
                     </div>
                   )}
@@ -376,16 +376,16 @@ export function DungeonCanvas({
       <div className="w-full max-w-[580px] mt-2.5 flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] font-mono text-[#64748B]">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1">
-            <span>🧙‍♂️</span> <span>Hero</span>
+            <span></span> <span>Hero</span>
           </span>
           <span className="flex items-center gap-1">
-            <span>💎</span> <span>Mana Gem</span>
+            <span></span> <span>Mana Gem</span>
           </span>
           <span className="flex items-center gap-1">
-            <span>👺</span> <span>Monster</span>
+            <span></span> <span>Monster</span>
           </span>
           <span className="flex items-center gap-1">
-            <span>🌀</span> <span>Portal</span>
+            <span></span> <span>Portal</span>
           </span>
         </div>
 

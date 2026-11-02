@@ -1,5 +1,5 @@
 // Dronacharya — Gamified AI-Powered Coding Adventure
-// Faithful Codédex Clone with Dronacharya Branding (DRONACHARYA ⋆˙⟡)
+// Faithful Codédex Clone with Dronacharya Branding (DRONACHARYA)
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -10,7 +10,6 @@ import {
   setActiveSession,
   authenticateUser,
   registerUser,
-  createGuestSession,
   RegisteredUser,
   AVAILABLE_SUBJECTS,
 } from '@/lib/db/auth-db';
@@ -73,25 +72,25 @@ export default function HomePage() {
       badge: 'Python',
       badgeColor: '#306998',
       code: [
-        '# 🐍 Python: Your First Quest',
+        '# Python: Your First Quest',
         'adventurer = "Scholar"',
         'xp = 100',
         'skills = ["Loops", "Functions", "Logic"]',
         '',
-        'print(f"🌟 Welcome to Gurukul, {adventurer}!")',
-        'print(f"⚔️ Mastered {len(skills)} core skills.")',
-        'print(f"✨ Quest Complete • +{xp} XP Earned!")',
+        'print(f"Welcome to Gurukul, {adventurer}!")',
+        'print(f"Mastered {len(skills)} core skills.")',
+        'print(f"Quest Complete • +{xp} XP Earned!")',
       ],
-      defaultOutput: `> 🌟 Welcome to Gurukul, Scholar!\n> ⚔️ Mastered 3 core skills.\n> ✨ Quest Complete • +100 XP Earned!\n> Status: 100% Success • Level Up Available`,
+      defaultOutput: `> Welcome to Gurukul, Scholar!\n> Mastered 3 core skills.\n> Quest Complete • +100 XP Earned!\n> Status: 100% Success • Level Up Available`,
     },
     html: {
       fileName: 'index.html',
       badge: 'HTML',
       badgeColor: '#E44D26',
       code: [
-        '<!-- 🌐 Web Studio: Responsive Card -->',
+        '<!-- Web Studio: Responsive Card -->',
         '<div class="adventure-badge">',
-        '  <h2>DRONACHARYA ⋆˙⟡</h2>',
+        '  <h2>DRONACHARYA</h2>',
         '  <p>Learn web development by doing.</p>',
         '  <button class="cta-btn">Start Quest</button>',
         '</div>',
@@ -103,17 +102,17 @@ export default function HomePage() {
       badge: 'JavaScript',
       badgeColor: '#F7DF1E',
       code: [
-        '// ⚡ JavaScript: Interactive Logic',
+        '// JavaScript: Interactive Logic',
         'const scholar = { name: "Explorer", hearts: 5 };',
         'let totalXp = 250;',
         '',
         'function unlockBadge(badgeName) {',
-        '  return `🏆 Seal Unlocked: [${badgeName}] (+50 XP)`;',
+        '  return `Seal Unlocked: [${badgeName}] (+50 XP)`;',
         '}',
         '',
         'console.log(unlockBadge("Logic Labyrinth"));',
       ],
-      defaultOutput: `> 🏆 Seal Unlocked: [Logic Labyrinth] (+50 XP)\n> Total Scholar XP: 300\n> 🛡️ Hearts remaining: 5/5`,
+      defaultOutput: `> Seal Unlocked: [Logic Labyrinth] (+50 XP)\n> Total Scholar XP: 300\n> Hearts remaining: 5/5`,
     },
   };
 
@@ -149,13 +148,6 @@ export default function HomePage() {
     }, 350);
   };
 
-  const handleInstantGuestLaunch = () => {
-    const guestUser = createGuestSession('python');
-    setCurrentUser(guestUser);
-    window.dispatchEvent(new Event('dronacharya_session_change'));
-    window.dispatchEvent(new Event('storage'));
-  };
-
   // Active course & first lesson for logged-in adventurers
   const activeSubjectId = currentUser?.targetSubject || 'python';
   const activeSubjectCourse =
@@ -185,7 +177,7 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]">
                 <Sparkles className="w-4 h-4 text-[#1E1E24]" />
                 <span className="text-xs font-black uppercase tracking-wider text-[#1E1E24]">
-                  THE DIGITAL GURUKUL ⋆˙⟡ CODING ADVENTURE
+                  THE DIGITAL GURUKUL - CODING ADVENTURE
                 </span>
               </div>
 
@@ -193,8 +185,7 @@ export default function HomePage() {
                 START YOUR <br />
                 <span className="inline-block pb-2 pr-1 bg-gradient-to-r from-[#6C5CE7] via-[#FF7675] to-[#FFD214] bg-clip-text text-transparent">
                   Coding Adventure
-                </span>{' '}
-                <span className="text-[#FFD214] text-3xl sm:text-4xl">⋆˙⟡</span>
+                </span>
               </h1>
 
               <p className="text-sm sm:text-base text-[#4A4A58] max-w-xl font-bold leading-relaxed">
@@ -209,7 +200,7 @@ export default function HomePage() {
                     className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4 text-[#071426]" />
-                    <span>Resume Adventure 🚀</span>
+                    <span>Resume Adventure</span>
                   </Link>
                 ) : (
                   <Link
@@ -217,7 +208,7 @@ export default function HomePage() {
                     className="btn-arcade btn-arcade-gold px-7 py-3.5 flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4 text-[#071426]" />
-                    <span>Start Your Adventure 🚀</span>
+                    <span>Start Your Adventure</span>
                   </Link>
                 )}
 
@@ -460,7 +451,7 @@ export default function HomePage() {
                         className="w-full btn-arcade btn-arcade-dark opacity-80 hover:opacity-100 py-2.5 px-3 flex items-center justify-center gap-1.5 cursor-pointer select-none transition-opacity"
                       >
                         <Lock className="w-3.5 h-3.5" />
-                        <span>Coming Soon ⏳</span>
+                        <span>Coming Soon </span>
                       </Link>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
@@ -594,7 +585,7 @@ export default function HomePage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <span className="text-xs font-black uppercase tracking-wider text-[#6C5CE7] bg-[#EDE9FE] px-3.5 py-1.5 rounded-full border border-[#6C5CE7]/30 shadow-[1px_1px_0px_#6C5CE7]">
-              ⋆˙⟡ Vedic-Tech Overworld • Quest Roadmap
+              Vedic-Tech Overworld • Quest Roadmap
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2 break-words">
               The 4 Ascents: Your Quest Journey
@@ -640,8 +631,8 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div className="w-12 h-12 rounded-xl bg-amber-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
-                  🏕️
+                <div className="w-12 h-12 rounded-xl bg-amber-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center mb-3">
+                  <Compass className="w-6 h-6 text-[#6C5CE7]" />
                 </div>
 
                 <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
@@ -687,8 +678,8 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
-                  🌲
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center mb-3">
+                  <Layers className="w-6 h-6 text-emerald-600" />
                 </div>
 
                 <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
@@ -734,8 +725,8 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div className="w-12 h-12 rounded-xl bg-purple-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
-                  🏰
+                <div className="w-12 h-12 rounded-xl bg-purple-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center mb-3">
+                  <ShieldCheck className="w-6 h-6 text-purple-600" />
                 </div>
 
                 <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
@@ -781,8 +772,8 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div className="w-12 h-12 rounded-xl bg-rose-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl mb-3">
-                  🏔️
+                <div className="w-12 h-12 rounded-xl bg-rose-50 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center mb-3">
+                  <Target className="w-6 h-6 text-rose-600" />
                 </div>
 
                 <h3 className="font-serif font-black text-base text-[#1E1E24] leading-tight mb-1">
@@ -823,8 +814,8 @@ export default function HomePage() {
               className="p-3.5 rounded-2xl bg-white/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] hover:-translate-y-0.5 transition-all flex items-center justify-between group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-sky-100 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center text-xl">
-                  🤖
+                <div className="w-10 h-10 rounded-xl bg-sky-100 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center">
+                  <Cpu className="w-5 h-5 text-sky-600" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -844,8 +835,8 @@ export default function HomePage() {
               className="p-3.5 rounded-2xl bg-white/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] hover:-translate-y-0.5 transition-all flex items-center justify-between group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center text-xl">
-                  🌳
+                <div className="w-10 h-10 rounded-xl bg-amber-100 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -865,8 +856,8 @@ export default function HomePage() {
               className="p-3.5 rounded-2xl bg-white/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] hover:-translate-y-0.5 transition-all flex items-center justify-between group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-amber-200 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center text-xl">
-                  📜
+                <div className="w-10 h-10 rounded-xl bg-amber-200 border border-[#1E1E24] shadow-[1px_1px_0px_#1E1E24] flex items-center justify-center">
+                  <Award className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -918,20 +909,12 @@ export default function HomePage() {
                 Continue Your Adventure Now →
               </Link>
             ) : (
-              <>
-                <Link
-                  href="/auth?mode=signup"
-                  className="btn-arcade btn-arcade-purple px-8 py-3.5 shadow-[3px_3px_0px_#1E1E24]"
-                >
-                  Start Free Adventure Now →
-                </Link>
-                <button
-                  onClick={handleInstantGuestLaunch}
-                  className="btn-arcade btn-arcade-gold px-6 py-3.5 shadow-[3px_3px_0px_#1E1E24]"
-                >
-                  ⚡ Instant 1-Click Guest Demo
-                </button>
-              </>
+              <Link
+                href="/auth?mode=signup"
+                className="btn-arcade btn-arcade-purple px-8 py-3.5 shadow-[3px_3px_0px_#1E1E24]"
+              >
+                Start Free Adventure Now →
+              </Link>
             )}
           </div>
         </div>

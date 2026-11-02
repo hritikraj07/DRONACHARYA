@@ -151,7 +151,7 @@ function CourseDetailContent() {
 
             <div className="space-y-2">
               <span className="px-3 py-1 rounded-full bg-amber-200 text-amber-900 border border-[#1E1E24] text-xs font-black uppercase">
-                Coming Soon ⏳
+                Coming Soon 
               </span>
               <h1 className="text-3xl sm:text-4xl font-black text-[#1E1E24] mt-2">
                 {course.title}
@@ -291,9 +291,8 @@ function CourseDetailContent() {
                   Two-Vault Guru Dakshina Active
                 </span>
               </div>
-              <h3 className="font-serif font-black text-2xl text-[#1E1E24] flex items-center gap-2">
-                <span>Rover Arya&apos;s Odyssey</span>
-                <span>🎮🕹️</span>
+              <h3 className="font-serif font-black text-2xl text-[#1E1E24]">
+                Rover Arya&apos;s Odyssey
               </h3>
               <p className="text-xs text-[#4A4A58] font-bold max-w-xl leading-relaxed">
                 Experience all 4 Python Chapters inside a retro-arcade 2D grid world. Write real Python code to ignite headlights, calculate bridge power, activate plasma shields, and harvest energy loops!
@@ -304,7 +303,7 @@ function CourseDetailContent() {
               href="/learn/py-less-1-1"
               className="btn-arcade btn-arcade-yellow text-xs py-3 px-6 shrink-0 flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24] cursor-pointer"
             >
-              <span>Play Python Odyssey 🎮</span>
+              <span>Play Python Odyssey</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

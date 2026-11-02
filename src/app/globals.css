@@ -86,10 +86,21 @@ html, body {
    DRONACHARYA CUSTOM RETRO PIXEL CURSOR SYSTEM
    ========================================================================= */
 
-/* 1. When high-fidelity custom React cursor is active, hide system cursor to reveal retro mascot */
+/* 1. When high-fidelity custom React cursor is active, hide system cursor to reveal retro mascot across all states */
 html.custom-cursor-active,
 html.custom-cursor-active body,
-html.custom-cursor-active body *:not(input):not(textarea):not([contenteditable="true"]):not(pre):not(code):not(pre *):not(code *):not(samp):not(kbd) {
+html.custom-cursor-active body *,
+html.custom-cursor-active a,
+html.custom-cursor-active a:hover,
+html.custom-cursor-active a:active,
+html.custom-cursor-active button,
+html.custom-cursor-active button:hover,
+html.custom-cursor-active button:active,
+html.custom-cursor-active [role="button"],
+html.custom-cursor-active [role="button"]:active,
+html.custom-cursor-active .btn-arcade,
+html.custom-cursor-active .btn-arcade:active,
+html.custom-cursor-active .cursor-pointer {
   cursor: none !important;
 }
 
@@ -117,49 +128,49 @@ html.custom-cursor-active .cursor-not-allowed {
   cursor: not-allowed !important;
 }
 
-/* 2. Universal CSS fallback cursors (works on all devices and browsers) */
-html,
-body,
-body * {
+/* 2. Universal CSS fallback cursors (only when custom React cursor is not active) */
+html:not(.custom-cursor-active),
+html:not(.custom-cursor-active) body,
+html:not(.custom-cursor-active) body * {
   cursor: url('/cursors/cursor-default.svg') 7 1, auto;
 }
 
-/* Interactive Elements: Buttons, Links, Clickable Cards */
-a,
-button,
-[role="button"],
-.cursor-pointer,
-.card-game-interactive,
-.btn-arcade,
-.btn-game-yellow,
-.btn-game-purple,
-.btn-game-mint,
-.btn-game-white,
-.btn-game-coral,
-.btn-primary,
-.btn-secondary,
-select,
-summary,
-input[type="submit"],
-input[type="button"],
-input[type="reset"],
-a *,
-button *,
-[role="button"] *,
-.cursor-pointer * {
+/* Interactive Elements fallback */
+html:not(.custom-cursor-active) a,
+html:not(.custom-cursor-active) button,
+html:not(.custom-cursor-active) [role="button"],
+html:not(.custom-cursor-active) .cursor-pointer,
+html:not(.custom-cursor-active) .card-game-interactive,
+html:not(.custom-cursor-active) .btn-arcade,
+html:not(.custom-cursor-active) .btn-game-yellow,
+html:not(.custom-cursor-active) .btn-game-purple,
+html:not(.custom-cursor-active) .btn-game-mint,
+html:not(.custom-cursor-active) .btn-game-white,
+html:not(.custom-cursor-active) .btn-game-coral,
+html:not(.custom-cursor-active) .btn-primary,
+html:not(.custom-cursor-active) .btn-secondary,
+html:not(.custom-cursor-active) select,
+html:not(.custom-cursor-active) summary,
+html:not(.custom-cursor-active) input[type="submit"],
+html:not(.custom-cursor-active) input[type="button"],
+html:not(.custom-cursor-active) input[type="reset"],
+html:not(.custom-cursor-active) a *,
+html:not(.custom-cursor-active) button *,
+html:not(.custom-cursor-active) [role="button"] *,
+html:not(.custom-cursor-active) .cursor-pointer * {
   cursor: url('/cursors/cursor-pointer.svg') 7 1, pointer !important;
 }
 
-/* Active Press on Clickable Elements */
-a:active,
-button:active:not(:disabled),
-[role="button"]:active,
-.btn-arcade:active:not(:disabled),
-.card-game-interactive:active,
-a:active *,
-button:active:not(:disabled) *,
-[role="button"]:active * {
-  cursor: url('/cursors/cursor-active.png') 5 2, pointer !important;
+/* Active Press on Clickable Elements (Fallback without outdated png) */
+html:not(.custom-cursor-active) a:active,
+html:not(.custom-cursor-active) button:active:not(:disabled),
+html:not(.custom-cursor-active) [role="button"]:active,
+html:not(.custom-cursor-active) .btn-arcade:active:not(:disabled),
+html:not(.custom-cursor-active) .card-game-interactive:active,
+html:not(.custom-cursor-active) a:active *,
+html:not(.custom-cursor-active) button:active:not(:disabled) *,
+html:not(.custom-cursor-active) [role="button"]:active * {
+  cursor: url('/cursors/cursor-pointer.svg') 7 1, pointer !important;
 }
 
 /* Text Inputs & Editors */

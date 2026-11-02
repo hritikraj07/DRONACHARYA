@@ -204,7 +204,7 @@ export function AcharyaDrawer({
           {
             id: `err-${Date.now()}`,
             role: 'assistant',
-            content: `⚠️ ${errorText}`,
+            content: ` ${errorText}`,
             timestamp: 'Just now',
             isError: true,
           },
@@ -218,7 +218,7 @@ export function AcharyaDrawer({
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: `⚠️ ${netError}`,
+          content: ` ${netError}`,
           timestamp: 'Just now',
           isError: true,
         },
@@ -337,7 +337,7 @@ export function AcharyaDrawer({
                 onClick={() => setShowSettingsPopover(false)}
                 className="text-xs text-slate-500 hover:text-slate-900 font-bold cursor-pointer"
               >
-                ✕ Close
+                 Close
               </button>
             </div>
 
@@ -402,7 +402,7 @@ export function AcharyaDrawer({
                 onClick={onClearProactiveTrigger}
                 className="text-gray-400 hover:text-gray-700 text-xs cursor-pointer"
               >
-                ✕
+                
               </button>
             </div>
             <p className="text-xs font-bold text-[#1E1E24] leading-relaxed">
@@ -413,7 +413,7 @@ export function AcharyaDrawer({
               disabled={isThinking}
               className="btn-arcade btn-arcade-yellow text-[10px] py-1 px-3 flex items-center gap-1 cursor-pointer"
             >
-              <span>⚡ Generate Exact Fix</span>
+              <span> Generate Exact Fix</span>
             </button>
           </div>
         )}
@@ -438,7 +438,7 @@ export function AcharyaDrawer({
               className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
               <Lightbulb className="w-3.5 h-3.5 text-[#6C5CE7] shrink-0" />
-              <span className="truncate">💡 Exact Solution</span>
+              <span className="truncate"> Exact Solution</span>
             </button>
 
             <button
@@ -451,7 +451,7 @@ export function AcharyaDrawer({
               className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
-              <span className="truncate">⚠️ Diagnose Error</span>
+              <span className="truncate"> Diagnose Error</span>
             </button>
 
             <button
@@ -464,7 +464,7 @@ export function AcharyaDrawer({
               className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#D1FAE5] hover:bg-[#A7F3D0] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
-              <span className="truncate">✅ Verify Logic</span>
+              <span className="truncate"> Verify Logic</span>
             </button>
 
             <button
@@ -477,7 +477,7 @@ export function AcharyaDrawer({
               className="p-2 rounded-xl border-2 border-[#1E1E24] bg-[#E0F2FE] hover:bg-[#BAE6FD] text-[#1E1E24] font-black text-left flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
             >
               <BookOpen className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
-              <span className="truncate">📖 Concept Guide</span>
+              <span className="truncate"> Concept Guide</span>
             </button>
           </div>
         </div>

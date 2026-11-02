@@ -174,7 +174,7 @@ export default function SquadsPage() {
     const idKey = targetGuild.id || targetGuild.joinCode;
     setRequestedGuildIds((prev) => [...prev, idKey]);
     setJoinFeedback({
-      text: `⚔️ Join request sent to ${targetGuild.name}! The guild lead will review your squad application.`,
+      text: ` Join request sent to ${targetGuild.name}! The guild lead will review your squad application.`,
       type: 'success',
     });
   };
@@ -204,7 +204,7 @@ export default function SquadsPage() {
     const res = joinSquad(codeToJoin);
     if (res.success) {
       setJoinFeedback({
-        text: `⚔️ Successfully joined ${res.squad?.name || 'guild'}!`,
+        text: ` Successfully joined ${res.squad?.name || 'guild'}!`,
         type: 'success',
       });
       setJoinCodeInput('');
@@ -234,7 +234,7 @@ export default function SquadsPage() {
 
     if (res.success && res.squad) {
       setJoinFeedback({
-        text: `🎉 Successfully founded ${res.squad.name}! Your join code is ${res.squad.joinCode}. Share it with friends!`,
+        text: ` Successfully founded ${res.squad.name}! Your join code is ${res.squad.joinCode}. Share it with friends!`,
         type: 'success',
       });
       // Add to available guilds list
@@ -911,7 +911,7 @@ export default function SquadsPage() {
                   type="submit"
                   className="btn-arcade btn-arcade-gold px-6 py-2.5 text-xs font-black cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
                 >
-                  Found Guild ⚔️
+                  Found Guild 
                 </button>
               </div>
             </form>
@@ -941,7 +941,7 @@ export default function SquadsPage() {
             </div>
 
             <div className="p-4 rounded-2xl bg-amber-50 border-2 border-[#1E1E24] text-xs font-bold text-[#1E1E24] leading-relaxed shadow-[2px_2px_0px_#1E1E24]">
-              🛡️ <strong>Squad Membership:</strong> You must be signed in to create, join, or send join requests to coding guilds. Sign in or create a free adventurer account to collaborate with squad mates!
+               <strong>Squad Membership:</strong> You must be signed in to create, join, or send join requests to coding guilds. Sign in or create a free adventurer account to collaborate with squad mates!
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -998,7 +998,7 @@ export default function SquadsPage() {
                 Are you sure you want to remove <strong className="text-[#1E1E24] font-black text-sm">{memberToRemove.fullName}</strong> from <strong className="text-[#6C5CE7]">{squad.name}</strong>?
               </p>
               <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-[11px] font-bold leading-normal flex items-start gap-2 shadow-[2px_2px_0px_#D97706]">
-                <span className="text-base shrink-0">⚠️</span>
+                <span className="text-base shrink-0"></span>
                 <span>
                   Their contributed XP will be retained by the guild, but they will be removed from your active party and squad quests.
                 </span>

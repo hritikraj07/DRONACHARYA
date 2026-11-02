@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { ShieldCheck, ScrollText, Sparkles, ArrowLeft, Code2, Cpu, UserCheck, AlertCircle, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Dronacharya ⋆˙⟡',
+  title: 'Terms of Service | Dronacharya ',
   description: 'Terms of Service and Community Guidelines for Dronacharya, the gamified AI-powered coding adventure.',
 };
 
@@ -40,7 +40,7 @@ export default function TermsPage() {
             Effective Date: {lastUpdated} • Version 2.4
           </p>
           <p className="text-sm sm:text-base text-[#4A4A58] font-bold leading-relaxed max-w-2xl">
-            Welcome to <strong className="text-[#1E1E24]">Dronacharya ⋆˙⟡ (The Digital Gurukul)</strong>. By entering the platform, running code simulations, embarking on curriculum quests, or consulting the Acharya AI mentor, you agree to abide by these Terms of Service.
+            Welcome to <strong className="text-[#1E1E24]">Dronacharya  (The Digital Gurukul)</strong>. By entering the platform, running code simulations, embarking on curriculum quests, or consulting the Acharya AI mentor, you agree to abide by these Terms of Service.
           </p>
         </div>
 
@@ -174,7 +174,7 @@ export default function TermsPage() {
             <ShieldCheck className="w-4 h-4 text-[#00B894]" />
             <span>Read Privacy Policy →</span>
           </Link>
-          <span>DRONACHARYA ⋆˙⟡ (The Digital Gurukul)</span>
+          <span>DRONACHARYA  (The Digital Gurukul)</span>
         </div>
       </div>
     </div>

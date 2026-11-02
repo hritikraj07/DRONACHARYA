@@ -220,14 +220,14 @@ export function SaveProgressModal({
         <div className="mb-5 p-3.5 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-[#FEF3C7] border-2 border-[#1E1E24] flex items-center justify-center text-lg shrink-0">
-              🕹️
+              
             </div>
             <div>
               <span className="text-[10px] font-black uppercase text-[#D97706] tracking-wider block">
                 Local Guest Stash
               </span>
               <span className="text-xs font-black text-[#1E1E24]">
-                {guestXp} XP • {questCount} Quests Done • {guestHearts} ❤️
+                {guestXp} XP • {questCount} Quests Done • {guestHearts} 
               </span>
             </div>
           </div>
@@ -332,7 +332,7 @@ export function SaveProgressModal({
                   onClick={handleGenerateSafePassword}
                   className="text-[10px] text-[#6C5CE7] hover:underline font-black flex items-center gap-1 cursor-pointer bg-[#EDE9FE] px-2 py-0.5 rounded-md border border-[#6C5CE7]/30"
                 >
-                  <span>🎲 Safe Password</span>
+                  <span> Safe Password</span>
                 </button>
               )}
             </div>
@@ -389,7 +389,7 @@ export function SaveProgressModal({
 
         {/* Security Note */}
         <p className="mt-4 text-[11px] text-center text-[#7E7E8F] font-bold">
-          🔒 Secure authentication powered by Supabase. Your passwords and data are strictly encrypted.
+           Secure authentication powered by Supabase. Your passwords and data are strictly encrypted.
         </p>
       </div>
     </div>

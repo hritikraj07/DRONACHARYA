@@ -152,7 +152,7 @@ export async function executeDungeonPythonCode(
   // Push initial standby frame
   pushFrame({
     actionType: 'idle',
-    logMessage: `⚔️ Hero entered ${level.title}. Ready for commands.`,
+    logMessage: ` Hero entered ${level.title}. Ready for commands.`,
   });
 
   // World sensor & action primitives
@@ -171,7 +171,7 @@ export async function executeDungeonPythonCode(
       if (nextX < 0 || nextX >= level.gridWidth || nextY < 0 || nextY >= level.gridHeight) {
         pushFrame({
           actionType: 'idle',
-          logMessage: `⚠️ Blocked by boundary wall at (${nextX}, ${nextY}).`,
+          logMessage: ` Blocked by boundary wall at (${nextX}, ${nextY}).`,
           floatingText: { text: 'Blocked!', color: '#EF4444' },
           soundToPlay: 'move',
         });
@@ -187,7 +187,7 @@ export async function executeDungeonPythonCode(
       if (isWall) {
         pushFrame({
           actionType: 'idle',
-          logMessage: `🧱 Bumped into dungeon wall at (${nextX}, ${nextY}).`,
+          logMessage: ` Bumped into dungeon wall at (${nextX}, ${nextY}).`,
           floatingText: { text: 'Wall!', color: '#F59E0B' },
           soundToPlay: 'move',
         });
@@ -197,8 +197,8 @@ export async function executeDungeonPythonCode(
       if (isLockedGate) {
         pushFrame({
           actionType: 'idle',
-          logMessage: `🔒 Iron Gate at (${nextX}, ${nextY}) is locked! Step on the switch first.`,
-          floatingText: { text: 'Locked Gate 🔒', color: '#EF4444' },
+          logMessage: ` Iron Gate at (${nextX}, ${nextY}) is locked! Step on the switch first.`,
+          floatingText: { text: 'Locked Gate ', color: '#EF4444' },
           soundToPlay: 'move',
         });
         break;
@@ -207,7 +207,7 @@ export async function executeDungeonPythonCode(
       if (isEnemyStanding) {
         pushFrame({
           actionType: 'idle',
-          logMessage: `⚔️ Blocked by monster at (${nextX}, ${nextY})! Attack to defeat it!`,
+          logMessage: ` Blocked by monster at (${nextX}, ${nextY})! Attack to defeat it!`,
           floatingText: { text: 'Blocked by Enemy!', color: '#EF4444' },
           soundToPlay: 'move',
         });
@@ -228,13 +228,13 @@ export async function executeDungeonPythonCode(
       if (targetTile?.type === 'spike') {
         damageTaken = 25;
         heroHp = Math.max(0, heroHp - damageTaken);
-        floatingText = { text: '-25 HP 🩸', color: '#EF4444' };
+        floatingText = { text: '-25 HP ', color: '#EF4444' };
         soundToPlay = 'damage';
         shakeScreen = true;
       } else if (targetTile?.type === 'lava') {
         damageTaken = 35;
         heroHp = Math.max(0, heroHp - damageTaken);
-        floatingText = { text: '-35 HP 🔥', color: '#EF4444' };
+        floatingText = { text: '-35 HP ', color: '#EF4444' };
         soundToPlay = 'damage';
         shakeScreen = true;
       }
@@ -250,16 +250,16 @@ export async function executeDungeonPythonCode(
         shakeScreen,
         logMessage:
           damageTaken > 0
-            ? `🩸 Stepped into hazard at (${heroX}, ${heroY})! Took ${damageTaken} damage. HP: ${heroHp}`
-            : `👣 Hero walked ${dir} to (${heroX}, ${heroY}).`,
+            ? ` Stepped into hazard at (${heroX}, ${heroY})! Took ${damageTaken} damage. HP: ${heroHp}`
+            : ` Hero walked ${dir} to (${heroX}, ${heroY}).`,
       });
 
       if (heroHp <= 0) {
         heroDied = true;
         pushFrame({
           actionType: 'fizzle',
-          logMessage: `💀 Hero collapsed in the dungeon at (${heroX}, ${heroY})! HP: 0`,
-          floatingText: { text: 'Defeated 💀', color: '#EF4444' },
+          logMessage: ` Hero collapsed in the dungeon at (${heroX}, ${heroY})! HP: 0`,
+          floatingText: { text: 'Defeated ', color: '#EF4444' },
           soundToPlay: 'damage',
           shakeScreen: true,
         });
@@ -303,14 +303,14 @@ export async function executeDungeonPythonCode(
         damageTaken: counterDamage > 0 ? counterDamage : undefined,
         heroHp,
         floatingText: isDead
-          ? { text: `-${damageDealt} HP 💀 Vanquished!`, color: '#10B981' }
-          : { text: `-${damageDealt} HP 💥`, color: '#F59E0B' },
+          ? { text: `-${damageDealt} HP  Vanquished!`, color: '#10B981' }
+          : { text: `-${damageDealt} HP `, color: '#F59E0B' },
         soundToPlay: 'attack',
         shakeScreen: targetEnemy.type === 'boss',
         tileMutations: mutations.length > 0 ? mutations : undefined,
         logMessage: isDead
-          ? `⚔️ Struck ${targetEnemy.name} for ${damageDealt} dmg! Monster defeated!`
-          : `⚔️ Struck ${targetEnemy.name} for ${damageDealt} dmg! Enemy HP: ${targetEnemy.hp}${
+          ? ` Struck ${targetEnemy.name} for ${damageDealt} dmg! Monster defeated!`
+          : ` Struck ${targetEnemy.name} for ${damageDealt} dmg! Enemy HP: ${targetEnemy.hp}${
               counterDamage > 0 ? ` (Boss retaliated for ${counterDamage} dmg!)` : ''
             }`,
       });
@@ -319,17 +319,17 @@ export async function executeDungeonPythonCode(
         heroDied = true;
         pushFrame({
           actionType: 'fizzle',
-          logMessage: '💀 Hero was defeated by the Boss shockwave!',
-          floatingText: { text: 'Hero Fallen 💀', color: '#EF4444' },
+          logMessage: ' Hero was defeated by the Boss shockwave!',
+          floatingText: { text: 'Hero Fallen ', color: '#EF4444' },
           soundToPlay: 'damage',
         });
       }
     } else {
       pushFrame({
         actionType: 'attack',
-        floatingText: { text: 'Whiff! 💨', color: '#9CA3AF' },
+        floatingText: { text: 'Whiff! ', color: '#9CA3AF' },
         soundToPlay: 'attack',
-        logMessage: `⚔️ Hero slashed into empty air (${facing}). No monster found.`,
+        logMessage: ` Hero slashed into empty air (${facing}). No monster found.`,
       });
     }
   };
@@ -352,10 +352,10 @@ export async function executeDungeonPythonCode(
       gemsCollected += 1;
       pushFrame({
         actionType: 'collect',
-        floatingText: { text: '💎 +1 Mana Gem!', color: '#38BDF8' },
+        floatingText: { text: ' +1 Mana Gem!', color: '#38BDF8' },
         soundToPlay: 'collect',
         tileMutations: [{ x: gemFound.x, y: gemFound.y, newType: 'stone' }],
-        logMessage: `💎 Picked up Mana Gem at (${gemFound.x}, ${gemFound.y})! [${gemsCollected}/${totalGems}]`,
+        logMessage: ` Picked up Mana Gem at (${gemFound.x}, ${gemFound.y})! [${gemsCollected}/${totalGems}]`,
       });
       return;
     }
@@ -367,17 +367,17 @@ export async function executeDungeonPythonCode(
       pushFrame({
         actionType: 'heal',
         heroHp,
-        floatingText: { text: `+${healAmount} HP 💚`, color: '#10B981' },
+        floatingText: { text: `+${healAmount} HP `, color: '#10B981' },
         soundToPlay: 'heal',
         tileMutations: [{ x: crystalFound.x, y: crystalFound.y, newType: 'stone' }],
-        logMessage: `💚 Absorbed Healing Crystal at (${crystalFound.x}, ${crystalFound.y})! Restored ${healAmount} HP.`,
+        logMessage: ` Absorbed Healing Crystal at (${crystalFound.x}, ${crystalFound.y})! Restored ${healAmount} HP.`,
       });
       return;
     }
 
     pushFrame({
       actionType: 'idle',
-      logMessage: `🔎 Checked for treasures at (${heroX}, ${heroY}), but found nothing to collect.`,
+      logMessage: ` Checked for treasures at (${heroX}, ${heroY}), but found nothing to collect.`,
       floatingText: { text: 'Nothing here', color: '#9CA3AF' },
     });
   };
@@ -404,15 +404,15 @@ export async function executeDungeonPythonCode(
 
       pushFrame({
         actionType: 'toggle',
-        floatingText: { text: '⚙️ Switch Flipped! 🔓 Gate Opened', color: '#10B981' },
+        floatingText: { text: ' Switch Flipped!  Gate Opened', color: '#10B981' },
         soundToPlay: 'switch',
         tileMutations: mutations,
-        logMessage: `⚙️ Flipped ancient pressure switch at (${sw.x}, ${sw.y})! Gate unlocked.`,
+        logMessage: ` Flipped ancient pressure switch at (${sw.x}, ${sw.y})! Gate unlocked.`,
       });
     } else {
       pushFrame({
         actionType: 'idle',
-        logMessage: `⚠️ No pressure switch adjacent to (${heroX}, ${heroY}).`,
+        logMessage: ` No pressure switch adjacent to (${heroX}, ${heroY}).`,
         floatingText: { text: 'No Switch Found', color: '#EF4444' },
       });
     }
@@ -423,7 +423,7 @@ export async function executeDungeonPythonCode(
     pushFrame({
       actionType: 'say',
       speechBubble: msg,
-      logMessage: `💬 Hero: "${msg}"`,
+      logMessage: ` Hero: "${msg}"`,
     });
   };
 
@@ -538,7 +538,7 @@ export async function executeDungeonPythonCode(
           return t?.type !== 'wall' && t?.type !== 'lava';
         },
         log_print: (text: string) => {
-          logs.push(`🖨️ [print] ${text}`);
+          logs.push(` [print] ${text}`);
         },
       });
 
@@ -619,7 +619,7 @@ ${userCode.replace(/\\/g, '\\\\')}
         queryGetEnemies,
         queryGetGems,
         getHeroHp: () => heroHp,
-        logPrint: (txt: string) => logs.push(`🖨️ [print] ${txt}`),
+        logPrint: (txt: string) => logs.push(` [print] ${txt}`),
       });
     } catch (err: any) {
       executionError = err?.message || String(err);
@@ -635,17 +635,17 @@ ${userCode.replace(/\\/g, '\\\\')}
     executionError = 'Infinite Loop or Excessive Steps! Execution capped at 500 ticks.';
     pushFrame({
       actionType: 'fizzle',
-      floatingText: { text: 'Spell Fizzled! ⚡', color: '#EF4444' },
+      floatingText: { text: 'Spell Fizzled! ', color: '#EF4444' },
       soundToPlay: 'fizzle',
-      logMessage: '⚡ Spell Fizzled: Infinite loop detected! Check your while/for loop conditions.',
+      logMessage: ' Spell Fizzled: Infinite loop detected! Check your while/for loop conditions.',
       shakeScreen: true,
     });
   } else if (executionError) {
     pushFrame({
       actionType: 'fizzle',
-      floatingText: { text: 'Syntax / Runtime Error! 💥', color: '#EF4444' },
+      floatingText: { text: 'Syntax / Runtime Error! ', color: '#EF4444' },
       soundToPlay: 'fizzle',
-      logMessage: `💥 Python Traceback: ${executionError}`,
+      logMessage: ` Python Traceback: ${executionError}`,
       shakeScreen: true,
     });
   }
@@ -667,9 +667,9 @@ ${userCode.replace(/\\/g, '\\\\')}
   if (isVictory) {
     pushFrame({
       actionType: 'victory',
-      floatingText: { text: 'QUEST CLEARED! 🏆', color: '#FBBF24' },
+      floatingText: { text: 'QUEST CLEARED! ', color: '#FBBF24' },
       soundToPlay: 'victory',
-      logMessage: `🏆 Level ${level.levelNumber}: ${level.title} Cleared Successfully!`,
+      logMessage: ` Level ${level.levelNumber}: ${level.title} Cleared Successfully!`,
     });
   }
 

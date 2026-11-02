@@ -168,7 +168,7 @@ export default function LeaderboardPage() {
       {!isUserLoggedIn && !isLoading && (
         <div className="mb-6 p-4 rounded-2xl bg-amber-50/90 border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] text-xs font-bold text-[#1E1E24] flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-base">⚔️</span>
+            <span className="text-base"></span>
             <span>
               <strong>Browsing community realm standings.</strong> Log in to record your quest XP and earn a spot on the Adventure Leaderboard!
             </span>
@@ -244,11 +244,11 @@ export default function LeaderboardPage() {
                   >
                     <td className="py-3.5 px-4 font-black text-sm">
                       {student.rank === 1
-                        ? '🥇 1'
+                        ? ' 1'
                         : student.rank === 2
-                        ? '🥈 2'
+                        ? ' 2'
                         : student.rank === 3
-                        ? '🥉 3'
+                        ? ' 3'
                         : `#${student.rank}`}
                     </td>
                     <td className="py-3.5 px-4">
@@ -263,7 +263,7 @@ export default function LeaderboardPage() {
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-center font-black text-[#FBBF24]">
-                      {student.badges} 🌟
+                      {student.badges} 
                     </td>
                     <td className="py-3.5 px-4 text-right font-mono font-black text-[#6C5CE7]">
                       {student.xp} XP

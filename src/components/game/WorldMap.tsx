@@ -128,7 +128,7 @@ export function WorldMap() {
       description:
         'Wake stranded field rover Arya on the starter plains. Master string literals, console output, and indentation fundamentals.',
       lore: 'At the foot of the ancient Gurukul peaks lies the Starter Village. Terracotta huts surround the clear resin river, where Field Rover Arya awaits your first code incantation across the wooden bridge.',
-      icon: '🏕️',
+      icon: '',
       badge: 'Level 1 Base Plain',
       xpReward: 130,
       lessonsCount: 2,
@@ -154,7 +154,7 @@ export function WorldMap() {
       description:
         'Ascend the tiered terracotta cliffs to the sacred Gurukul Tree. Store battery reserves, coordinates, and health in dynamic variable registers.',
       lore: 'The colossal Gurukul Tree has shaded scholars for centuries. Its sculpted roots clasp the stone plateau, while its leaves glow with ancient cyber-runes storing immutable variables and dynamic program state.',
-      icon: '🌲',
+      icon: '',
       badge: 'Level 2 Tiered Cliffs',
       xpReward: 170,
       lessonsCount: 2,
@@ -180,7 +180,7 @@ export function WorldMap() {
       description:
         'Navigate the steep mountain pass carved with monolithic stone archways. Equip Arya with autonomous hazard-avoidance and boolean branch decisions.',
       lore: 'Perched on the high windswept slopes, Conditional Castle guards the mountain pass. Double stone archways test every traveler: only code with valid boolean comparisons may cross the bridge.',
-      icon: '🏰',
+      icon: '',
       badge: 'Level 3 High Peaks',
       xpReward: 170,
       lessonsCount: 2,
@@ -206,7 +206,7 @@ export function WorldMap() {
       description:
         'Reach the highest altitude: the grand Temple-Castle peak. Automate continuous wheel rotations with for-loops and construct the Stage Capstone Project.',
       lore: 'The apex of the Python realm. Volumetric clouds drift past the golden shikhara temple spires. Here, continuous iteration powers the Chrono Wheel, and the massive hanging vellum scroll presents the ultimate trial.',
-      icon: '🏔️',
+      icon: '',
       badge: 'Level 4 Capstone Summit',
       xpReward: 350,
       lessonsCount: 2,
@@ -317,7 +317,7 @@ export function WorldMap() {
                   : 'bg-white text-[#4A4A58] border-[#1E1E24]/40 hover:border-[#1E1E24]'
               }`}
             >
-              🗺️ Full Landscape
+               Full Landscape
             </button>
             {dioramaZones.map((z) => {
               const isSelected = activeAltitudeFocus === z.altitudeLevel;
@@ -369,14 +369,14 @@ export function WorldMap() {
         {/* Floating Cotton-like Clouds (Layered Depth) */}
         <div className="absolute top-6 left-8 pointer-events-none opacity-85 select-none animate-pulse duration-1000">
           <div className="relative px-5 py-2.5 bg-white/90 backdrop-blur-xs rounded-full border-2 border-white shadow-[0_8px_16px_rgba(0,0,0,0.06)] flex items-center gap-1.5 text-xs font-mono font-bold text-sky-700">
-            <span>☁️</span>
+            <span></span>
             <span className="text-[10px] tracking-wider uppercase font-pixel">ALT 300m</span>
           </div>
         </div>
 
         <div className="absolute top-20 right-12 pointer-events-none opacity-80 select-none hidden md:block">
           <div className="px-6 py-3 bg-white/95 backdrop-blur-xs rounded-full border-2 border-white shadow-[0_10px_20px_rgba(0,0,0,0.08)] flex items-center gap-2 text-xs font-mono font-bold text-sky-800">
-            <span>☁️</span>
+            <span></span>
             <span className="text-[10px] tracking-wider uppercase font-pixel">ALT 1200m MIST</span>
           </div>
         </div>
@@ -561,7 +561,7 @@ export function WorldMap() {
           >
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-sky-100 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl group-hover:rotate-6 transition-transform">
-                🤖
+                
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -589,7 +589,7 @@ export function WorldMap() {
           >
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-amber-100 border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl group-hover:rotate-6 transition-transform">
-                🌳
+                
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -619,7 +619,7 @@ export function WorldMap() {
           >
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-2xl group-hover:rotate-6 transition-transform">
-                📜
+                
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -747,7 +747,7 @@ export function WorldMap() {
           <div className="relative w-full max-w-md bg-[#181822] text-[#FAF6EE] rounded-3xl border-4 border-[#38BDF8] shadow-[10px_10px_0px_#1E1E24] p-6 space-y-5 animate-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-[#2C2C3A] pb-3">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">🤖</span>
+                <span className="text-2xl"></span>
                 <div>
                   <h3 className="font-mono font-black text-sm text-cyan-300">
                     [ROVER.ARYA // TELEMETRY]
@@ -879,7 +879,7 @@ export function WorldMap() {
             {/* Description Card */}
             <div className="p-4 rounded-2xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] space-y-2">
               <span className="text-[10px] font-pixel text-[#D97706] block uppercase">
-                ⚔️ Grand Summit Challenge
+                 Grand Summit Challenge
               </span>
               <p className="text-xs font-bold text-[#4A4A58] leading-relaxed">
                 Synthesize all four core concepts—variables, data types, arithmetic calculations, and formatted string output—into a complete RPG character generation program.
@@ -923,7 +923,7 @@ HP: 100 | Attack: 25 | Level: 1`}
                 className="btn-arcade btn-arcade-gold px-6 py-2.5 text-xs font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
-                <span>Launch Character Creator ⚔️</span>
+                <span>Launch Character Creator </span>
               </Link>
             </div>
           </div>

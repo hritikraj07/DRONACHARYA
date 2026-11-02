@@ -62,8 +62,8 @@ export function PythonOdysseyArena({
   // Python Code Editor State
   const [code, setCode] = useState<string>(quest.starterCode);
   const [consoleLogs, setConsoleLogs] = useState<string[]>([
-    `🎮 Initialized Quest: ${quest.realmName} — ${quest.title}`,
-    '💡 Review your mission objectives and write code to control Rover Arya.',
+    ` Initialized Quest: ${quest.realmName} — ${quest.title}`,
+    ' Review your mission objectives and write code to control Rover Arya.',
   ]);
 
   // Two-Vault Guru Dakshina State
@@ -148,9 +148,9 @@ export function PythonOdysseyArena({
     setVictoryModalOpen(false);
     setProactiveTrigger(null);
     setConsoleLogs([
-      `🎮 Realm: ${newQuest.realmName} — ${newQuest.title}`,
-      `📜 Objective: ${newQuest.instructions}`,
-      '💡 Ready for Python code execution.',
+      ` Realm: ${newQuest.realmName} — ${newQuest.title}`,
+      ` Objective: ${newQuest.instructions}`,
+      ' Ready for Python code execution.',
     ]);
     if (onQuestChange) onQuestChange(newQuestId);
   };
@@ -163,7 +163,7 @@ export function PythonOdysseyArena({
     setCurrentFrameIndex(0);
     setSimulationFrames([]);
     setVictoryModalOpen(false);
-    setConsoleLogs((prev) => [...prev.slice(-4), '🔄 Arena simulation reset to initial coordinates.']);
+    setConsoleLogs((prev) => [...prev.slice(-4), ' Arena simulation reset to initial coordinates.']);
   };
 
   // Trigger heart loss animation
@@ -202,7 +202,7 @@ export function PythonOdysseyArena({
 
       setConsoleLogs((prev) => [
         ...prev,
-        `❌ [SIMULATION HALTED]: ${result.error || 'Code verification failed.'}`,
+        ` [SIMULATION HALTED]: ${result.error || 'Code verification failed.'}`,
       ]);
       return;
     }
@@ -392,7 +392,7 @@ export function PythonOdysseyArena({
       ctx.fillStyle = '#FEF08A';
       ctx.font = 'bold 10px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('🔒 GATE', gx + TILE_PX / 2, gy + TILE_PX / 2 + 3);
+      ctx.fillText(' GATE', gx + TILE_PX / 2, gy + TILE_PX / 2 + 3);
     }
 
     // 3. Quest 2 Specific: Abyss Chasm & Energy Bridge across (2,3) -> (5,3)
@@ -483,7 +483,7 @@ export function PythonOdysseyArena({
     ctx.fillStyle = '#FBBF24';
     ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('🎯', tx + TILE_PX / 2, ty + TILE_PX / 2 + 4);
+    ctx.fillText('', tx + TILE_PX / 2, ty + TILE_PX / 2 + 4);
 
     // 7. Draw Rover Arya Sprite at (roverX, roverY)
     const rx = frame.roverX * TILE_PX + TILE_PX / 2;
@@ -723,7 +723,7 @@ export function PythonOdysseyArena({
                   {briefingLanguage === 'hinglish' ? quest.briefing.storyHinglish : quest.briefing.story}
                 </p>
                 <div className="p-2.5 rounded-xl bg-[#EDE9FE] border border-[#6C5CE7]/30 text-[#4C1D95] font-mono text-[11px] font-bold">
-                  💡 {briefingLanguage === 'hinglish' ? quest.briefing.syntaxTipHinglish : quest.briefing.syntaxTip}
+                   {briefingLanguage === 'hinglish' ? quest.briefing.syntaxTipHinglish : quest.briefing.syntaxTip}
                 </div>
               </div>
             )}
@@ -827,7 +827,7 @@ export function PythonOdysseyArena({
           {/* LOWER HALF: LIVE TELEMETRY & TERMINAL OUTPUT */}
           <div className="h-[48%] flex flex-col bg-[#0E0F17]">
             <div className="h-9 bg-[#161824] border-b border-[#2B2E42] px-3 flex items-center justify-between shrink-0 select-none text-xs font-mono">
-              <span className="text-gray-400 font-bold">📟 Pyodide Console &amp; Odyssey Telemetry</span>
+              <span className="text-gray-400 font-bold"> Pyodide Console &amp; Odyssey Telemetry</span>
               <button
                 onClick={() => setConsoleLogs([])}
                 className="text-[10px] text-gray-500 hover:text-white"
@@ -841,9 +841,9 @@ export function PythonOdysseyArena({
                 <div
                   key={idx}
                   className={`leading-tight ${
-                    log.includes('❌') || log.includes('SyntaxError') || log.includes('REJECTED') || log.includes('HALTED')
+                    log.includes('') || log.includes('SyntaxError') || log.includes('REJECTED') || log.includes('HALTED')
                       ? 'text-rose-400 bg-rose-950/20 px-1 rounded'
-                      : log.includes('🏆') || log.includes('Activated') || log.includes('Mastered')
+                      : log.includes('') || log.includes('Activated') || log.includes('Mastered')
                       ? 'text-emerald-300 font-bold'
                       : 'text-gray-300'
                   }`}
@@ -864,7 +864,7 @@ export function PythonOdysseyArena({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-[#FAF6EE] border-4 border-[#1E1E24] rounded-2xl p-6 shadow-[8px_8px_0px_#1E1E24] text-center space-y-4 animate-in zoom-in-95 duration-200">
             <div className="w-16 h-16 rounded-2xl bg-[#D1FAE5] border-2 border-[#10B981] text-4xl flex items-center justify-center mx-auto shadow-[3px_3px_0px_#1E1E24]">
-              🏆
+              
             </div>
 
             <div>
@@ -886,7 +886,7 @@ export function PythonOdysseyArena({
               </div>
               <div className="flex items-center justify-center gap-3 text-sm font-black">
                 <span className="text-gray-600 line-through">Security: ₹{vault.securityVault + 10}</span>
-                <span className="text-[#10B981] animate-bounce">🪙 +₹10</span>
+                <span className="text-[#10B981] animate-bounce"> +₹10</span>
                 <span className="text-emerald-700 font-mono">Withdrawable: ₹{vault.withdrawableVault}</span>
               </div>
             </div>
@@ -931,7 +931,7 @@ export function PythonOdysseyArena({
         isOpen={isMentorOpen}
         onClose={() => setIsMentorOpen(false)}
         contextCode={code}
-        contextError={consoleLogs.filter((l) => l.includes('Error') || l.includes('REJECTED') || l.includes('HALTED') || l.includes('❌')).join('\n')}
+        contextError={consoleLogs.filter((l) => l.includes('Error') || l.includes('REJECTED') || l.includes('HALTED') || l.includes('')).join('\n')}
         activeMissionTitle={`Rover Arya's Odyssey: ${quest.realmName} — ${quest.title}`}
         missionGoal={quest.instructions}
         language="python"

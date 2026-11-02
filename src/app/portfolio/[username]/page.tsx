@@ -162,7 +162,7 @@ function PortfolioContent({ params }: { params: Promise<{ username: string }> })
                   key={seal.id}
                   className="p-3.5 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-start gap-3"
                 >
-                  <span className="text-2xl mt-0.5">🌟</span>
+                  <span className="text-2xl mt-0.5"></span>
                   <div>
                     <h4 className="font-black text-xs text-[#1E1E24]">
                       {seal.title}

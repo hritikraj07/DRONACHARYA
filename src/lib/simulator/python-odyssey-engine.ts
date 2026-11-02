@@ -309,8 +309,8 @@ export function executeOdysseyQuest(
         batteryLevel: 20,
         gateOpen: false,
         collectedItems: [],
-        logMessage: '📡 Incantation received: "' + printedMsg + '"',
-        toast: { text: 'Core Ignited! ⚡', type: 'info' },
+        logMessage: ' Incantation received: "' + printedMsg + '"',
+        toast: { text: 'Core Ignited! ', type: 'info' },
       },
       {
         step: 1,
@@ -322,7 +322,7 @@ export function executeOdysseyQuest(
         batteryLevel: 60,
         gateOpen: false,
         collectedItems: [],
-        logMessage: '💡 Optical sensors online! Headlights illuminated.',
+        logMessage: ' Optical sensors online! Headlights illuminated.',
         toast: { text: 'Headlights Online', type: 'info' },
       },
       {
@@ -335,7 +335,7 @@ export function executeOdysseyQuest(
         batteryLevel: 80,
         gateOpen: true,
         collectedItems: [],
-        logMessage: '🔓 Ancient stone gate glyph unlocks and dissolves!',
+        logMessage: ' Ancient stone gate glyph unlocks and dissolves!',
         toast: { text: 'Gate Dissolved!', type: 'info' },
       },
       {
@@ -348,7 +348,7 @@ export function executeOdysseyQuest(
         batteryLevel: 85,
         gateOpen: true,
         collectedItems: [],
-        logMessage: '🚗 Rover Arya drives through the open gateway...',
+        logMessage: ' Rover Arya drives through the open gateway...',
       },
       {
         step: 4,
@@ -360,7 +360,7 @@ export function executeOdysseyQuest(
         batteryLevel: 90,
         gateOpen: true,
         collectedItems: [],
-        logMessage: '🚗 Approaching the village extraction beacon...',
+        logMessage: ' Approaching the village extraction beacon...',
       },
       {
         step: 5,
@@ -372,8 +372,8 @@ export function executeOdysseyQuest(
         batteryLevel: 100,
         gateOpen: true,
         collectedItems: [{ x: 4, y: 4 }],
-        logMessage: '🏆 Beacon Activated! Starter Village Quest 1 Mastered!',
-        toast: { text: '+30 XP • +₹10 Vault Unlocked! 💸', type: 'vault' },
+        logMessage: ' Beacon Activated! Starter Village Quest 1 Mastered!',
+        toast: { text: '+30 XP • +₹10 Vault Unlocked! ', type: 'vault' },
       },
     ];
 
@@ -390,7 +390,7 @@ export function executeOdysseyQuest(
       return {
         success: false,
         frames: [],
-        stdout: ['[VOLTAGE REGULATOR] ⚠️ REJECTED: Received literal text string instead of numeric calculation!'],
+        stdout: ['[VOLTAGE REGULATOR]  REJECTED: Received literal text string instead of numeric calculation!'],
         error: 'The Voltage Regulator sparked and rejected the input! You wrapped numbers in quotes, making it a string.',
         sparksRejected: true,
         socraticHint: 'Quotes make text strings (e.g. "50"). Remove quotes around numbers so Python calculates them mathematically!',
@@ -424,8 +424,8 @@ export function executeOdysseyQuest(
         batteryLevel: 95,
         bridgeActive: false,
         collectedItems: [],
-        logMessage: '📡 Communications Beacon & Voltage Regulator calibrated.',
-        toast: { text: 'Voltage Matched: 95V ⚡', type: 'info' },
+        logMessage: ' Communications Beacon & Voltage Regulator calibrated.',
+        toast: { text: 'Voltage Matched: 95V ', type: 'info' },
       },
       {
         step: 1,
@@ -437,8 +437,8 @@ export function executeOdysseyQuest(
         batteryLevel: 95,
         bridgeActive: true,
         collectedItems: [],
-        logMessage: '⚡ Radiant cyan energy bridge materializes across the chasm!',
-        toast: { text: 'Bridge Materialized! 🌉', type: 'info' },
+        logMessage: ' Radiant cyan energy bridge materializes across the chasm!',
+        toast: { text: 'Bridge Materialized! ', type: 'info' },
       },
       {
         step: 2,
@@ -450,7 +450,7 @@ export function executeOdysseyQuest(
         batteryLevel: 93,
         bridgeActive: true,
         collectedItems: [],
-        logMessage: '🚗 Arya crossing the shimmering energy bridge...',
+        logMessage: ' Arya crossing the shimmering energy bridge...',
       },
       {
         step: 3,
@@ -462,7 +462,7 @@ export function executeOdysseyQuest(
         batteryLevel: 91,
         bridgeActive: true,
         collectedItems: [],
-        logMessage: '🚗 Successfully traversing the chasm...',
+        logMessage: ' Successfully traversing the chasm...',
       },
       {
         step: 4,
@@ -474,8 +474,8 @@ export function executeOdysseyQuest(
         batteryLevel: 100,
         bridgeActive: true,
         collectedItems: [{ x: 5, y: 3 }],
-        logMessage: '🏆 Bridge Crossed! Numbers vs. Text Strings Mastered!',
-        toast: { text: '+30 XP • +₹10 Vault Unlocked! 💸', type: 'vault' },
+        logMessage: ' Bridge Crossed! Numbers vs. Text Strings Mastered!',
+        toast: { text: '+30 XP • +₹10 Vault Unlocked! ', type: 'vault' },
       },
     ];
 
@@ -513,8 +513,8 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 20,
         collectedItems: [],
-        logMessage: '💾 Allocating memory registers: battery = 100...',
-        toast: { text: 'Memory Allocated! 💾', type: 'info' },
+        logMessage: ' Allocating memory registers: battery = 100...',
+        toast: { text: 'Memory Allocated! ', type: 'info' },
       },
       {
         step: 1,
@@ -525,8 +525,8 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 100,
         collectedItems: [],
-        logMessage: '🔥 Thrusters ignited! HUD gauge charged to 100%.',
-        toast: { text: 'Thrusters 100% Charged 🔥', type: 'info' },
+        logMessage: ' Thrusters ignited! HUD gauge charged to 100%.',
+        toast: { text: 'Thrusters 100% Charged ', type: 'info' },
       },
       {
         step: 2,
@@ -537,7 +537,7 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 98,
         collectedItems: [],
-        logMessage: '🚗 Accelerating down Variable Valley cavern...',
+        logMessage: ' Accelerating down Variable Valley cavern...',
       },
       {
         step: 3,
@@ -548,7 +548,7 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 95,
         collectedItems: [],
-        logMessage: '🚗 Passing magnetic vault pillars...',
+        logMessage: ' Passing magnetic vault pillars...',
       },
       {
         step: 4,
@@ -559,7 +559,7 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 92,
         collectedItems: [],
-        logMessage: '🚗 Locking onto power crystal coordinates...',
+        logMessage: ' Locking onto power crystal coordinates...',
       },
       {
         step: 5,
@@ -570,8 +570,8 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 100,
         collectedItems: [{ x: 5, y: 4 }],
-        logMessage: '💎 Power Crystal Collected! Variable Valley Mastered!',
-        toast: { text: '+30 XP • +₹10 Vault Unlocked! 💸', type: 'vault' },
+        logMessage: ' Power Crystal Collected! Variable Valley Mastered!',
+        toast: { text: '+30 XP • +₹10 Vault Unlocked! ', type: 'vault' },
       },
     ];
 
@@ -620,7 +620,7 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 95,
         collectedItems: [],
-        logMessage: '🔍 Evaluating condition: if barrier_detected is True...',
+        logMessage: ' Evaluating condition: if barrier_detected is True...',
       },
       {
         step: 1,
@@ -631,8 +631,8 @@ export function executeOdysseyQuest(
         shieldActive: true,
         batteryLevel: 95,
         collectedItems: [],
-        logMessage: '🛡️ Blue plasma shield bubble activated around Arya!',
-        toast: { text: 'Plasma Shield Active 🛡️', type: 'info' },
+        logMessage: ' Blue plasma shield bubble activated around Arya!',
+        toast: { text: 'Plasma Shield Active ', type: 'info' },
       },
       {
         step: 2,
@@ -643,7 +643,7 @@ export function executeOdysseyQuest(
         shieldActive: true,
         batteryLevel: 90,
         collectedItems: [],
-        logMessage: '🚗 Approaching the humming red laser barrier...',
+        logMessage: ' Approaching the humming red laser barrier...',
       },
       {
         step: 3,
@@ -654,8 +654,8 @@ export function executeOdysseyQuest(
         shieldActive: true,
         batteryLevel: 85,
         collectedItems: [],
-        logMessage: '✨ LASER DEFLECTED! Plasma shield safely deflected laser beam bolts!',
-        toast: { text: 'Laser Deflected! ✨', type: 'info' },
+        logMessage: ' LASER DEFLECTED! Plasma shield safely deflected laser beam bolts!',
+        toast: { text: 'Laser Deflected! ', type: 'info' },
       },
       {
         step: 4,
@@ -666,7 +666,7 @@ export function executeOdysseyQuest(
         shieldActive: true,
         batteryLevel: 80,
         collectedItems: [],
-        logMessage: '🚗 Advancing safely beyond the hazard corridor...',
+        logMessage: ' Advancing safely beyond the hazard corridor...',
       },
       {
         step: 5,
@@ -677,7 +677,7 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 78,
         collectedItems: [],
-        logMessage: '🚗 Entering the Castle Throne Room...',
+        logMessage: ' Entering the Castle Throne Room...',
       },
       {
         step: 6,
@@ -688,8 +688,8 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 100,
         collectedItems: [{ x: 6, y: 3 }],
-        logMessage: '👑 Throne Room Reached! Condition Sentinel Seal Unlocked!',
-        toast: { text: '+30 XP • +₹10 Vault • Condition Sentinel Seal 🛡️', type: 'vault' },
+        logMessage: ' Throne Room Reached! Condition Sentinel Seal Unlocked!',
+        toast: { text: '+30 XP • +₹10 Vault • Condition Sentinel Seal ', type: 'vault' },
       },
     ];
 
@@ -708,7 +708,7 @@ export function executeOdysseyQuest(
       return {
         success: false,
         frames: [],
-        stdout: ['[DRY RULE VIOLATOR DETECTED] ❌ Don’t Repeat Yourself: Repeating manual commands is strictly forbidden in Loop Lab!'],
+        stdout: ['[DRY RULE VIOLATOR DETECTED]  Don’t Repeat Yourself: Repeating manual commands is strictly forbidden in Loop Lab!'],
         error: 'DRY Rule Violation: You repeated commands manually! Automate this using `for step in range(5):`.',
         dryRuleViolated: true,
         socraticHint: 'Use a for-loop: for step in range(5): rover.move_right()',
@@ -755,7 +755,7 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: 25,
         collectedItems: [],
-        logMessage: '🔄 Commencing for-loop automation: 5 iterations...',
+        logMessage: ' Commencing for-loop automation: 5 iterations...',
       },
     ];
 
@@ -771,8 +771,8 @@ export function executeOdysseyQuest(
         shieldActive: false,
         batteryLevel: Math.min(100, 25 + i * 15),
         collectedItems: [...collected],
-        logMessage: `⚡ Step ${i}/5: Harvested Energy Cell ${i}! Power +15%`,
-        toast: { text: `+XP Energy Cell ${i} ⚡`, type: 'xp' },
+        logMessage: ` Step ${i}/5: Harvested Energy Cell ${i}! Power +15%`,
+        toast: { text: `+XP Energy Cell ${i} `, type: 'xp' },
       });
     }
 
@@ -786,8 +786,8 @@ export function executeOdysseyQuest(
       shieldActive: false,
       batteryLevel: 100,
       collectedItems: [...collected, { x: 6, y: 3 }],
-      logMessage: '🌀 Docked at Extraction Teleport Vortex! Loop Lab Mastered!',
-      toast: { text: '+30 XP • +₹10 Vault • Loop Navigator Seal 🌀', type: 'vault' },
+      logMessage: ' Docked at Extraction Teleport Vortex! Loop Lab Mastered!',
+      toast: { text: '+30 XP • +₹10 Vault • Loop Navigator Seal ', type: 'vault' },
     });
 
     return { success: true, frames, stdout };

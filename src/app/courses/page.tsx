@@ -77,7 +77,7 @@ export default function CoursesPage() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFD214] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-black text-[#1E1E24]">
               <Compass className="w-3.5 h-3.5" />
-              <span>DRONACHARYA ⋆˙⟡ CURRICULUM</span>
+              <span>DRONACHARYA CURRICULUM</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-black text-[#1E1E24] tracking-tight">
               Course Catalog
@@ -123,12 +123,12 @@ export default function CoursesPage() {
                 }`}
               >
                 {filter === 'All' && 'All Tracks'}
-                {filter === 'Active' && 'Active Quests ⚔️'}
+                {filter === 'Active' && 'Active Quests'}
                 {filter === 'Python' && 'Python'}
                 {filter === 'HTML' && 'HTML'}
                 {filter === 'CSS' && 'CSS'}
                 {filter === 'JavaScript' && 'JavaScript'}
-                {filter === 'Coming Soon' && 'Coming Soon ⏳'}
+                {filter === 'Coming Soon' && 'Coming Soon'}
               </button>
             );
           })}
@@ -143,7 +143,7 @@ export default function CoursesPage() {
                 <span>Recommended Starter Path</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-                Python Programming Course 🐍
+                Python Programming Course
               </h2>
               <p className="text-xs sm:text-sm font-bold text-purple-100 leading-relaxed">
                 Step into the live game-based Python universe! Control Rover Arya, master loops, conditionals, and functions in real sandboxed Python, or battle monsters in the Python Code Dungeon.
@@ -159,7 +159,7 @@ export default function CoursesPage() {
                   href="/dungeon"
                   className="btn-arcade btn-arcade-white px-5 py-2.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>⚔️ Python Dungeon Arena</span>
+                  <span>Python Dungeon Arena</span>
                 </Link>
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function CoursesPage() {
                         className="w-full btn-arcade btn-arcade-dark opacity-80 hover:opacity-100 py-2.5 px-3 flex items-center justify-center gap-1.5 cursor-pointer select-none transition-opacity"
                       >
                         <Lock className="w-3.5 h-3.5" />
-                        <span>Coming Soon ⏳</span>
+                        <span>Coming Soon </span>
                       </Link>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">

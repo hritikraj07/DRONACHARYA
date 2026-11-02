@@ -624,7 +624,7 @@ function QuestLearningLab() {
 
             {lesson.codeExampleExplanation && (
               <p className="text-xs font-bold text-gray-500 italic mt-1.5">
-                💡 {lesson.codeExampleExplanation}
+                 {lesson.codeExampleExplanation}
               </p>
             )}
           </div>
@@ -707,12 +707,12 @@ function QuestLearningLab() {
                     <div className="flex items-center gap-1.5 text-[10px] font-mono font-black uppercase text-[#6C5CE7]">
                       <span>
                         {idx === 0
-                          ? '🌱 Tier 1: Gentle Nudge'
+                          ? ' Tier 1: Gentle Nudge'
                           : idx === 1
-                          ? '🔍 Tier 2: Conceptual Clue'
+                          ? ' Tier 2: Conceptual Clue'
                           : idx === 2
-                          ? '📐 Tier 3: Code Blueprint'
-                          : '🔑 Tier 4: Complete Solution'}
+                          ? ' Tier 3: Code Blueprint'
+                          : ' Tier 4: Complete Solution'}
                       </span>
                     </div>
                     <p className="text-xs font-bold text-[#2D3436] whitespace-pre-wrap font-mono">

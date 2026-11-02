@@ -78,7 +78,7 @@ export function Footer() {
               <div className="flex flex-col justify-center">
                 <span className="font-serif font-black text-lg sm:text-xl tracking-tight leading-none text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors flex items-center gap-1.5 select-none">
                   DRONACHARYA
-                  <span className="text-amber-500 font-bold text-sm sm:text-base">⋆˙⟡</span>
+
                 </span>
                 <span className="text-[10px] font-black tracking-[0.22em] uppercase text-[#D97706] leading-none mt-1 select-none">
                   Coding Adventure
@@ -176,12 +176,12 @@ export function Footer() {
                 </li>
                 <li>
                   <Link href="/dungeon" className="hover:text-[#020617] hover:underline transition-colors">
-                    ⚔️ Python Code Dungeon
+                     Python Code Dungeon
                   </Link>
                 </li>
                 <li>
                   <Link href="/learn/py-less-1-1" className="hover:text-[#020617] hover:underline transition-colors">
-                    🚀 Python Odyssey RPG
+                     Python Odyssey RPG
                   </Link>
                 </li>
                 <li>
@@ -264,7 +264,7 @@ export function Footer() {
           {/* Bottom Bar: Copyright, Terms, Privacy & Social Icons */}
           <div className="pt-6 border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#64748B]">
             <div className="flex flex-wrap items-center gap-4">
-              <span>© {currentYear} DRONACHARYA ⋆˙⟡ (The Digital Gurukul)</span>
+              <span>© {currentYear} DRONACHARYA  (The Digital Gurukul)</span>
               <span>•</span>
               <Link href="/about" className="hover:text-[#020617] hover:underline transition-colors">
                 About
@@ -444,7 +444,7 @@ export function Footer() {
 
             {/* Bottom Tip Bar (Close Window button removed) */}
             <div className="mt-5 pt-3 border-t border-[#1E1E24]/10 flex items-center justify-center text-[11px] font-bold text-[#64748B]">
-              <span>💡 Links open the official profile in a secure tab</span>
+              <span> Links open the official profile in a secure tab</span>
             </div>
           </div>
         </div>

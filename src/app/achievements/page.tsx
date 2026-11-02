@@ -54,7 +54,7 @@ export default function AchievementsPage() {
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-3xl">{seal.isUnlocked ? '🌟' : '🔒'}</span>
+                <span className="text-3xl">{seal.isUnlocked ? '' : ''}</span>
                 <span
                   className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border-2 border-[#1E1E24] ${
                     seal.isUnlocked

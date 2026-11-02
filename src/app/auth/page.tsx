@@ -1,4 +1,4 @@
-// Dronacharya Authentication Gateway (Sign In, Sign Up, Guest Demo)
+// Dronacharya Authentication Gateway (Sign In, Sign Up)
 // Translucent frosted neo-brutalist aesthetic with minimal scrollability, confirm password, and course dropdown
 'use client';
 
@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   authenticateUser,
   registerUser,
-  createGuestSession,
   setActiveSession,
   AVAILABLE_SUBJECTS,
 } from '@/lib/db/auth-db';
@@ -33,8 +32,8 @@ function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Mode: 'signin' | 'signup' | 'guest'
-  const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'guest'>('signin');
+  // Mode: 'signin' | 'signup'
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
   // Form Fields
   const [email, setEmail] = useState('');
@@ -57,7 +56,7 @@ function AuthContent() {
   // Sync mode from URL searchParams automatically whenever query changes
   useEffect(() => {
     const modeParam = searchParams.get('mode');
-    if (modeParam === 'signup' || modeParam === 'signin' || modeParam === 'guest') {
+    if (modeParam === 'signup' || modeParam === 'signin') {
       setAuthMode(modeParam);
     }
   }, [searchParams]);
@@ -87,16 +86,14 @@ function AuthContent() {
   // Sync document title with active auth mode
   useEffect(() => {
     if (authMode === 'signin') {
-      document.title = 'Sign In ⋆˙⟡ Dronacharya';
-    } else if (authMode === 'signup') {
-      document.title = 'Sign Up ⋆˙⟡ Dronacharya';
+      document.title = 'Sign In - Dronacharya';
     } else {
-      document.title = 'Guest Demo ⋆˙⟡ Dronacharya';
+      document.title = 'Sign Up - Dronacharya';
     }
   }, [authMode]);
 
   // Unified mode switcher that keeps state & URL query aligned
-  const switchMode = (mode: 'signin' | 'signup' | 'guest') => {
+  const switchMode = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -197,21 +194,6 @@ function AuthContent() {
     }
   };
 
-  // Handle Instant Guest Demo Launch
-  const handleLaunchGuestDemo = (subjectId?: string) => {
-    const sub = subjectId || selectedSubject || 'python';
-    setIsSubmitting(true);
-    setSuccessMsg('Launching Instant Guest Demo...');
-
-    createGuestSession(sub);
-    window.dispatchEvent(new Event('dronacharya_session_change'));
-    window.dispatchEvent(new Event('storage'));
-
-    setTimeout(() => {
-      window.location.href = '/courses';
-    }, 300);
-  };
-
   const selectedSubjectObj = AVAILABLE_SUBJECTS.find((s) => s.id === selectedSubject) || AVAILABLE_SUBJECTS[0];
 
   return (
@@ -238,23 +220,17 @@ function AuthContent() {
             />
 
             <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#1E1E24] tracking-tight">
-              {authMode === 'guest'
-                ? 'Guest Demo'
-                : authMode === 'signup'
-                ? 'Create Account'
-                : 'Sign In'}
+              {authMode === 'signup' ? 'Create Account' : 'Sign In'}
             </h1>
 
             <p className="text-xs text-[#4A4A58] font-bold mt-1 max-w-sm mx-auto">
-              {authMode === 'guest'
-                ? 'Explore all courses and interactive studios with zero signup required.'
-                : authMode === 'signup'
-                ? 'Embark on RPG quests, earn XP, and unlock verifiable achievements.'
+              {authMode === 'signup'
+                ? 'Embark on quests, earn XP, and unlock verifiable achievements.'
                 : 'Enter your credentials to load your saved progress and rank.'}
             </p>
           </div>
 
-          {/* 3-Tab Switcher: Sign In | Sign Up | Guest Demo */}
+          {/* 2-Tab Switcher: Sign In | Sign Up */}
           <div className="flex bg-white/70 backdrop-blur-md p-1 rounded-2xl border-2 border-[#1E1E24] mb-4 shadow-[2px_2px_0px_#1E1E24]">
             <button
               type="button"
@@ -278,19 +254,6 @@ function AuthContent() {
               }`}
             >
               Sign Up
-            </button>
-
-            <button
-              type="button"
-              onClick={() => switchMode('guest')}
-              className={`flex-1 py-1.5 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                authMode === 'guest'
-                  ? 'bg-[#FFD214] text-[#1E1E24] shadow-[2px_2px_0px_#1E1E24]'
-                  : 'text-[#4A4A58] hover:text-[#1E1E24]'
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5 fill-current" />
-              <span>Guest Demo</span>
             </button>
           </div>
 
@@ -382,7 +345,7 @@ function AuthContent() {
                   type="button"
                   onClick={() =>
                     setInfoMsg(
-                      'Forgot password? Enter your registered email to reset via Supabase Auth or try the Guest Demo!'
+                      'Forgot password? Enter your registered email to reset via Supabase Auth.'
                     )
                   }
                   className="text-[#6C5CE7] hover:underline font-black cursor-pointer text-xs"
@@ -453,7 +416,7 @@ function AuthContent() {
                     onClick={handleGenerateSafePassword}
                     className="text-[10px] text-[#6C5CE7] hover:underline font-black flex items-center gap-1 cursor-pointer bg-purple-50/80 px-2 py-0.5 rounded-md border border-[#6C5CE7]/30 transition-colors"
                   >
-                    <span>🎲 Generate Safe</span>
+                    <span>Generate Safe</span>
                   </button>
                 </div>
                 <div className="relative">
@@ -615,72 +578,6 @@ function AuthContent() {
             </form>
           )}
 
-          {/* ========================================================
-              TAB 3: GUEST DEMO
-             ======================================================== */}
-          {authMode === 'guest' && (
-            <div className="space-y-4">
-              <div className="p-3 rounded-2xl bg-[#FEF3C7]/90 border-2 border-[#1E1E24] text-xs text-amber-900 font-bold leading-relaxed shadow-[2px_2px_0px_#1E1E24]">
-                ⚡ <strong>Instant Exploration:</strong> Jump straight into live coding quests, interactive test assertions, and 2D mini-game simulators without creating an account.
-              </div>
-
-              <div>
-                <label className="block text-xs font-black text-[#1E1E24] mb-1.5">
-                  Choose Course to Start:
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {AVAILABLE_SUBJECTS.map((s) => {
-                    const isSelected = selectedSubject === s.id;
-                    const isPlayable = !s.isComingSoon;
-                    return (
-                      <div
-                        key={s.id}
-                        onClick={() => {
-                          if (isPlayable) {
-                            setSelectedSubject(s.id);
-                          }
-                        }}
-                        className={`p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between ${
-                          !isPlayable
-                            ? 'opacity-50 cursor-not-allowed bg-gray-100/60 border-gray-300'
-                            : isSelected
-                            ? 'bg-[#FFD214]/90 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] cursor-pointer'
-                            : 'bg-white/70 backdrop-blur-md border-[#1E1E24] hover:bg-white/90 shadow-[2px_2px_0px_#1E1E24] cursor-pointer'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-black text-xs text-[#1E1E24]">{s.name}</span>
-                          <span
-                            className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${
-                              isPlayable
-                                ? 'text-emerald-800 bg-emerald-100 border-emerald-300'
-                                : 'text-gray-600 bg-gray-200 border-gray-300'
-                            }`}
-                          >
-                            {isPlayable ? 'Playable' : 'Soon'}
-                          </span>
-                        </div>
-                        <span className="text-[10px] text-gray-600 font-bold mt-1 line-clamp-1">
-                          {s.tagline}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleLaunchGuestDemo(selectedSubject)}
-                disabled={isSubmitting}
-                className="w-full btn-arcade btn-arcade-gold py-3 px-6 text-xs sm:text-sm flex items-center justify-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
-              >
-                <Zap className="w-4 h-4 fill-current" />
-                <span>{isSubmitting ? 'Entering course...' : 'Enter as Guest Explorer Now →'}</span>
-              </button>
-            </div>
-          )}
-
           {/* Quick Switch Text Links */}
           <div className="mt-4 text-center text-xs font-bold text-gray-600">
             {authMode === 'signin' ? (
@@ -693,16 +590,8 @@ function AuthContent() {
                 >
                   Create one for free
                 </button>
-                {' or '}
-                <button
-                  type="button"
-                  onClick={() => switchMode('guest')}
-                  className="text-amber-600 hover:underline font-black cursor-pointer"
-                >
-                  Try guest demo
-                </button>
               </p>
-            ) : authMode === 'signup' ? (
+            ) : (
               <p>
                 Already have an account?{' '}
                 <button
@@ -711,17 +600,6 @@ function AuthContent() {
                   className="text-[#6C5CE7] hover:underline font-black cursor-pointer"
                 >
                   Sign in here
-                </button>
-              </p>
-            ) : (
-              <p>
-                Want to save permanent progress?{' '}
-                <button
-                  type="button"
-                  onClick={() => switchMode('signup')}
-                  className="text-[#6C5CE7] hover:underline font-black cursor-pointer"
-                >
-                  Sign up for an account
                 </button>
               </p>
             )}

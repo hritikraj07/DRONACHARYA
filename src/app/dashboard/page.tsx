@@ -78,34 +78,6 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-8 overflow-x-hidden">
-      {/* 0. Guest Mode Call-to-Action Banner */}
-      {isGuest && (
-        <div className="card-game p-4 sm:p-5 bg-[#FEF3C7] border-2 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#F59E0B] text-white flex items-center justify-center text-xl font-black border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] shrink-0">
-              🕹️
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#D97706] tracking-wider">
-                <span>Guest Explorer Mode</span>
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-              </div>
-              <p className="text-xs sm:text-sm text-[#1E1E24] font-bold">
-                You are playing as a Guest! Your streak, {totalXp} XP, and completed quests are saved locally in this browser.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => triggerSaveProgressModal('dashboard_guest_banner')}
-            className="btn-game-yellow text-xs py-2.5 px-5 shrink-0 flex items-center gap-1.5 shadow-[2px_2px_0px_#1E1E24] cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-[#1E1E24]" />
-            <span>Sign In to Save Progress</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-
       {/* 1. Player Status Hero Banner */}
       <div className="card-game p-6 sm:p-8 bg-[#FAF6EE] shadow-[6px_6px_0px_#1E1E24]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -115,7 +87,7 @@ export default function DashboardPage() {
               <span>Adventurer Headquarters</span>
             </div>
             <h1 className="font-serif font-black text-3xl sm:text-4xl text-[#1E1E24]">
-              {isGuest ? 'Welcome, Guest Explorer!' : `Welcome back, ${currentUser?.name || 'Apprentice'}!`}
+              `Welcome back, ${currentUser?.name || 'Apprentice'}!`
             </h1>
             <p className="text-xs sm:text-sm text-[#4A4A58] font-medium max-w-xl flex items-center flex-wrap gap-2">
               <span>Active Course: <strong className="text-[#1E1E24]">{activeSubjectObj.name}</strong></span>
@@ -141,16 +113,16 @@ export default function DashboardPage() {
               <span className="font-serif font-black text-xl text-[#059669]">{totalXp}</span>
             </div>
             <div className="bg-[#FAF6EE] border-2 border-[#1E1E24] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
-              <span className="text-[10px] font-black uppercase text-amber-800 block">🔒 Security Vault</span>
+              <span className="text-[10px] font-black uppercase text-amber-800 block">Security Vault</span>
               <span className="font-serif font-black text-lg text-[#1E1E24]">₹{vaultState.securityVault}</span>
             </div>
             <div className="bg-[#D1FAE5] border-2 border-[#10B981] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
-              <span className="text-[10px] font-black uppercase text-emerald-800 block">💸 Withdrawable</span>
+              <span className="text-[10px] font-black uppercase text-emerald-800 block">Withdrawable</span>
               <span className="font-serif font-black text-lg text-emerald-700">₹{vaultState.withdrawableVault}</span>
             </div>
             <div className="bg-[#FEE2E2] border-2 border-[#1E1E24] rounded-xl px-3 py-2.5 shadow-[2px_2px_0px_#1E1E24] text-center">
               <span className="text-[10px] font-black uppercase text-[#DC2626] block">Hearts</span>
-              <span className="font-serif font-black text-lg text-[#EF4444]">{currentUser?.hearts ?? 3} ❤️</span>
+              <span className="font-serif font-black text-lg text-[#EF4444]">{currentUser?.hearts ?? 3}</span>
             </div>
           </div>
         </div>
@@ -178,7 +150,7 @@ export default function DashboardPage() {
           <div className="card-game p-6 bg-gradient-to-br from-[#FAF6EE] to-[#FEF3C7] border-2 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] relative overflow-hidden">
             {/* Background decorative corner icon */}
             <div className="absolute -right-4 -bottom-4 text-7xl opacity-10 select-none pointer-events-none">
-              ⚔️
+              
             </div>
 
             <div className="flex items-center justify-between mb-3">
@@ -193,7 +165,7 @@ export default function DashboardPage() {
 
             <h2 className="font-serif font-black text-2xl text-[#1E1E24] mb-1 flex items-center gap-2">
               <span>Code Dungeon &amp; Craft Realm</span>
-              <span className="text-lg">⚔️⛏️</span>
+              
             </h2>
             <p className="text-xs font-bold text-[#D97706] mb-2">
               Voxel Mining, Bridge Crafting &amp; 4 Dungeon Boss Floors
@@ -227,7 +199,7 @@ export default function DashboardPage() {
                 href="/dungeon"
                 className="btn-arcade text-xs py-2 px-5 btn-arcade-yellow shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5"
               >
-                <span>Enter Dungeon ⚔️</span>
+                <span>Enter Dungeon</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -247,7 +219,7 @@ export default function DashboardPage() {
 
             <h2 className="font-serif font-black text-2xl text-[#1E1E24] mb-1 flex items-center gap-2">
               <span>Rover Arya&apos;s Python Odyssey</span>
-              <span className="text-lg">🎮🚀</span>
+              
             </h2>
             <p className="text-xs font-bold text-[#6C5CE7] mb-2">
               Learn Real Python: Syntax, Variables, Conditionals &amp; Loops through 4 Playable Realms
@@ -258,16 +230,16 @@ export default function DashboardPage() {
 
             <div className="flex items-center justify-between pt-4 border-t-2 border-[#1E1E24]/15">
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#6C5CE7]">
-                <span>🔒 ₹{vaultState.securityVault}</span>
+                <span>₹{vaultState.securityVault}</span>
                 <span>→</span>
-                <span className="text-emerald-700 font-black">💸 ₹{vaultState.withdrawableVault} Unlocked</span>
+                <span className="text-emerald-700 font-black">₹{vaultState.withdrawableVault} Unlocked</span>
               </div>
 
               <Link
                 href="/learn/py-less-1-1"
                 className="btn-arcade text-xs py-2 px-5 btn-arcade-yellow shadow-[3px_3px_0px_#1E1E24] flex items-center gap-1.5 cursor-pointer"
               >
-                <span>Play Python Odyssey 🎮</span>
+                <span>Play Python Odyssey</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -358,11 +330,11 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-2 gap-2 mb-4">
               <div className="p-2.5 rounded-xl bg-white border border-[#1E1E24] text-center">
-                <span className="text-[10px] font-bold text-gray-500 block">🔒 Security Vault</span>
+                <span className="text-[10px] font-bold text-gray-500 block">Security Vault</span>
                 <span className="text-base font-black text-[#D97706]">₹450</span>
               </div>
               <div className="p-2.5 rounded-xl bg-white border border-[#1E1E24] text-center">
-                <span className="text-[10px] font-bold text-gray-500 block">💸 Withdrawable</span>
+                <span className="text-[10px] font-bold text-gray-500 block">Withdrawable</span>
                 <span className="text-base font-black text-[#059669]">₹50</span>
               </div>
             </div>
@@ -393,7 +365,7 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#6C5CE7] border border-[#1E1E24] flex items-center justify-center text-white font-bold text-xs">
-                    🎮
+                    <Gamepad2 className="w-4 h-4 text-white" />
                   </div>
                   <div>
                     <span className="font-black text-xs text-[#1E1E24] block">Rover Arya Rescue</span>
@@ -409,7 +381,7 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#F59E0B] border border-[#1E1E24] flex items-center justify-center text-white font-bold text-xs">
-                    ⚡
+                    <Zap className="w-4 h-4 text-white" />
                   </div>
                   <div>
                     <span className="font-black text-xs text-[#1E1E24] block">Bio-Cell Hazard Filter</span>

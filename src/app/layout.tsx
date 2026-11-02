@@ -30,7 +30,7 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: 'Dronacharya ⋆˙⟡',
+  title: 'Dronacharya',
   description:
     'Start your coding adventure with Dronacharya. The most fun and beginner-friendly way to learn Python, HTML, CSS, and JavaScript.',
   icons: {

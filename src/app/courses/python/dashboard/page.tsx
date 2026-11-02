@@ -223,95 +223,107 @@ function PythonDashboardContent() {
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-10">
         {/* =========================================================================
-            A. PYTHON COURSE HERO (Version removed & Progress Bar brought here)
+            A. AUTHENTIC PIXEL ART PYTHON SERPENT JUNGLE BANNER & HERO
            ========================================================================= */}
-        <section
-          className="relative w-full rounded-3xl border-3 border-[#1E1E24] p-6 sm:p-8 lg:p-10 shadow-[8px_8px_0px_#1E1E24] overflow-hidden"
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.78)',
-            backdropFilter: 'blur(20px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-          }}
-        >
-          {/* Subtle Ambient Decorative Gradients */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#306998]/10 via-[#FFD43B]/10 to-transparent rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+        <section className="relative w-full rounded-3xl border-3 border-[#1E1E24] shadow-[8px_8px_0px_#1E1E24] overflow-hidden bg-[#1B4332]">
+          {/* Panoramic Python Jungle Pixel Art Banner */}
+          <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden border-b-3 border-[#1E1E24]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/courses/python-hero-banner.jpg"
+              alt="Learn Python Jungle Serpent Realm"
+              className="w-full h-full object-cover object-center filter saturate-110"
+            />
+            {/* Ambient Dark Gradient Vignette for Readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1E1E24]/90 via-[#1E1E24]/30 to-transparent pointer-events-none" />
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Column: Course Logo, Title & Tagline */}
-            <div className="lg:col-span-7 space-y-4">
-              {/* Badge Row (Python version removed as requested) */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#306998] text-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[11px] font-pixel">
-                  <span>🐍 PYTHON</span>
+            {/* Overlaid Banner Typography & Fast Stage Action */}
+            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-8 right-4 sm:right-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD214] text-[#1E1E24] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-[10px] sm:text-xs font-pixel font-bold">
+                  <span>PYTHON REALM</span>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  ● Beginner Friendly
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                  ⚡ Project Based
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                  ✨ AI Mentor
-                </span>
-              </div>
-
-              {/* Course Title & Catchphrase */}
-              <div className="space-y-1">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight text-[#1E1E24]">
-                    Python
-                  </h1>
-                  <span className="text-2xl sm:text-3xl font-black text-amber-500 animate-pulse">
-                    ⋆˙⟡
-                  </span>
-                </div>
-                <p className="text-base sm:text-xl font-serif font-bold text-[#6C5CE7]">
-                  “Think in Logic. Build in Python.”
+                <h1 className="text-3xl sm:text-5xl font-pixel font-black text-white tracking-wide drop-shadow-[0_3px_6px_rgba(0,0,0,0.8)]">
+                  Python
+                </h1>
+                <p className="text-xs sm:text-sm font-bold text-amber-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] max-w-xl">
+                  Think in Logic. Master Python through quests, interactive simulations, and in-browser execution.
                 </p>
               </div>
 
-              {/* Description */}
-              <p className="text-xs sm:text-sm font-bold text-[#4A4A58] leading-relaxed max-w-2xl">
-                From the basics to real-world projects — learn Python by solving missions,
-                writing code and building useful programs. Control autonomous rovers,
-                craft calculations, and defeat dungeon bugs in real in-browser execution.
-              </p>
-
-              {/* Primary Call to Action Buttons */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-3 shrink-0">
                 <Link
                   href="/courses/python/stage-1"
-                  className="btn-arcade btn-arcade-gold px-6 py-3 text-xs sm:text-sm font-black flex items-center gap-2 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-gold px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
                 >
                   <Play className="w-4 h-4 fill-current" />
                   <span>Play Stage 1 Now →</span>
                 </Link>
                 <Link
                   href="/dungeon"
-                  className="btn-arcade btn-arcade-purple px-5 py-3 text-xs sm:text-sm font-black flex items-center gap-2 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-purple px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm font-black flex items-center gap-2 shadow-[3px_3px_0px_#1E1E24]"
                 >
-                  <span>⚔️ Enter Code Dungeon</span>
+                  <span>Enter Code Dungeon</span>
                 </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Lower Hero Bar: Python Track Specifications & Real-time Progress HUD */}
+          <div
+            className="p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+            style={{
+              backgroundColor: 'rgba(250, 246, 238, 0.95)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+            }}
+          >
+            {/* Left Specs & Fast Links */}
+            <div className="lg:col-span-7 space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  Beginner Friendly
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                  Project Based
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                  AI Mentor
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-300">
+                  Pyodide Sandbox
+                </span>
+              </div>
+
+              <p className="text-xs sm:text-sm font-bold text-[#4A4A58] leading-relaxed">
+                From the basics to real-world projects: learn Python by solving missions,
+                writing code and building useful programs. Control autonomous rovers,
+                craft calculations, and defeat dungeon bugs in real in-browser execution.
+              </p>
+
+              <div className="flex items-center gap-3 pt-1">
                 <button
                   type="button"
                   onClick={() => setIsSyllabusModalOpen(true)}
-                  className="btn-arcade btn-arcade-white px-4 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[3px_3px_0px_#1E1E24]"
+                  className="btn-arcade btn-arcade-white px-4 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-[#306998]" />
                   <span>Curriculum Syllabus</span>
                 </button>
+                <Link
+                  href="/paths"
+                  className="btn-arcade btn-arcade-white px-4 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#1E1E24]"
+                >
+                  <Compass className="w-3.5 h-3.5 text-[#6C5CE7]" />
+                  <span>Interactive World Map</span>
+                </Link>
               </div>
             </div>
 
-            {/* Right Column: Course Progress Panel (Relocated into Hero, Python version removed) */}
+            {/* Right Column: Course Progress Panel */}
             <div className="lg:col-span-5 flex flex-col items-center justify-center w-full">
               <div
-                className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4 w-full"
-                style={{
-                  backgroundColor: 'rgba(250, 246, 238, 0.88)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                }}
+                className="p-5 sm:p-6 rounded-3xl border-3 border-[#1E1E24] shadow-[6px_6px_0px_#1E1E24] space-y-4 w-full bg-white/90"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between pb-3 border-b-2 border-[#1E1E24]/10">
@@ -351,7 +363,7 @@ function PythonDashboardContent() {
                         cx="50"
                         cy="50"
                         r={ringRadius}
-                        className="text-[#6C5CE7] transition-all duration-700 ease-out"
+                        className="text-[#10B981] transition-all duration-700 ease-out"
                         strokeWidth="9"
                         strokeDasharray={ringCircumference}
                         strokeDashoffset={ringStrokeOffset}
@@ -370,19 +382,19 @@ function PythonDashboardContent() {
                     </div>
                   </div>
 
-                  {/* Encouraging message / Streak message */}
+                  {/* Encouraging message */}
                   <div className="space-y-1 min-w-0 flex-1">
                     {calculatedPercent === 0 ? (
                       <p className="text-[11px] font-bold text-gray-600 leading-snug">
-                        🚀 Complete your first quest to earn XP and fill your mastery ring!
+                        Complete your first quest to earn XP and fill your mastery ring!
                       </p>
                     ) : calculatedPercent >= 100 ? (
                       <p className="text-[11px] font-bold text-emerald-700 leading-snug">
-                        🏆 Outstanding! You have mastered all active Python quests.
+                        Outstanding! You have mastered all active Python quests.
                       </p>
                     ) : (
-                      <p className="text-[11px] font-bold text-[#6C5CE7] leading-snug">
-                        🔥 Great momentum! Keep solving missions to unlock new ranks.
+                      <p className="text-[11px] font-bold text-[#059669] leading-snug">
+                        Great momentum! Keep solving missions to unlock new ranks.
                       </p>
                     )}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-gray-500 font-bold">
@@ -398,7 +410,7 @@ function PythonDashboardContent() {
                 <div className="space-y-1">
                   <div className="w-full h-2.5 rounded-full bg-white border-2 border-[#1E1E24] overflow-hidden p-0.5">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#6C5CE7] via-[#A29BFE] to-[#FFD214] transition-all duration-500"
+                      className="h-full rounded-full bg-gradient-to-r from-[#10B981] via-[#34D399] to-[#FFD214] transition-all duration-500"
                       style={{ width: `${Math.max(4, calculatedPercent)}%` }}
                     />
                   </div>
@@ -898,7 +910,7 @@ function PythonDashboardContent() {
             </div>
 
             <div className="pt-2 text-center text-xs font-bold text-gray-500">
-              💡 Completed projects are automatically linked to your public Gurukul player folio.
+              Completed projects are automatically linked to your public Gurukul player folio.
             </div>
           </div>
         </div>
@@ -999,7 +1011,7 @@ function PythonDashboardContent() {
                 onClick={() => setIsSyllabusModalOpen(false)}
                 className="text-xs font-black text-[#6C5CE7] hover:underline flex items-center gap-1"
               >
-                <span>🗺️ Open Interactive Python World Map</span>
+                <span>Open Interactive Python World Map</span>
                 <ArrowRight className="w-3 h-3" />
               </Link>
               <Link

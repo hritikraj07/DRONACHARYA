@@ -100,7 +100,7 @@ export async function askMentorAI(payload: AskMentorPayload): Promise<AskMentorR
           reply: '',
           error:
             data?.error ||
-            'GEMINI_API_KEY is missing. Please set GEMINI_API_KEY=your_key in your `.env.local` file, or enter your key in the AI Settings dialog (⚙️) in the top-right of the mentor drawer.',
+            'GEMINI_API_KEY is missing. Please set GEMINI_API_KEY=your_key in your `.env.local` file, or enter your key in the AI Settings dialog () in the top-right of the mentor drawer.',
           isConfigError: true,
         };
       }

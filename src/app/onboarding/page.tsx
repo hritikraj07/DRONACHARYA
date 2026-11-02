@@ -312,23 +312,23 @@ export default function OnboardingPage() {
               <div className="grid grid-cols-3 gap-2 aspect-square max-w-[200px] mx-auto">
                 {/* 3x3 Grid Tiles */}
                 <div className="relative rounded-xl bg-[#2D2D38] border-2 border-white/10 flex items-center justify-center aspect-square">
-                  {previewStep === 0 && <span className="text-xl animate-bounce">🤖</span>}
+                  {previewStep === 0 && <span className="text-xl animate-bounce"></span>}
                   <span className="absolute top-0.5 left-1 text-[8px] text-[#A0A0B0] font-mono">0,0</span>
                 </div>
                 <div className="relative rounded-xl bg-[#2D2D38] border-2 border-white/10 flex items-center justify-center aspect-square">
-                  {previewStep === 1 && <span className="text-xl animate-bounce">🤖</span>}
-                  {previewStep < 1 && <span className="text-lg animate-pulse">⚡</span>}
+                  {previewStep === 1 && <span className="text-xl animate-bounce"></span>}
+                  {previewStep < 1 && <span className="text-lg animate-pulse"></span>}
                   <span className="absolute top-0.5 left-1 text-[8px] text-[#A0A0B0] font-mono">1,0</span>
                 </div>
                 <div className="relative rounded-xl bg-[#6C5CE7]/30 border-2 border-dashed border-[#FBBF24] flex items-center justify-center aspect-square">
-                  {previewStep === 2 ? <span className="text-xl animate-bounce">🤖</span> : <span className="text-lg">🏁</span>}
+                  {previewStep === 2 ? <span className="text-xl animate-bounce"></span> : <span className="text-lg"></span>}
                   <span className="absolute top-0.5 left-1 text-[8px] text-[#FBBF24] font-mono">2,0</span>
                 </div>
               </div>
               <div className="text-center text-[10px] text-[#A0A0B0] font-bold mt-2">
                 {previewStep === 0 && 'Rover is waiting at (0,0). Write code to move and collect energy!'}
-                {previewStep === 1 && '⚡ Loop step 1 executed! Rover collected energy cell (+35%)!'}
-                {previewStep === 2 && '🏁 Loop step 2 completed! Rover reached the Beacon safely!'}
+                {previewStep === 1 && ' Loop step 1 executed! Rover collected energy cell (+35%)!'}
+                {previewStep === 2 && ' Loop step 2 completed! Rover reached the Beacon safely!'}
               </div>
             </div>
 

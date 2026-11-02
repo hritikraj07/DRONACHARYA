@@ -183,7 +183,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
               <div className="flex flex-col justify-center shrink-0">
                 <span className="font-serif font-black text-sm sm:text-base tracking-tight leading-none text-[#1E1E24] group-hover:text-[#6C5CE7] transition-colors flex items-center gap-1 select-none">
                   DRONACHARYA
-                  <span className="text-amber-500 font-bold text-xs sm:text-sm">⋆˙⟡</span>
+
                 </span>
                 <span className="text-[9px] font-black tracking-[0.22em] uppercase text-[#D97706] leading-none mt-1 select-none">
                   Coding Adventure
@@ -405,8 +405,8 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
             ) : (
               <div className="p-3.5 rounded-2xl bg-[#FEF9C3] border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24] space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-bold text-[#1E1E24]">
-                  <span>🕹️ Playing as Guest Explorer</span>
-                  <span className="text-[#854D0E] font-mono font-black">{guestUser?.totalXp || 0} XP Stashed</span>
+                  <span>Welcome to Dronacharya</span>
+
                 </div>
                 <div className="flex gap-2">
                   <Link
@@ -421,7 +421,7 @@ export function TopNav({ onOpenMentor }: TopNavProps) {
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex-1 btn-arcade btn-arcade-gold py-2 text-center text-xs"
                   >
-                    Sign Up to Save
+                    Sign Up
                   </Link>
                 </div>
               </div>

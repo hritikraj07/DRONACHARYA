@@ -568,7 +568,7 @@ function Stage1AdventureContent() {
                 </span>
                 <h1 className="font-serif font-black text-sm sm:text-base text-[#1E1E24] tracking-wide flex items-center gap-1.5">
                   <span>Code Quest: The First Command</span>
-                  <span className="text-[#6C5CE7]">⋆˙⟡</span>
+                  <span className="text-[#6C5CE7]"></span>
                 </h1>
               </div>
               <p className="text-[11px] font-bold text-gray-600 hidden sm:block">
@@ -697,7 +697,7 @@ function Stage1AdventureContent() {
                     : 'bg-amber-100 text-amber-800 border-amber-500'
                 }`}
               >
-                {gateOpen ? 'GATE UNLOCKED 🔓' : 'GATE SEALED 🔒'}
+                {gateOpen ? 'GATE UNLOCKED ' : 'GATE SEALED '}
               </span>
             </div>
 
@@ -858,7 +858,7 @@ function Stage1AdventureContent() {
 
                 {/* Pixel Avatar Representation */}
                 <div className="text-3xl sm:text-4xl filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">
-                  🧙‍♂️
+                  
                 </div>
                 <span className="text-[9px] font-pixel px-1.5 py-0.2 rounded bg-black/80 text-[#FFD214] border border-[#3A3A48] mt-0.5">
                   Arya (Coder)
@@ -919,7 +919,7 @@ function Stage1AdventureContent() {
               <div className="p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 space-y-1 shadow-[2px_2px_0px_#1E1E24] animate-in fade-in duration-150">
                 <div className="flex items-center justify-between text-[11px] font-bold text-amber-800 font-mono">
                   <span>
-                    💡 HINT {hintLevel + 1} OF {activeMission.hints.length}:
+                     HINT {hintLevel + 1} OF {activeMission.hints.length}:
                   </span>
                   {hintLevel < activeMission.hints.length - 1 && (
                     <button
@@ -1045,7 +1045,7 @@ function Stage1AdventureContent() {
                   }`}
                 >
                   <div className="font-bold font-mono text-xs mb-1">
-                    {predictionCorrect ? '✅ PREDICTION ACCURATE!' : '❌ INCORRECT PREDICTION'}
+                    {predictionCorrect ? ' PREDICTION ACCURATE!' : ' INCORRECT PREDICTION'}
                   </div>
                   {activeMission.predictionExplanation}
                 </div>
@@ -1150,7 +1150,7 @@ function Stage1AdventureContent() {
                       : 'bg-rose-100 text-rose-900'
                   }`}
                 >
-                  {lastRunPassed ? 'PASSED ✅' : 'FAILED ❌'}
+                  {lastRunPassed ? 'PASSED ' : 'FAILED '}
                 </span>
               )}
             </div>

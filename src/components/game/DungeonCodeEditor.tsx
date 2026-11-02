@@ -150,7 +150,7 @@ export function DungeonCodeEditor({
       <div className="flex items-center justify-between bg-white p-3 rounded-xl border-2 border-[#1E1E24] shadow-[3px_3px_0px_#1E1E24]">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[#6C5CE7] text-[#FFD214] border border-[#1E1E24] flex items-center justify-center font-bold text-xs shadow-xs">
-            🐍
+            
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -177,7 +177,7 @@ export function DungeonCodeEditor({
             }`}
           >
             <span>Lines: {effectiveLines}/{parLines}</span>
-            <span>{effectiveLines <= parLines ? '⭐⭐⭐' : '⭐⭐'}</span>
+            <span>{effectiveLines <= parLines ? '' : ''}</span>
           </div>
 
           <button
@@ -347,11 +347,11 @@ export function DungeonCodeEditor({
               <div
                 key={`log-${idx}`}
                 className={`${
-                  log.includes('💥') || log.includes('💀') || log.includes('🩸')
+                  log.includes('') || log.includes('') || log.includes('')
                     ? 'text-[#F87171] font-bold'
-                    : log.includes('🏆') || log.includes('💎') || log.includes('💚')
+                    : log.includes('') || log.includes('') || log.includes('')
                     ? 'text-[#34D399] font-bold'
-                    : log.includes('🖨️')
+                    : log.includes('')
                     ? 'text-[#38BDF8]'
                     : 'text-[#E2E8F0]'
                 }`}
@@ -380,7 +380,7 @@ export function DungeonCodeEditor({
                   </h4>
                   <p className="text-xs font-mono mt-0.5">{diagnostic.summary}</p>
                   <p className="text-[11px] text-[#4A4A58] mt-1 font-sans">
-                    💡 <strong>Acharya Guild Hint:</strong> {diagnostic.socraticHint}
+                     <strong>Acharya Guild Hint:</strong> {diagnostic.socraticHint}
                   </p>
                 </div>
               </div>

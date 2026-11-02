@@ -45,22 +45,22 @@ export default function AboutPage() {
           </h1>
 
           <p className="max-w-3xl mx-auto text-sm sm:text-base font-bold text-[#4A4A58] leading-relaxed">
-            Welcome to <strong className="text-[#1E1E24]">DRONACHARYA ⋆˙⟡</strong>. We are reinventing computer science education by combining ancient Gurukul mentorship philosophy with game simulations, zero-setup browser laboratories, and Socratic artificial intelligence.
+            Welcome to <strong className="text-[#1E1E24]">DRONACHARYA</strong>. We are reinventing computer science education by combining ancient Gurukul mentorship philosophy with game simulations, zero-setup browser laboratories, and Socratic artificial intelligence.
           </p>
 
           {/* Quick Stats Pill Row */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <span className="px-3 py-1 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-mono font-bold text-emerald-800">
-              ⚡ 4 Active Tracks (HTML, CSS, JS, Python)
+              4 Active Tracks (HTML, CSS, JS, Python)
             </span>
             <span className="px-3 py-1 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-mono font-bold text-purple-800">
-              🤖 Socratic Acharya AI Mentor
+              Socratic Acharya AI Mentor
             </span>
             <span className="px-3 py-1 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-mono font-bold text-amber-800">
-              🏰 Code Dungeon &amp; Craft Realm
+              Code Dungeon &amp; Craft Realm
             </span>
             <span className="px-3 py-1 rounded-xl bg-white border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] text-xs font-mono font-bold text-blue-800">
-              🌐 Dual Dialect (English + Hinglish)
+              Dual Dialect (English + Hinglish)
             </span>
           </div>
         </div>

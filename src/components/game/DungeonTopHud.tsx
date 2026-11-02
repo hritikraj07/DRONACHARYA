@@ -61,7 +61,7 @@ export function DungeonTopHud({
         {/* Left: Player Badge & Level */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-[#FEF3C7] border-2 border-[#1E1E24] px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_#1E1E24]">
-            <span className="text-lg">🧙‍♂️</span>
+            <span className="text-lg"></span>
             <div>
               <span className="text-[9px] font-black uppercase text-[#D97706] block leading-none">
                 Python Guild
@@ -122,7 +122,7 @@ export function DungeonTopHud({
             >
               {Object.values(DUNGEON_CAMPAIGN_LEVELS).map((lvl) => {
                 const stars = levelStars[lvl.levelNumber] || 0;
-                const starStr = stars > 0 ? ` (${'★'.repeat(stars)})` : '';
+                const starStr = stars > 0 ? ` (${''.repeat(stars)})` : '';
                 return (
                   <option key={`lvl-${lvl.levelNumber}`} value={lvl.levelNumber}>
                     Level {lvl.levelNumber}: {lvl.title} {starStr}
@@ -138,7 +138,7 @@ export function DungeonTopHud({
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Gems counter */}
           <div className="flex items-center gap-1.5 bg-[#E0F2FE] border-2 border-[#1E1E24] px-2.5 py-1.5 rounded-xl shadow-[2px_2px_0px_#1E1E24]">
-            <span className="text-sm">💎</span>
+            <span className="text-sm"></span>
             <span className="font-mono font-black text-xs text-[#0284C7]">
               {gemsCount}
             </span>

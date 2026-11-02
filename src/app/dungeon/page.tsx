@@ -78,9 +78,9 @@ export default function DungeonPage() {
   const [activeFrame, setActiveFrame] = useState<GameFrame | null>(null);
   const [pathTrail, setPathTrail] = useState<{ x: number; y: number }[]>([]);
   const [logs, setConsoleLogs] = useState<string[]>([
-    `⚔️ Welcome to Level ${currentLevel.levelNumber}: ${currentLevel.title}`,
-    `💡 ${currentLevel.concept}`,
-    '🐍 Python 3 Spellbook initialized. Write code and press "Run Code ▶".',
+    ` Welcome to Level ${currentLevel.levelNumber}: ${currentLevel.title}`,
+    ` ${currentLevel.concept}`,
+    ' Python 3 Spellbook initialized. Write code and press "Run Code ▶".',
   ]);
   const [diagnostic, setDiagnostic] = useState<any>(undefined);
   const [isPyodideActive, setIsPyodideActive] = useState<boolean>(false);
@@ -158,9 +158,9 @@ export default function DungeonPage() {
     setActiveFrame(null);
     setPathTrail([{ x: spec.startX, y: spec.startY }]);
     setConsoleLogs([
-      `⚔️ Level ${spec.levelNumber}: ${spec.title} loaded.`,
-      `💡 Concept: ${spec.concept}`,
-      `🎯 3-Star Goal: Complete in under ${spec.parLines} lines of Python code!`,
+      ` Level ${spec.levelNumber}: ${spec.title} loaded.`,
+      ` Concept: ${spec.concept}`,
+      ` 3-Star Goal: Complete in under ${spec.parLines} lines of Python code!`,
     ]);
     setDiagnostic(undefined);
     setVictoryModalOpen(false);

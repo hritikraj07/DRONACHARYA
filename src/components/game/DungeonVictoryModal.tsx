@@ -59,7 +59,7 @@ export function DungeonVictoryModal({
       <div className="relative w-full max-w-lg bg-[#FAF6EE] border-4 border-[#1E1E24] rounded-2xl shadow-[8px_8px_0px_#1E1E24] p-6 text-center animate-in fade-in zoom-in-95 duration-200">
         {/* Trophy Header Icon */}
         <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-[#FEF3C7] border-3 border-[#1E1E24] shadow-[4px_4px_0px_#1E1E24] flex items-center justify-center text-3xl animate-bounce">
-          🏆
+          
         </div>
 
         <span className="text-xs font-black uppercase text-[#D97706] tracking-wider bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#D97706]/40 inline-block mb-2">
@@ -92,10 +92,10 @@ export function DungeonVictoryModal({
           <div className="flex items-center gap-3 text-xs font-mono font-bold mt-1">
             <span className="text-[#059669]">
               {starsEarned === 3
-                ? '⭐⭐⭐ Perfect 3-Star Master!'
+                ? ' Perfect 3-Star Master!'
                 : starsEarned === 2
-                ? '⭐⭐ 2-Star Code Adept!'
-                : '⭐ 1-Star Cleared!'}
+                ? ' 2-Star Code Adept!'
+                : ' 1-Star Cleared!'}
             </span>
             <span className="text-[#64748B]">|</span>
             <span

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sign In ⋆˙⟡ Dronacharya',
+  title: 'Sign In - Dronacharya',
   description: 'Sign in to Dronacharya to access your coding quests, stats, and courses.',
 };
 

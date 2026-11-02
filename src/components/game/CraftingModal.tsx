@@ -47,7 +47,7 @@ export function CraftingModal({
         <div className="p-4 sm:p-5 bg-[#EDE9FE] border-b-2 border-[#1E1E24] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-[#6C5CE7] border-2 border-[#1E1E24] shadow-[2px_2px_0px_#1E1E24] flex items-center justify-center text-xl text-white">
-              ⚒️
+              
             </div>
             <div>
               <h2 className="font-serif font-black text-lg sm:text-xl text-[#1E1E24]">
@@ -70,19 +70,19 @@ export function CraftingModal({
         {/* Current Resources Hotbar Strip */}
         <div className="p-3 bg-white border-b-2 border-[#1E1E24] flex items-center justify-around text-xs font-bold">
           <span className="flex items-center gap-1.5">
-            <span>🪵 Wood:</span>
+            <span> Wood:</span>
             <strong className="text-[#D97706] font-mono text-sm">{inventory.wood}</strong>
           </span>
           <span className="flex items-center gap-1.5">
-            <span>🪨 Stone:</span>
+            <span> Stone:</span>
             <strong className="text-slate-600 font-mono text-sm">{inventory.stone}</strong>
           </span>
           <span className="flex items-center gap-1.5">
-            <span>⛏️ Iron:</span>
+            <span> Iron:</span>
             <strong className="text-[#EA580C] font-mono text-sm">{inventory.iron}</strong>
           </span>
           <span className="flex items-center gap-1.5">
-            <span>💎 Crystal:</span>
+            <span> Crystal:</span>
             <strong className="text-[#0284C7] font-mono text-sm">{inventory.crystal}</strong>
           </span>
         </div>
@@ -133,12 +133,12 @@ export function CraftingModal({
                           >
                             <span>
                               {mat === 'wood'
-                                ? '🪵 Wood'
+                                ? ' Wood'
                                 : mat === 'stone'
-                                ? '🪨 Stone'
+                                ? ' Stone'
                                 : mat === 'iron'
-                                ? '⛏️ Iron'
-                                : '💎 Crystal'}
+                                ? ' Iron'
+                                : ' Crystal'}
                               :
                             </span>
                             <strong>
@@ -187,7 +187,7 @@ export function CraftingModal({
 
         {/* Footer info note */}
         <div className="p-3 bg-[#FAF6EE] border-t-2 border-[#1E1E24] text-center text-xs text-[#7E7E8F] font-medium">
-          💡 You can craft manually here or automate it in your code using <code className="bg-white px-1.5 py-0.5 rounded border border-[#1E1E24]/20 font-bold text-[#6C5CE7]">hero.craft(&quot;bridge&quot;)</code>.
+           You can craft manually here or automate it in your code using <code className="bg-white px-1.5 py-0.5 rounded border border-[#1E1E24]/20 font-bold text-[#6C5CE7]">hero.craft(&quot;bridge&quot;)</code>.
         </div>
       </div>
     </div>

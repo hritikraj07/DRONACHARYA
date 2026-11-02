@@ -248,7 +248,7 @@ export function CustomCursor() {
       isMouseDownRef.current = false;
       const target = e.target as HTMLElement | null;
       const isInteractive = target?.closest(
-        'a, button, [role="button"], .cursor-pointer, .card-game-interactive, .btn-arcade, .btn-game-yellow, .btn-game-purple, .btn-game-mint, select, summary'
+        'a, button, [role="button"], .cursor-pointer, .card-game-interactive, .btn-arcade, .btn-game-yellow, .btn-game-purple, .btn-game-mint, .btn-game-white, .btn-game-coral, .btn-primary, .btn-secondary, select, summary, input[type="submit"], input[type="button"]'
       );
       const nextType = isInteractive ? 'pointer' : 'default';
       cursorTypeRef.current = nextType;
